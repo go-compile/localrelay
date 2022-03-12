@@ -2,6 +2,7 @@ package localrelay
 
 import (
 	"io"
+	"net"
 
 	"github.com/pkg/errors"
 	"golang.org/x/net/proxy"
@@ -81,6 +82,20 @@ func (r *Relay) ListenServe() error {
 
 		r.close = l
 
+		return relayTCP(r, l)
+	default:
+		return ErrUnknownProxyType
+	}
+}
+
+// Serve lets you set your own listener and then serve on it
+func (r *Relay) Serve(l net.Listener) error {
+	defer r.logger.Info.Printf("STOPPING: %q on %q\n", r.Name, r.Host)
+
+	r.logger.Info.Printf("STARTING: %q on %q\n", r.Name, r.Host)
+
+	switch r.ProxyType {
+	case ProxyTCP:
 		return relayTCP(r, l)
 	default:
 		return ErrUnknownProxyType
