@@ -1,23 +1,32 @@
 package localrelay
 
 import (
+	"errors"
 	"io"
 	"net"
 )
 
-func relayTCP(r *Relay) error {
+func listenerTCP(r *Relay) (net.Listener, error) {
+	l, err := net.Listen("tcp", r.Host)
+	if err != nil {
+		return nil, err
+	}
+
+	return l, nil
+}
+
+func relayTCP(r *Relay, l net.Listener) error {
 
 	r.logger.Info.Println("STARTING TCP RELAY")
 
-	l, err := net.Listen("tcp", r.Host)
-	if err != nil {
-		return err
-	}
-
-	// TODO: add way to shutdown listener
 	for {
 		conn, err := l.Accept()
 		if err != nil {
+			if errors.Is(err, net.ErrClosed) {
+				r.logger.Warning.Println("LISTENER CLOSED")
+				return nil
+			}
+
 			r.logger.Warning.Println("ACCEPT FAILED: ", err)
 			continue
 		}

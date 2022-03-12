@@ -28,6 +28,7 @@ type Relay struct {
 	proxy *proxy.Dialer
 
 	logger *Logger
+	close  io.Closer
 }
 
 const (
@@ -59,6 +60,11 @@ func (r *Relay) SetProxy(dialer proxy.Dialer) {
 	r.proxy = &dialer
 }
 
+// Close will close the relay's listener
+func (r *Relay) Close() error {
+	return r.close.Close()
+}
+
 // ListenServe will start a listener and handle the incoming requests
 func (r *Relay) ListenServe() error {
 
@@ -68,7 +74,14 @@ func (r *Relay) ListenServe() error {
 
 	switch r.ProxyType {
 	case ProxyTCP:
-		return relayTCP(r)
+		l, err := listenerTCP(r)
+		if err != nil {
+			return err
+		}
+
+		r.close = l
+
+		return relayTCP(r, l)
 	default:
 		return ErrUnknownProxyType
 	}
