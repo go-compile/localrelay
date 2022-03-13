@@ -41,6 +41,10 @@ type Relay struct {
 	// http relay section
 	server     http.Server
 	httpClient *http.Client
+
+	// TLS settings
+	certificateFile string
+	keyFile         string
 }
 
 const (
@@ -49,6 +53,8 @@ const (
 	// ProxyHTTP creates a HTTP server and forwards the traffic to
 	// either a HTTP or HTTPs server
 	ProxyHTTP
+	// ProxyHTTPS is the same as HTTP but listens on TLS
+	ProxyHTTPS
 )
 
 var (
@@ -101,6 +107,15 @@ func (r *Relay) SetClient(client *http.Client) {
 	r.httpClient = client
 }
 
+// SetTLS sets the TLS certificates for use in the ProxyHTTPS relay.
+// This function will upgrade this relay to a HTTPS relay
+func (r *Relay) SetTLS(certificateFile, keyFile string) {
+	r.certificateFile = certificateFile
+	r.keyFile = keyFile
+
+	r.ProxyType = ProxyHTTPS
+}
+
 // SetProxy sets the proxy dialer to be used
 // proxy.SOCKS5() can be used to setup a socks5 proxy
 func (r *Relay) SetProxy(dialer proxy.Dialer) {
@@ -119,26 +134,27 @@ func (r *Relay) ListenServe() error {
 
 	r.logger.Info.Printf("STARTING: %q on %q\n", r.Name, r.Host)
 
+	l, err := listener(r)
+	if err != nil {
+		return err
+	}
+
 	switch r.ProxyType {
 	case ProxyTCP:
-		l, err := listener(r)
-		if err != nil {
-			return err
-		}
-
 		r.close = l
 
 		return relayTCP(r, l)
 	case ProxyHTTP:
-		l, err := listener(r)
-		if err != nil {
-			return err
-		}
-
 		r.close = l
 
 		return relayHTTP(r, l)
+	case ProxyHTTPS:
+		r.close = l
+
+		return relayHTTPS(r, l)
 	default:
+		l.Close()
+
 		return ErrUnknownProxyType
 	}
 }
@@ -155,6 +171,8 @@ func (r *Relay) Serve(l net.Listener) error {
 		return relayTCP(r, l)
 	case ProxyHTTP:
 		return relayHTTP(r, l)
+	case ProxyHTTPS:
+		return relayHTTPS(r, l)
 	default:
 		return ErrUnknownProxyType
 	}
