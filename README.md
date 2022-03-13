@@ -36,3 +36,11 @@ For examples of API usage visit [examples/](https://github.com/go-compile/localr
   - Concurrent safe
   - Dialler 10 point average response time
     - When using Tor this is the circuit build time
+
+# Privacy Proxies
+
+Proxy your services whilst stripping personal information such as User-Agent, accept language or even cookies. Route the traffic through Tor to access the service anywhere in the word even behind a firewall.
+
+![Relay spoofing useragent & using Tor](/examples/http-privacy/access-tor.png)
+
+![Relay spoofing useragent & accept language](/examples/http-privacy/ifconfig.me.png)
