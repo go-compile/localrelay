@@ -52,6 +52,7 @@ func handleTCP(r *Relay, conn net.Conn) {
 			return
 		}
 
+		r.logger.Info.Printf("CONNECTED TO %s\n", r.ForwardAddr)
 		streamConns(conn, c)
 
 		return
@@ -66,6 +67,7 @@ func handleTCP(r *Relay, conn net.Conn) {
 		return
 	}
 
+	r.logger.Info.Printf("CONNECTED TO %s\n", r.ForwardAddr)
 	streamConns(conn, c)
 }
 
