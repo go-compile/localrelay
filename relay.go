@@ -29,7 +29,9 @@ type Relay struct {
 	proxy *proxy.Dialer
 
 	logger *Logger
-	close  io.Closer
+
+	// close is linked to the listener
+	close io.Closer
 }
 
 const (
@@ -93,6 +95,7 @@ func (r *Relay) Serve(l net.Listener) error {
 	defer r.logger.Info.Printf("STOPPING: %q on %q\n", r.Name, r.Host)
 
 	r.logger.Info.Printf("STARTING: %q on %q\n", r.Name, r.Host)
+	r.close = l
 
 	switch r.ProxyType {
 	case ProxyTCP:
