@@ -52,7 +52,7 @@ func handleTCP(r *Relay, conn net.Conn) {
 		}
 
 		r.logger.Info.Printf("CONNECTED TO %s\n", r.ForwardAddr)
-		streamConns(conn, c)
+		streamConns(conn, c, r.Metrics)
 
 		r.logger.Info.Printf("CONNECTION CLOSED %q ON %q\n", conn.RemoteAddr(), conn.LocalAddr())
 		return
@@ -68,22 +68,52 @@ func handleTCP(r *Relay, conn net.Conn) {
 	}
 
 	r.logger.Info.Printf("CONNECTED TO %s\n", r.ForwardAddr)
-	streamConns(conn, c)
+	streamConns(conn, c, r.Metrics)
 
 	r.logger.Info.Printf("CONNECTION CLOSED %q ON %q\n", conn.RemoteAddr(), conn.LocalAddr())
 }
 
-func streamConns(client net.Conn, remote net.Conn) {
-	go copier(client, remote, 128)
-	copier(remote, client, 128)
+func streamConns(client net.Conn, remote net.Conn, m *Metrics) {
+	go copierIn(client, remote, 128, m)
+	copierOut(remote, client, 128, m)
 }
 
-func copier(src net.Conn, dst net.Conn, buffer int) error {
+func copierIn(src net.Conn, dst net.Conn, buffer int, m *Metrics) error {
 
 	buf := make([]byte, buffer)
 	for {
 
 		n, err := src.Read(buf)
+		m.bandwidth(n, 0)
+		if err != nil {
+
+			// if we read some data, flush it then return a error
+			if n > 0 {
+				dst.Write(buf[:n])
+			}
+
+			src.Close()
+			dst.Close()
+
+			return err
+		}
+
+		if n2, err := dst.Write(buf[:n]); err != nil || n2 != n {
+			src.Close()
+			dst.Close()
+
+			return err
+		}
+	}
+}
+
+func copierOut(src net.Conn, dst net.Conn, buffer int, m *Metrics) error {
+
+	buf := make([]byte, buffer)
+	for {
+
+		n, err := src.Read(buf)
+		m.bandwidth(0, n)
 		if err != nil {
 
 			// if we read some data, flush it then return a error

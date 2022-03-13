@@ -32,6 +32,10 @@ type Relay struct {
 
 	// close is linked to the listener
 	close io.Closer
+
+	// Metrics is used to store information such as upload/download
+	// and other statistics
+	*Metrics
 }
 
 const (
@@ -52,6 +56,8 @@ func New(name, host, destination string, logger io.Writer) *Relay {
 		Host:        host,
 		ForwardAddr: destination,
 		ProxyType:   ProxyTCP,
+
+		Metrics: &Metrics{},
 
 		logger: NewLogger(logger, name),
 	}
