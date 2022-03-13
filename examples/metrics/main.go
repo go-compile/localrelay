@@ -37,7 +37,7 @@ func main() {
 			time.Sleep(time.Second * 5)
 
 			active, total := r.Metrics.Connections()
-			fmt.Printf("[In/Out: %d/%d] [Active: %d] [Total: %d]\n", r.Metrics.Download(), r.Metrics.Upload(), active, total)
+			fmt.Printf("[In/Out: %d/%d] [Active: %d] [Total: %d] [Dialer Avg: %dms]\n", r.Metrics.Download(), r.Metrics.Upload(), active, total, r.Metrics.DialerAvg())
 		}
 	}()
 

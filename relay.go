@@ -57,7 +57,10 @@ func New(name, host, destination string, logger io.Writer) *Relay {
 		ForwardAddr: destination,
 		ProxyType:   ProxyTCP,
 
-		Metrics: &Metrics{},
+		Metrics: &Metrics{
+			// Preallocate array with capacity of 10
+			dialTimes: make([]int64, 0, 10),
+		},
 
 		logger: NewLogger(logger, name),
 	}

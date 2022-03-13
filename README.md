@@ -28,3 +28,5 @@ For examples of API usage visit [examples/](https://github.com/go-compile/localr
   - Active connections
   - Dialler: successes/failures
   - Concurrent safe
+  - Dialler 10 point average response time
+    - When using Tor this is the circuit build time

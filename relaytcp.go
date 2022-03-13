@@ -3,6 +3,7 @@ package localrelay
 import (
 	"errors"
 	"net"
+	"time"
 )
 
 func listenerTCP(r *Relay) (net.Listener, error) {
@@ -44,6 +45,8 @@ func handleTCP(r *Relay, conn net.Conn) {
 
 	r.logger.Info.Printf("NEW CONNECTION %q ON %q\n", conn.RemoteAddr(), conn.LocalAddr())
 
+	start := time.Now()
+
 	// If using a proxy dial with proxy
 	if r.proxy != nil {
 		r.logger.Info.Println("CREATING PROXY DIALER")
@@ -52,13 +55,13 @@ func handleTCP(r *Relay, conn net.Conn) {
 		r.logger.Info.Println("DIALLING FORWARD ADDRESS THROUGH PROXY")
 		c, err := dialer.Dial("tcp", r.ForwardAddr)
 		if err != nil {
-			r.Metrics.dial(0, 1)
+			r.Metrics.dial(0, 1, start)
 
 			r.logger.Error.Printf("DIAL FORWARD ADDR: %s\n", err)
 			return
 		}
 
-		r.Metrics.dial(1, 0)
+		r.Metrics.dial(1, 0, start)
 
 		r.logger.Info.Printf("CONNECTED TO %s\n", r.ForwardAddr)
 		streamConns(conn, c, r.Metrics)
@@ -72,13 +75,13 @@ func handleTCP(r *Relay, conn net.Conn) {
 	r.logger.Info.Println("DIALLING FORWARD ADDRESS")
 	c, err := net.Dial("tcp", r.ForwardAddr)
 	if err != nil {
-		r.Metrics.dial(0, 1)
+		r.Metrics.dial(0, 1, start)
 
 		r.logger.Error.Printf("DIAL FORWARD ADDR: %s\n", err)
 		return
 	}
 
-	r.Metrics.dial(1, 0)
+	r.Metrics.dial(1, 0, start)
 
 	r.logger.Info.Printf("CONNECTED TO %s\n", r.ForwardAddr)
 	streamConns(conn, c, r.Metrics)
