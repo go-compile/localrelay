@@ -1,4 +1,4 @@
-module localrelay
+module github.com/go-compile/localrelay
 
 go 1.17
 
