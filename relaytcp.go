@@ -48,25 +48,33 @@ func handleTCP(r *Relay, conn net.Conn) {
 	start := time.Now()
 
 	// If using a proxy dial with proxy
-	if r.proxy != nil {
+	if r.proxies != nil {
 		r.logger.Info.Println("CREATING PROXY DIALER")
-		dialer := *r.proxy
 
-		r.logger.Info.Println("DIALLING FORWARD ADDRESS THROUGH PROXY")
-		c, err := dialer.Dial("tcp", r.ForwardAddr)
-		if err != nil {
-			r.Metrics.dial(0, 1, start)
+		// Use proxies list as failover list
+		for i := 0; i < len(r.proxies); i++ {
+			dialer := *r.proxies[i]
 
-			r.logger.Error.Printf("DIAL FORWARD ADDR: %s\n", err)
+			r.logger.Info.Printf("DIALLING FORWARD ADDRESS THROUGH PROXY %d\n", i+1)
+
+			c, err := dialer.Dial("tcp", r.ForwardAddr)
+			if err != nil {
+				r.Metrics.dial(0, 1, start)
+
+				r.logger.Error.Printf("DIAL FORWARD ADDR: %s\n", err)
+				continue
+			}
+
+			r.Metrics.dial(1, 0, start)
+
+			r.logger.Info.Printf("CONNECTED TO %s\n", r.ForwardAddr)
+			streamConns(conn, c, r.Metrics)
+
+			r.logger.Info.Printf("CONNECTION CLOSED %q ON %q\n", conn.RemoteAddr(), conn.LocalAddr())
 			return
 		}
 
-		r.Metrics.dial(1, 0, start)
-
-		r.logger.Info.Printf("CONNECTED TO %s\n", r.ForwardAddr)
-		streamConns(conn, c, r.Metrics)
-
-		r.logger.Info.Printf("CONNECTION CLOSED %q ON %q\n", conn.RemoteAddr(), conn.LocalAddr())
+		r.logger.Error.Printf("CONNECTION CLOSED %q ON %q AFTER DIALLING WITH PROXY FAILED\n", conn.RemoteAddr(), conn.LocalAddr())
 		return
 	}
 

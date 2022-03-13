@@ -27,7 +27,7 @@ type Relay struct {
 	// ProxyType is used to forward or manipulate the connection
 	ProxyType ProxyType
 
-	proxy *proxy.Dialer
+	proxies []*proxy.Dialer
 
 	logger *Logger
 
@@ -118,8 +118,9 @@ func (r *Relay) SetTLS(certificateFile, keyFile string) {
 
 // SetProxy sets the proxy dialer to be used
 // proxy.SOCKS5() can be used to setup a socks5 proxy
-func (r *Relay) SetProxy(dialer proxy.Dialer) {
-	r.proxy = &dialer
+// or a list of proxies
+func (r *Relay) SetProxy(dialer ...*proxy.Dialer) {
+	r.proxies = dialer
 }
 
 // Close will close the relay's listener

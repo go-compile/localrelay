@@ -29,7 +29,7 @@ func main() {
 	}
 
 	// SetProxy tells the relay you want to use a proxy
-	r.SetProxy(prox)
+	r.SetProxy(&prox)
 
 	// Prints metrics every 5 seconds
 	go func() {

@@ -27,7 +27,7 @@ func main() {
 	}
 
 	// SetProxy tells the relay you want to use a proxy
-	r.SetProxy(prox)
+	r.SetProxy(&prox)
 
 	// Start the relay server
 	panic(r.ListenServe())
