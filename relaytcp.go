@@ -35,7 +35,12 @@ func relayTCP(r *Relay, l net.Listener) error {
 }
 
 func handleTCP(r *Relay, conn net.Conn) {
-	defer conn.Close()
+	defer func() {
+		conn.Close()
+		r.Metrics.connections(-1)
+	}()
+
+	r.Metrics.connections(1)
 
 	r.logger.Info.Printf("NEW CONNECTION %q ON %q\n", conn.RemoteAddr(), conn.LocalAddr())
 
@@ -47,9 +52,13 @@ func handleTCP(r *Relay, conn net.Conn) {
 		r.logger.Info.Println("DIALLING FORWARD ADDRESS THROUGH PROXY")
 		c, err := dialer.Dial("tcp", r.ForwardAddr)
 		if err != nil {
+			r.Metrics.dial(0, 1)
+
 			r.logger.Error.Printf("DIAL FORWARD ADDR: %s\n", err)
 			return
 		}
+
+		r.Metrics.dial(1, 0)
 
 		r.logger.Info.Printf("CONNECTED TO %s\n", r.ForwardAddr)
 		streamConns(conn, c, r.Metrics)
@@ -63,9 +72,13 @@ func handleTCP(r *Relay, conn net.Conn) {
 	r.logger.Info.Println("DIALLING FORWARD ADDRESS")
 	c, err := net.Dial("tcp", r.ForwardAddr)
 	if err != nil {
+		r.Metrics.dial(0, 1)
+
 		r.logger.Error.Printf("DIAL FORWARD ADDR: %s\n", err)
 		return
 	}
+
+	r.Metrics.dial(1, 0)
 
 	r.logger.Info.Printf("CONNECTED TO %s\n", r.ForwardAddr)
 	streamConns(conn, c, r.Metrics)
@@ -78,6 +91,7 @@ func streamConns(client net.Conn, remote net.Conn, m *Metrics) {
 	copierOut(remote, client, 128, m)
 }
 
+// NOTE: statics function for maximum performance
 func copierIn(src net.Conn, dst net.Conn, buffer int, m *Metrics) error {
 
 	buf := make([]byte, buffer)
@@ -107,6 +121,7 @@ func copierIn(src net.Conn, dst net.Conn, buffer int, m *Metrics) error {
 	}
 }
 
+// NOTE: statics function for maximum performance
 func copierOut(src net.Conn, dst net.Conn, buffer int, m *Metrics) error {
 
 	buf := make([]byte, buffer)
