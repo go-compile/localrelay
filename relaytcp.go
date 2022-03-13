@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-func listenerTCP(r *Relay) (net.Listener, error) {
+func listener(r *Relay) (net.Listener, error) {
 	l, err := net.Listen("tcp", r.Host)
 	if err != nil {
 		return nil, err

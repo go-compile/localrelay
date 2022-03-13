@@ -3,6 +3,7 @@ package localrelay
 import (
 	"io"
 	"net"
+	"net/http"
 
 	"github.com/pkg/errors"
 	"golang.org/x/net/proxy"
@@ -36,16 +37,26 @@ type Relay struct {
 	// Metrics is used to store information such as upload/download
 	// and other statistics
 	*Metrics
+
+	// http relay section
+	server     http.Server
+	httpClient *http.Client
 }
 
 const (
 	// ProxyTCP is for raw TCP forwarding
 	ProxyTCP ProxyType = iota
+	// ProxyHTTP creates a HTTP server and forwards the traffic to
+	// either a HTTP or HTTPs server
+	ProxyHTTP
 )
 
 var (
 	// ErrUnknownProxyType is returned when a relay has a proxy type which is invalid
 	ErrUnknownProxyType = errors.New("unknown proxytype used in creation of relay")
+	// ErrAddrNotMatch is returned when a server object has a addr which is not nil
+	// and does not equal the relay's address
+	ErrAddrNotMatch = errors.New("addr does not match the relays host address")
 )
 
 // New creates a new TCP relay
@@ -62,8 +73,32 @@ func New(name, host, destination string, logger io.Writer) *Relay {
 			dialTimes: make([]int64, 0, 10),
 		},
 
+		httpClient: http.DefaultClient,
+
 		logger: NewLogger(logger, name),
 	}
+}
+
+// SetHTTP is used to set the relay as a type HTTP relay
+// addr will auto be set in the server object if left blank
+func (r *Relay) SetHTTP(server http.Server) error {
+	r.ProxyType = ProxyHTTP
+
+	// Auto set addr if left blank
+	if server.Addr == "" {
+		server.Addr = r.Host
+	} else if server.Addr != r.Host {
+		return ErrAddrNotMatch
+	}
+
+	r.server = server
+
+	return nil
+}
+
+// SetClient will set the http client used by the relay
+func (r *Relay) SetClient(client *http.Client) {
+	r.httpClient = client
 }
 
 // SetProxy sets the proxy dialer to be used
@@ -86,7 +121,7 @@ func (r *Relay) ListenServe() error {
 
 	switch r.ProxyType {
 	case ProxyTCP:
-		l, err := listenerTCP(r)
+		l, err := listener(r)
 		if err != nil {
 			return err
 		}
@@ -94,6 +129,15 @@ func (r *Relay) ListenServe() error {
 		r.close = l
 
 		return relayTCP(r, l)
+	case ProxyHTTP:
+		l, err := listener(r)
+		if err != nil {
+			return err
+		}
+
+		r.close = l
+
+		return relayHTTP(r, l)
 	default:
 		return ErrUnknownProxyType
 	}
@@ -109,6 +153,8 @@ func (r *Relay) Serve(l net.Listener) error {
 	switch r.ProxyType {
 	case ProxyTCP:
 		return relayTCP(r, l)
+	case ProxyHTTP:
+		return relayHTTP(r, l)
 	default:
 		return ErrUnknownProxyType
 	}
