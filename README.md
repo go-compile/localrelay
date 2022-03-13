@@ -14,4 +14,4 @@ Many apps such as Nextcloud and Bitwarden do not allow you to specify a proxy wh
 
 This repository contains the library written in Go, for it's cross platform capabilities, and contains the CLI application which can be ran on all major operating systems including [Android via Termux](https://termux.com/).
 
-For examples of API usage visit [examples/](https://github.com/go-compile/examples).
+For examples of API usage visit [examples/](https://github.com/go-compile/localrelay/tree/master/examples).
