@@ -55,6 +55,9 @@ const (
 	ProxyHTTP
 	// ProxyHTTPS is the same as HTTP but listens on TLS
 	ProxyHTTPS
+
+	// VERSION uses semantic versioning
+	VERSION = "v0.1.0"
 )
 
 var (
