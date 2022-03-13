@@ -22,6 +22,12 @@ For examples of API usage visit [examples/](https://github.com/go-compile/localr
 - Proxy remote address through SOCKS5 proxy
 - Close relay concurrently
 - Verbose logging with custom output (io.Writer)
+- HTTP relay
+  - Http to https
+  - Header modification
+  - Useragent spoofing
+  - Accept language spoofing
+  - Proxy using socks5
 - Metrics
   - Upload/Download
   - Total connections
