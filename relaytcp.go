@@ -2,7 +2,6 @@ package localrelay
 
 import (
 	"errors"
-	"io"
 	"net"
 )
 
@@ -55,6 +54,7 @@ func handleTCP(r *Relay, conn net.Conn) {
 		r.logger.Info.Printf("CONNECTED TO %s\n", r.ForwardAddr)
 		streamConns(conn, c)
 
+		r.logger.Info.Printf("CONNECTION CLOSED %q ON %q\n", conn.RemoteAddr(), conn.LocalAddr())
 		return
 	}
 
@@ -69,12 +69,39 @@ func handleTCP(r *Relay, conn net.Conn) {
 
 	r.logger.Info.Printf("CONNECTED TO %s\n", r.ForwardAddr)
 	streamConns(conn, c)
+
+	r.logger.Info.Printf("CONNECTION CLOSED %q ON %q\n", conn.RemoteAddr(), conn.LocalAddr())
 }
 
 func streamConns(client net.Conn, remote net.Conn) {
-	go io.Copy(client, remote)
-	io.Copy(remote, client)
+	go copier(client, remote, 128)
+	copier(remote, client, 128)
+}
 
-	remote.Close()
-	client.Close()
+func copier(src net.Conn, dst net.Conn, buffer int) error {
+
+	buf := make([]byte, buffer)
+	for {
+
+		n, err := src.Read(buf)
+		if err != nil {
+
+			// if we read some data, flush it then return a error
+			if n > 0 {
+				dst.Write(buf[:n])
+			}
+
+			src.Close()
+			dst.Close()
+
+			return err
+		}
+
+		if n2, err := dst.Write(buf[:n]); err != nil || n2 != n {
+			src.Close()
+			dst.Close()
+
+			return err
+		}
+	}
 }
