@@ -4,6 +4,7 @@ import (
 	"io"
 	"net"
 	"net/http"
+	"sync"
 
 	"github.com/pkg/errors"
 	"golang.org/x/net/proxy"
@@ -45,6 +46,9 @@ type Relay struct {
 	// TLS settings
 	certificateFile string
 	keyFile         string
+
+	running bool
+	m       sync.Mutex
 }
 
 const (
@@ -57,7 +61,7 @@ const (
 	ProxyHTTPS
 
 	// VERSION uses semantic versioning
-	VERSION = "v0.1.0"
+	VERSION = "v0.2.0"
 )
 
 var (
@@ -86,6 +90,21 @@ func New(name, host, destination string, logger io.Writer) *Relay {
 
 		logger: NewLogger(logger, name),
 	}
+}
+
+// Running returns true if relay is running
+func (r *Relay) Running() bool {
+	r.m.Lock()
+	defer r.m.Unlock()
+
+	return r.running
+}
+
+func (r *Relay) setRunning(toggle bool) {
+	r.m.Lock()
+	defer r.m.Unlock()
+
+	r.running = toggle
 }
 
 // SetHTTP is used to set the relay as a type HTTP relay
@@ -134,7 +153,12 @@ func (r *Relay) Close() error {
 // ListenServe will start a listener and handle the incoming requests
 func (r *Relay) ListenServe() error {
 
-	defer r.logger.Info.Printf("STOPPING: %q on %q\n", r.Name, r.Host)
+	defer func() {
+		r.logger.Info.Printf("STOPPING: %q on %q\n", r.Name, r.Host)
+		r.setRunning(false)
+	}()
+
+	r.setRunning(true)
 
 	r.logger.Info.Printf("STARTING: %q on %q\n", r.Name, r.Host)
 
@@ -165,7 +189,12 @@ func (r *Relay) ListenServe() error {
 
 // Serve lets you set your own listener and then serve on it
 func (r *Relay) Serve(l net.Listener) error {
-	defer r.logger.Info.Printf("STOPPING: %q on %q\n", r.Name, r.Host)
+	defer func() {
+		r.logger.Info.Printf("STOPPING: %q on %q\n", r.Name, r.Host)
+		r.setRunning(false)
+	}()
+
+	r.setRunning(true)
 
 	r.logger.Info.Printf("STARTING: %q on %q\n", r.Name, r.Host)
 	r.close = l
