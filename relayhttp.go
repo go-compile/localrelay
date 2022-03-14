@@ -25,6 +25,7 @@ func HandleHTTP(relay *Relay) http.HandlerFunc {
 
 func handleHTTP(w http.ResponseWriter, r *http.Request, re *Relay) {
 
+	// BUG: sometimes requests redirect and cause a loop (Loop is auto stopped)
 	req, err := http.NewRequest(r.Method, re.ForwardAddr+r.URL.Path+"?"+r.URL.Query().Encode(), r.Body)
 	if err != nil {
 		re.logger.Error.Println("BUILD REQUEST ERROR: ", err)

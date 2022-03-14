@@ -45,3 +45,48 @@ Proxy your services whilst stripping personal information such as User-Agent, ac
 ![Relay spoofing useragent & using Tor](/examples/http-privacy/access-tor.png)
 
 ![Relay spoofing useragent & accept language](/examples/http-privacy/ifconfig.me.png)
+
+# CLI Usage
+
+You can download the CLI from the [releases tab](https://github.com/go-compile/localrelay/releases) or compile it your self by building [./cmd/localrelay](https://github.com/go-compile/localrelay/tree/cli.v1.0.0-alpha/cmd/localrelay). All releases hashed with SHA256 and signed.
+
+Once you've downloaded the CLI you will need to give it execute permission if you're on a Unix based system. This is done with `chmod +x localrelay`. You don't need root permission to run the relay nor should you use it even if you want to run on a privileged port. Use `sudo setcap CAP_NET_BIND_SERVICE=+eip /path/to/localrelay` instead.
+
+## Create Relay
+
+To run a relay you must first create a relay config, this allows for permanent storage of relay configuration and easy management. You can create as many of these as you like.
+
+### Syntax
+
+```bash
+# Create a simple TCP relay
+localrelay new <relay_name> -host <bind_addr> -destination <remote_addr>
+
+# Create HTTP relay
+localrelay new <relay_name> -host <bind_addr> -destination <remote_addr> -http
+
+# Create HTTPS relay
+localrelay new <relay_name> -host <bind_addr> -destination <remote_addr> -https -certificate=cert.pem key=key.pem
+
+# Use proxy
+localrelay new <relay_name> -host <bind_addr> -destination <remote_addr> -proxy <proxy_url>
+
+# Set custom output config file
+localrelay new <relay_name> -host <bind_addr> -destination <remote_addr> -output ./config.toml
+```
+
+### Examples
+
+```bash
+# Create a simple TCP relay
+localrelay new example.com -host 127.0.0.1:8080 -destination example.com:80
+
+# Create HTTP relay
+localrelay new example.com -host 127.0.0.1:8080 -destination http://example.com -http
+
+# Create HTTPS relay
+localrelay new example.com -host 127.0.0.1:8080 -destination https://example.com -https -certificate=cert.pem key=key.pem
+
+# Use proxy
+localrelay new onion -host 127.0.0.1:8080 -destination 2gzyxa5ihm7nsggfxnu52rck2vv4rvmdlkiu3zzui5du4xyclen53wid.onion:80 -proxy socks5://127.0.0.1:9050
+```
