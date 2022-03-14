@@ -4,6 +4,7 @@ import "github.com/go-compile/localrelay"
 
 // Relay is a config for a relay server
 type Relay struct {
+	Name        string
 	Host        string
 	Destination string
 	// Kind is ProxyType; TCP, HTTP, HTTPS

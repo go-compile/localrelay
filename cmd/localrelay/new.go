@@ -36,6 +36,7 @@ func newRelay(opt *options, i int, cmd []string) error {
 	// TODO: add TLS certificate options
 	// TODO: add logging options
 	relay := Relay{
+		Name:        name,
 		Host:        opt.host,
 		Destination: opt.destination,
 		Kind:        opt.proxyType,

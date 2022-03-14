@@ -7,7 +7,7 @@ import (
 
 const (
 	// VERSION uses semantic versioning
-	VERSION = "v0.1.0-alpha"
+	VERSION = "v0.2.0-alpha"
 )
 
 func main() {
@@ -31,8 +31,10 @@ func main() {
 			if err := newRelay(opt, i, opt.commands); err != nil {
 				fmt.Println(err)
 			}
-
-			return
+		case "run":
+			if err := runRelays(opt, i, opt.commands); err != nil {
+				fmt.Println(err)
+			}
 		}
 	}
 }
