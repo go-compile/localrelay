@@ -90,3 +90,35 @@ localrelay new example.com -host 127.0.0.1:8080 -destination https://example.com
 # Use proxy
 localrelay new onion -host 127.0.0.1:8080 -destination 2gzyxa5ihm7nsggfxnu52rck2vv4rvmdlkiu3zzui5du4xyclen53wid.onion:80 -proxy socks5://127.0.0.1:9050
 ```
+
+## Run Relay
+
+Now you have your relay config toml files we can now launch them using the CLI.
+
+### Syntax
+
+```bash
+# Run 1 relay
+localrelay run <relay_config>
+
+# Run 2 relays
+localrelay run <relay_config1> <relay_config2>
+
+# Run more than 2
+# Keep adding the config files to the command
+localrelay run <relay_config1> <relay_config2>...
+```
+
+### Examples
+
+```bash
+# Run 1 relay
+localrelay run onion.toml
+
+# Run 2 relays
+localrelay run onion.toml bitwarden.toml
+
+# Run more than 2
+# Keep adding the config files to the command
+localrelay run onion.toml bitwarden.toml nextcloud.toml piped.toml
+```
