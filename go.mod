@@ -6,6 +6,7 @@ require (
 	github.com/chzyer/readline v0.0.0-20180603132655-2972be24d48e
 	github.com/naoina/toml v0.1.1
 	github.com/pkg/errors v0.9.1
+	github.com/tam7t/hpkp v0.0.0-20160821193359-2b70b4024ed5
 	golang.org/x/net v0.0.0-20220225172249-27dd8689420f
 )
 
