@@ -9,7 +9,7 @@ A cross platform CLI & lib which acts as a reverse proxy allowing the destinatio
 
 # Use Cases
 
-If you self host a service for example; Bitwarden, Nextcloud, Syncthing, Graphana, Gitea... you may not want to expose your public IP address to the internet. Especially considering some self-hosted platforms such as Plex has been [exploited with code execution vulnerabilities](https://www.cvedetails.com/vulnerability-list.php?vendor_id=14994). You may consider to protect it behind Tor (however this isn't full proof).
+If you self host a service for example; [Bitwarden](https://github.com/dani-garcia/vaultwarden), [Nextcloud](https://github.com/nextcloud), [Syncthing](https://github.com/syncthing/syncthing), [Grafana](https://github.com/grafana/grafana), [Gitea](https://github.com/go-gitea/gitea)... You may not want to expose your public IP address to the internet. Especially considering some self-hosted platforms such as [Plex](https://www.plex.tv/) has been exploited with code execution [vulnerabilities](https://www.cvedetails.com/vulnerability-list.php?vendor_id=14994). You may consider to protect it behind Tor (however this isn't full proof).
 
 Access your local services securely over [Tor](https://www.torproject.org/) without needing to port forward.
 
