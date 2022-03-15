@@ -1,6 +1,6 @@
 # LocalRelay
 
-[![go.dev reference](https://img.shields.io/badge/go.dev-reference-007d9c?logo=go&logoColor=white)](https://pkg.go.dev/go-compile/localrelay)
+[![go.dev reference](https://img.shields.io/badge/go.dev-reference-007d9c?logo=go&logoColor=white)](https://pkg.go.dev/github.com/go-compile/localrelay)
 [![Go Report Card](https://goreportcard.com/badge/go-compile/localrelay)](https://goreportcard.com/report/go-compile/localrelay)
 
 <!-- [![GitHub release](https://img.shields.io/github/release/go-compile/localrelay.svg)](https://github.com/go-compile/localrelay/releases) -->
