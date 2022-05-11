@@ -15,6 +15,8 @@ Access your local or remote services securely over [Tor](https://www.torproject.
 
 Many apps such as Nextcloud, Termis and Bitwarden do not allow you to specify a proxy when connecting to your self-hosted server. Localrelay allows you to host a local reverse proxy on your devices loopback. This relay then encrypts the outgoing traffic through your set SOCKS5 proxy (Tor: 127.0.0.1:9050).
 
+When at **home connect locally**, when away **connect over Tor**. Securely connect to remotely without port forwarding AND when at home connect directly with high speeds.
+
 # This Repository
 
 This repository contains the library written in Go, for it's cross platform capabilities, and contains the CLI application which can be ran on all major operating systems including [Android via Termux](https://termux.com/).
@@ -28,6 +30,8 @@ For examples of API usage visit [examples/](https://github.com/go-compile/localr
 - Close relay concurrently
 - Verbose logging with custom output (io.Writer)
 - Multiple failover proxies for TCP relay
+- Failovers for TCP relays
+- Select which remote will connect via a proxy
 - HTTP relay
   - Http to https
   - Header modification
@@ -78,6 +82,9 @@ localrelay new <relay_name> -host <bind_addr> -destination <remote_addr> -proxy 
 
 # Set custom output config file
 localrelay new <relay_name> -host <bind_addr> -destination <remote_addr> -output ./config.toml
+
+# Create a failover TCP relay
+localrelay new <relay_name> -host <bind_addr> -destination <remote_addr_(1)>,<remote_addr_(2)> -failover
 ```
 
 ### Examples
@@ -94,6 +101,9 @@ localrelay new example.com -host 127.0.0.1:8080 -destination https://example.com
 
 # Use proxy
 localrelay new onion -host 127.0.0.1:8080 -destination 2gzyxa5ihm7nsggfxnu52rck2vv4rvmdlkiu3zzui5du4xyclen53wid.onion:80 -proxy socks5://127.0.0.1:9050
+
+# Create a failover TCP relay with one remote accessed via Tor
+localrelay new onion -host 127.0.0.1:8080 -destination 192.168.1.240:80,2gzyxa5ihm7nsggfxnu52rck2vv4rvmdlkiu3zzui5du4xyclen53wid.onion:80 -failover -ignore_proxy=0 -proxy socks5://127.0.0.1:9050
 ```
 
 ## Run Relay
