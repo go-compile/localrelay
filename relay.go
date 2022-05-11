@@ -23,12 +23,17 @@ type Relay struct {
 	// Host is the address to listen on
 	Host string
 
-	// ForwardAddr is the destination to send the connection
+	// ForwardAddr is the destination to send the connection.
+	// When using a relay type which accept multipule destinations
+	// use a comma seperated list.
 	ForwardAddr string
 	// ProxyType is used to forward or manipulate the connection
 	ProxyType ProxyType
 
 	proxies []*proxy.Dialer
+	// remoteProxyIgnore is a list of indexes in the ForwardAddr array
+	// to which the proxy settings should be ignored
+	remoteProxyIgnore []int
 
 	logger *Logger
 
@@ -59,6 +64,10 @@ const (
 	ProxyHTTP
 	// ProxyHTTPS is the same as HTTP but listens on TLS
 	ProxyHTTPS
+
+	// ProxyFailOverTCP acts like the TCP proxy however if it cannot connect
+	// it will use a failover address instead.
+	ProxyFailOverTCP
 
 	// VERSION uses semantic versioning
 	VERSION = "v0.2.0"
@@ -105,6 +114,33 @@ func (r *Relay) setRunning(toggle bool) {
 	defer r.m.Unlock()
 
 	r.running = toggle
+}
+
+// DisableProxy will disable the proxy settings when connecting
+// to the remote at the index provided.
+//
+// OPTION ONLY AVALIABLE FOR FAIL OVER TCP PROXY TYPE!
+func (r *Relay) DisableProxy(remoteIndex ...int) {
+	r.remoteProxyIgnore = remoteIndex
+}
+
+// ignoreProxySettings returns true if the proxy should be disabled
+// for this remote index
+func (r *Relay) ignoreProxySettings(remoteIndex int) bool {
+	for _, v := range r.remoteProxyIgnore {
+		if v == remoteIndex {
+			return true
+		}
+	}
+
+	return false
+}
+
+// SetFailOverTCP will make the relay type TCP and support
+// multipule destinations. If one destination fails to dial
+// the next will be attempted.
+func (r *Relay) SetFailOverTCP() {
+	r.ProxyType = ProxyFailOverTCP
 }
 
 // SetHTTP is used to set the relay as a type HTTP relay
@@ -180,6 +216,10 @@ func (r *Relay) ListenServe() error {
 		r.close = l
 
 		return relayHTTPS(r, l)
+	case ProxyFailOverTCP:
+		r.close = l
+
+		return relayFailOverTCP(r, l)
 	default:
 		l.Close()
 
@@ -206,6 +246,8 @@ func (r *Relay) Serve(l net.Listener) error {
 		return relayHTTP(r, l)
 	case ProxyHTTPS:
 		return relayHTTPS(r, l)
+	case ProxyFailOverTCP:
+		return relayFailOverTCP(r, l)
 	default:
 		return ErrUnknownProxyType
 	}
