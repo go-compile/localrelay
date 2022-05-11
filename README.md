@@ -137,3 +137,31 @@ localrelay run onion.toml bitwarden.toml
 # Keep adding the config files to the command
 localrelay run onion.toml bitwarden.toml nextcloud.toml piped.toml
 ```
+
+# Build
+
+This repository contains two code bases. The Localrelay package in the root and the CLI app in `./cmd/localrelay`. To compile the CLI you have two options. Compile for all targets (via the Makefile) or compile directly.
+
+## Compile For All Targets
+
+Open a terminal in the root of the repository and execute:
+```
+make
+```
+The binaries will be placed in `./bin/`.
+
+## Compile For One Platform
+
+Open a terminal and cd into `./cmd/localrelay`.
+
+```bash
+go build -trimpath -ldflags="-s -w"
+```
+
+The binary will be created in the current directory (`./cmd/localrelay`).
+
+### Cross Compile
+
+```bash
+GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -trimpath -o ./bin/localrelay-linux-64 ./cmd/localrelay
+```
