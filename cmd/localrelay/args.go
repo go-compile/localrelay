@@ -11,6 +11,10 @@ import (
 	"github.com/pkg/errors"
 )
 
+var (
+	ErrFailedCheckUpdate = errors.New("failed to check for updates")
+)
+
 type options struct {
 	host        string
 	destination string
@@ -46,13 +50,7 @@ func parseArgs() (*options, error) {
 
 		switch strings.ToLower(arg[0]) {
 		case "version":
-			fmt.Printf("LocalRelay CLI - %s\n", VERSION)
-			fmt.Println()
-			fmt.Println(" A reverse proxying program to allow services e.g. Nextcloud, Bitwarden etc to be accessed\n" +
-				" over Tor (SOCKS5) even when the client app do not support SOCKS proxies.")
-			fmt.Println()
-			fmt.Println()
-			fmt.Println(" github.com/go-compile/localrelay")
+			version()
 			return nil, nil
 		case "host", "lhost":
 			value, err := getAnswer(args, arg, &i)
@@ -175,4 +173,16 @@ func help() {
 	fmt.Printf("  %-28s %s\n", "-output, -o", "Set output file path")
 	fmt.Printf("  %-28s %s\n", "-proxy_ignore", "Destination indexes to ignore proxy settings")
 	fmt.Printf("  %-28s %s\n", "-version", "View version page")
+}
+
+func version() {
+	fmt.Printf("LocalRelay CLI - %s\n", VERSION)
+	fmt.Println()
+	fmt.Println(" A reverse proxying program to allow services e.g. Nextcloud, Bitwarden etc to be accessed\n" +
+		" over Tor (SOCKS5) even when the client app do not support SOCKS proxies.")
+	fmt.Println()
+	fmt.Println()
+	fmt.Println(" github.com/go-compile/localrelay")
+
+	checkForUpdates()
 }
