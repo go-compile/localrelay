@@ -41,6 +41,7 @@ func newRelay(opt *options, i int, cmd []string) error {
 		Destination: opt.destination,
 		Kind:        opt.proxyType,
 		Logging:     "stdout",
+		ProxyIgnore: opt.proxyIgnore,
 
 		Proxy: &opt.proxy,
 	}

@@ -17,6 +17,9 @@ type Relay struct {
 	Key         string
 
 	Proxy *Proxy
+	// ProxyIgnore is a list of destination indexes where
+	// the proxy settings should be ignored.
+	ProxyIgnore []int
 }
 
 // Proxy is used for relay forwarding

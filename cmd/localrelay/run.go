@@ -60,7 +60,7 @@ func launchRelays(relays []Relay) error {
 		relay := localrelay.New(r.Name, r.Host, r.Destination, w)
 
 		switch r.Kind {
-		case localrelay.ProxyTCP:
+		case localrelay.ProxyTCP, localrelay.ProxyFailOverTCP:
 			// If proxy enabled
 			if r.Proxy.Host != "" && strings.ToLower(r.Proxy.Protocol) == "socks5" {
 
@@ -80,6 +80,11 @@ func launchRelays(relays []Relay) error {
 				}
 
 				relay.SetProxy(&prox)
+			}
+
+			if r.Kind == localrelay.ProxyFailOverTCP {
+				relay.SetFailOverTCP()
+				relay.DisableProxy(r.ProxyIgnore...)
 			}
 
 			wg.Add(1)

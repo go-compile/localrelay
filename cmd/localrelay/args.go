@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/url"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/go-compile/localrelay"
@@ -16,6 +17,7 @@ type options struct {
 	proxyType   localrelay.ProxyType
 	proxy       Proxy
 	output      string
+	proxyIgnore []int
 
 	commands []string
 }
@@ -73,6 +75,23 @@ func parseArgs() (*options, error) {
 			}
 
 			opt.output = value
+		case "proxyignore", "proxy_ignore":
+			value, err := getAnswer(args, arg, &i)
+			if err != nil {
+				return nil, err
+			}
+
+			var ignored []int
+			for _, index := range strings.Split(value, ",") {
+				i, err := strconv.Atoi(index)
+				if err != nil {
+					return nil, err
+				}
+
+				ignored = append(ignored, i)
+			}
+
+			opt.proxyIgnore = ignored
 		case "proxy":
 			value, err := getAnswer(args, arg, &i)
 			if err != nil {
@@ -98,6 +117,8 @@ func parseArgs() (*options, error) {
 			opt.proxyType = localrelay.ProxyHTTP
 		case "https":
 			opt.proxyType = localrelay.ProxyHTTPS
+		case "failover", "failovertcp", "failover-tcp", "tcp-failover":
+			opt.proxyType = localrelay.ProxyFailOverTCP
 		case "help", "h", "?":
 			help()
 			return nil, nil
@@ -149,7 +170,9 @@ func help() {
 	fmt.Printf("  %-28s %s\n", "-tcp", "Set relay to TCP relay")
 	fmt.Printf("  %-28s %s\n", "-http", "Set relay to HTTP relay")
 	fmt.Printf("  %-28s %s\n", "-https", "Set relay to HTTPS relay")
+	fmt.Printf("  %-28s %s\n", "-failover", "Set relay to TCP failover relay")
 	fmt.Printf("  %-28s %s\n", "-proxy", "Set socks5 proxy via URL")
 	fmt.Printf("  %-28s %s\n", "-output, -o", "Set output file path")
+	fmt.Printf("  %-28s %s\n", "-proxy_ignore", "Destination indexes to ignore proxy settings")
 	fmt.Printf("  %-28s %s\n", "-version", "View version page")
 }

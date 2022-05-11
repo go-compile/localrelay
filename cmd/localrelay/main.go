@@ -3,11 +3,13 @@ package main
 import (
 	"fmt"
 	"strings"
+
+	"github.com/go-compile/localrelay"
 )
 
 const (
 	// VERSION uses semantic versioning
-	VERSION = "v1.0.0-alpha"
+	VERSION = localrelay.VERSION
 )
 
 func main() {
@@ -18,6 +20,11 @@ func main() {
 
 	if err != nil {
 		fmt.Println(err)
+		return
+	}
+
+	if len(opt.commands) == 0 {
+		help()
 		return
 	}
 
