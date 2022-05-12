@@ -20,9 +20,24 @@ var (
 	// activeRelays is a list of relays being ran
 	activeRelays  map[string]*localrelay.Relay
 	activeRelaysM sync.Mutex
+
+	forkIdentifier = "exec.signal-forked-process-true"
 )
 
 func runRelays(opt *options, i int, cmd []string) error {
+
+	// if detach is enable fork process and start daemon
+	if opt.detach {
+		if !opt.isFork {
+			return fork()
+		}
+
+		// if we are the fork child start the daemon listener
+		fmt.Println("Daemon launching daemon service")
+		launchDaemon()
+
+		// now execute like normal
+	}
 
 	// Read all relay config files and decode them
 	relays := make([]Relay, 0, len(cmd[i+1:]))
@@ -178,9 +193,23 @@ func removeRelay(name string) {
 func runningRelays() []*localrelay.Relay {
 	activeRelaysM.Lock()
 
-	relays := make([]*localrelay.Relay, len(activeRelays))
+	relays := make([]*localrelay.Relay, 0, len(activeRelays))
 	for _, r := range activeRelays {
 		relays = append(relays, r)
+	}
+	activeRelaysM.Unlock()
+
+	return relays
+}
+
+// runningRelaysCopy makes a copy instead of returning the
+// pointers
+func runningRelaysCopy() []localrelay.Relay {
+	activeRelaysM.Lock()
+
+	relays := make([]localrelay.Relay, 0, len(activeRelays))
+	for _, r := range activeRelays {
+		relays = append(relays, *r)
 	}
 	activeRelaysM.Unlock()
 
