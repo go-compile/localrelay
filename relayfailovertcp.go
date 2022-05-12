@@ -8,7 +8,10 @@ import (
 )
 
 var (
+	// ErrFailConnect will be returned if the remote failed to dial
 	ErrFailConnect = errors.New("failed to dial remote")
+	// Timeout is only used when dialling without a proxy
+	Timeout = time.Second * 5
 )
 
 func relayFailOverTCP(r *Relay, l net.Listener) error {
@@ -59,7 +62,7 @@ func handleFailOverTCP(r *Relay, conn net.Conn) {
 						continue
 					}
 
-					// if no error dialing then exit
+					// if no error dialling then exit
 					return
 				}
 
@@ -100,7 +103,8 @@ func handleFailOverTCP(r *Relay, conn net.Conn) {
 
 func tcpDial(r *Relay, conn net.Conn, remoteAddress string, i int, start time.Time) error {
 	r.logger.Info.Printf("DIALLING FORWARD ADDRESS [%d]\n", i+1)
-	c, err := net.Dial("tcp", remoteAddress)
+
+	c, err := net.DialTimeout("tcp", remoteAddress, Timeout)
 	if err != nil {
 		r.Metrics.dial(0, 1, start)
 
