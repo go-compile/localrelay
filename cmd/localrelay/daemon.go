@@ -10,6 +10,7 @@ import (
 	"os/exec"
 
 	"github.com/go-compile/localrelay"
+	"github.com/pkg/errors"
 )
 
 const (
@@ -21,6 +22,12 @@ const (
 	daemonStatus uint8 = iota
 	// daemonStop will close all the relays and stop the daemon
 	daemonStop
+)
+
+var (
+	// ErrIPCShutdownFail is returned when the daemon fails to shutdown when being
+	// requested via IPC
+	ErrIPCShutdownFail = errors.New("failed to shutdown daemon process via IPC")
 )
 
 type status struct {

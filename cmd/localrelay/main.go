@@ -46,6 +46,14 @@ func main() {
 			}
 
 			return
+		// TODO: add restart which will ask the daemon to fork it self
+		case "stop":
+			if err := stopDaemon(); err != nil {
+				fmt.Println(err)
+			}
+
+			fmt.Println("Daemon has been shutdown")
+			return
 		default:
 			fmt.Printf("Unrecognised command %q\n", opt.commands[i])
 			return

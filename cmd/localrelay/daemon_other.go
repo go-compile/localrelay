@@ -6,6 +6,8 @@ package main
 import (
 	"fmt"
 	"os"
+
+	"github.com/pkg/errors"
 )
 
 var (
@@ -22,4 +24,8 @@ func getDaemonStatus() (*status, error) {
 	os.Exit(0)
 
 	return nil, nil
+}
+
+func stopDaemon() error {
+	return errors.New(daemonNotSupported)
 }

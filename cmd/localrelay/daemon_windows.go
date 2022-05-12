@@ -39,6 +39,32 @@ func getDaemonStatus() (*status, error) {
 	return &s, nil
 }
 
+func stopDaemon() error {
+	fmt.Println("Attempting to connect to daemon")
+	conn, err := npipe.DialTimeout(`\\.\pipe\`+serviceName, time.Second*2)
+	if err != nil {
+		return err
+	}
+	fmt.Println("Connected to daemon")
+
+	_, err = conn.Write([]byte{0, 1, daemonStop})
+	if err != nil {
+		return err
+	}
+
+	buf := make([]byte, 1)
+	if _, err := conn.Read(buf); err != nil {
+		return err
+	}
+
+	// check if response is 1 for success
+	if buf[0] != 1 {
+		return ErrIPCShutdownFail
+	}
+
+	return nil
+}
+
 func launchDaemon() {
 	conn, err := npipe.DialTimeout(`\\.\pipe\`+serviceName, time.Second*2)
 	if err == nil {
@@ -113,6 +139,8 @@ func handleDaemonConn(conn net.Conn, l *npipe.PipeListener) {
 			}
 
 			log.Printf("[Info] All relays closed:\n")
+
+			conn.Write([]byte{1})
 			os.Exit(0)
 		}
 	}
