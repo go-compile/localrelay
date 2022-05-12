@@ -54,6 +54,12 @@ func main() {
 
 			fmt.Println("Daemon has been shutdown")
 			return
+		case "status":
+			if err := relayStatus(); err != nil {
+				fmt.Println(err)
+			}
+
+			return
 		default:
 			fmt.Printf("Unrecognised command %q\n", opt.commands[i])
 			return

@@ -19,6 +19,7 @@ func getDaemonStatus() (*status, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	fmt.Println("Connected to daemon")
 
 	_, err = conn.Write([]byte{0, 1, daemonStatus})
