@@ -6,12 +6,14 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/go-compile/localrelay"
 	"github.com/pkg/errors"
 )
 
 var (
+	// ErrFailedCheckUpdate is returned when the latest version could not be fetched
 	ErrFailedCheckUpdate = errors.New("failed to check for updates")
 )
 
@@ -59,6 +61,19 @@ func parseArgs() (*options, error) {
 			}
 
 			opt.host = value
+		case "timeout":
+			value, err := getAnswer(args, arg, &i)
+			if err != nil {
+				return nil, err
+			}
+
+			dur, err := time.ParseDuration(value)
+			if err != nil {
+				return nil, err
+			}
+
+			fmt.Printf("Timeout set to: %dms\n", dur.Milliseconds())
+			localrelay.Timeout = dur
 		case "destination", "d", "dst", "rhost":
 			value, err := getAnswer(args, arg, &i)
 			if err != nil {
