@@ -12,7 +12,8 @@ func relayStatus() error {
 	s, err := getDaemonStatus()
 	if err != nil {
 		fmt.Printf("Daemon:    \x1b[31m [OFFLINE] \x1b[0m\r\n")
-		return err
+
+		return nil
 	}
 
 	// make terminal raw to allow the use of colour on windows terminals
