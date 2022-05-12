@@ -81,7 +81,7 @@ func handleTCP(r *Relay, conn net.Conn) {
 	// Not using proxy so dial with standard dialer
 
 	r.logger.Info.Println("DIALLING FORWARD ADDRESS")
-	c, err := net.Dial("tcp", r.ForwardAddr)
+	c, err := net.DialTimeout("tcp", r.ForwardAddr, Timeout)
 	if err != nil {
 		r.Metrics.dial(0, 1, start)
 
