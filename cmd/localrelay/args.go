@@ -26,6 +26,9 @@ type options struct {
 	proxyIgnore []int
 
 	commands []string
+	detach   bool
+
+	isFork bool
 }
 
 /*
@@ -51,6 +54,8 @@ func parseArgs() (*options, error) {
 		arg := strings.SplitN(args[i][1:], "=", 2)
 
 		switch strings.ToLower(arg[0]) {
+		case forkIdentifier:
+			opt.isFork = true
 		case "version":
 			version()
 			return nil, nil
@@ -61,6 +66,18 @@ func parseArgs() (*options, error) {
 			}
 
 			opt.host = value
+		case "detach", "bg":
+			value, err := getAnswer(args, arg, &i)
+			if err != nil {
+				return nil, err
+			}
+
+			toggle, err := parseBool(value)
+			if err != nil {
+				return nil, err
+			}
+
+			opt.detach = toggle
 		case "timeout":
 			value, err := getAnswer(args, arg, &i)
 			if err != nil {

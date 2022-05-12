@@ -38,10 +38,14 @@ func main() {
 			if err := newRelay(opt, i, opt.commands); err != nil {
 				fmt.Println(err)
 			}
+
+			return
 		case "run":
 			if err := runRelays(opt, i, opt.commands); err != nil {
 				fmt.Println(err)
 			}
+
+			return
 		default:
 			fmt.Printf("Unrecognised command %q\n", opt.commands[i])
 			return
