@@ -130,6 +130,12 @@ localrelay run <relay_config1> <relay_config2>...
 # Run 1 relay
 localrelay run onion.toml
 
+# Specify dial timeout (for none proxied remotes)
+# <num>s  seconds
+# <num>ms  milliseconds
+# <num>m  minute
+localrelay run onion.toml -timeout=5s
+
 # Run 2 relays
 localrelay run onion.toml bitwarden.toml
 
@@ -145,9 +151,11 @@ This repository contains two code bases. The Localrelay package in the root and 
 ## Compile For All Targets
 
 Open a terminal in the root of the repository and execute:
+
 ```
 make
 ```
+
 The binaries will be placed in `./bin/`.
 
 ## Compile For One Platform
