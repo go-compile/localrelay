@@ -170,7 +170,7 @@ func getAnswer(args []string, arg []string, i *int) (string, error) {
 
 	// Check if there are any more key values
 	if len(args)-1 <= *i {
-		return "", errors.New("Expected host to be paired with a address")
+		return "", errors.New("Expected value to be paired with argument")
 	}
 
 	// Skip next argument as we are going to use it now
