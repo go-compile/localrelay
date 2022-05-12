@@ -42,6 +42,9 @@ func main() {
 			if err := runRelays(opt, i, opt.commands); err != nil {
 				fmt.Println(err)
 			}
+		default:
+			fmt.Printf("Unrecognised command %q\n", opt.commands[i])
+			return
 		}
 	}
 }
