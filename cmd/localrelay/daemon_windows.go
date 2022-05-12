@@ -8,14 +8,13 @@ import (
 	"log"
 	"net"
 	"os"
-	"time"
 
 	"gopkg.in/natefinch/npipe.v2"
 )
 
 func getDaemonStatus() (*status, error) {
 	fmt.Println("Attempting to connect to daemon")
-	conn, err := npipe.DialTimeout(`\\.\pipe\`+serviceName, time.Second*2)
+	conn, err := npipe.DialTimeout(`\\.\pipe\`+serviceName, ipcTimeout)
 	if err != nil {
 		return nil, err
 	}
@@ -42,7 +41,7 @@ func getDaemonStatus() (*status, error) {
 
 func stopDaemon() error {
 	fmt.Println("Attempting to connect to daemon")
-	conn, err := npipe.DialTimeout(`\\.\pipe\`+serviceName, time.Second*2)
+	conn, err := npipe.DialTimeout(`\\.\pipe\`+serviceName, ipcTimeout)
 	if err != nil {
 		return err
 	}
@@ -68,7 +67,7 @@ func stopDaemon() error {
 
 func forkDeamon() error {
 	fmt.Println("Attempting to connect to daemon")
-	conn, err := npipe.DialTimeout(`\\.\pipe\`+serviceName, time.Second*2)
+	conn, err := npipe.DialTimeout(`\\.\pipe\`+serviceName, ipcTimeout)
 	if err != nil {
 		return err
 	}
@@ -94,7 +93,7 @@ func forkDeamon() error {
 }
 
 func launchDaemon() {
-	conn, err := npipe.DialTimeout(`\\.\pipe\`+serviceName, time.Second*2)
+	conn, err := npipe.DialTimeout(`\\.\pipe\`+serviceName, ipcTimeout)
 	if err == nil {
 		conn.Close()
 		fmt.Println("Localrelay service already running.")

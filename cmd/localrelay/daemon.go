@@ -8,6 +8,7 @@ import (
 	"net"
 	"os"
 	"os/exec"
+	"time"
 
 	"github.com/go-compile/localrelay"
 	"github.com/pkg/errors"
@@ -33,6 +34,8 @@ var (
 
 	// ErrIPCForkFail is returned when trying to re-fork the daemon process
 	ErrIPCForkFail = errors.New("ipc fork failed")
+
+	ipcTimeout = time.Second
 )
 
 type status struct {
