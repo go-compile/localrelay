@@ -16,6 +16,12 @@ import (
 	"golang.org/x/net/proxy"
 )
 
+var (
+	// activeRelays is a list of relays being ran
+	activeRelays  map[string]*localrelay.Relay
+	activeRelaysM sync.Mutex
+)
+
 func runRelays(opt *options, i int, cmd []string) error {
 
 	// Read all relay config files and decode them
@@ -51,6 +57,7 @@ func runRelays(opt *options, i int, cmd []string) error {
 func launchRelays(relays []Relay) error {
 
 	wg := sync.WaitGroup{}
+	activeRelays = make(map[string]*localrelay.Relay, len(relays))
 
 	for i, r := range relays {
 		fmt.Printf("[Info] [Relay:%d] Starting %q on %q\n", i+1, r.Name, r.Host)
@@ -87,12 +94,14 @@ func launchRelays(relays []Relay) error {
 				relay.DisableProxy(r.ProxyIgnore...)
 			}
 
+			addRelay(relay)
 			wg.Add(1)
 			go func(relay *localrelay.Relay) {
 				if err := relay.ListenServe(); err != nil {
 					log.Println("[Error] ", err)
 				}
 
+				removeRelay(relay.Name)
 				wg.Done()
 			}(relay)
 		case localrelay.ProxyHTTP, localrelay.ProxyHTTPS:
@@ -133,15 +142,16 @@ func launchRelays(relays []Relay) error {
 
 					Timeout: time.Second * 120,
 				})
-
 			}
 
+			addRelay(relay)
 			wg.Add(1)
 			go func(relay *localrelay.Relay) {
 				if err := relay.ListenServe(); err != nil {
 					log.Println("[Error] ", err)
 				}
 
+				removeRelay(relay.Name)
 				wg.Done()
 			}(relay)
 
@@ -151,4 +161,28 @@ func launchRelays(relays []Relay) error {
 	wg.Wait()
 	fmt.Println("[Info] All relays closed.")
 	return nil
+}
+
+func addRelay(r *localrelay.Relay) {
+	activeRelaysM.Lock()
+	activeRelays[r.Name] = r
+	activeRelaysM.Unlock()
+}
+
+func removeRelay(name string) {
+	activeRelaysM.Lock()
+	delete(activeRelays, name)
+	activeRelaysM.Unlock()
+}
+
+func runningRelays() []*localrelay.Relay {
+	activeRelaysM.Lock()
+
+	relays := make([]*localrelay.Relay, len(activeRelays))
+	for _, r := range activeRelays {
+		relays = append(relays, r)
+	}
+	activeRelaysM.Unlock()
+
+	return relays
 }
