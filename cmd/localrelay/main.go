@@ -46,13 +46,25 @@ func main() {
 			}
 
 			return
-		// TODO: add restart which will ask the daemon to fork it self
 		case "stop":
 			if err := stopDaemon(); err != nil {
 				fmt.Println(err)
 			}
 
 			fmt.Println("Daemon has been shutdown")
+			return
+		case "restart":
+			if err := relayStatus(); err != nil {
+				fmt.Println(err)
+				return
+			}
+
+			if err := forkDeamon(); err != nil {
+				fmt.Println("Could not restart/fork daemon")
+				return
+			}
+
+			fmt.Println("Daemon has been restarted")
 			return
 		case "status":
 			if err := relayStatus(); err != nil {

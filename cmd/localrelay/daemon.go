@@ -22,12 +22,17 @@ const (
 	daemonStatus uint8 = iota
 	// daemonStop will close all the relays and stop the daemon
 	daemonStop
+
+	daemonFork
 )
 
 var (
 	// ErrIPCShutdownFail is returned when the daemon fails to shutdown when being
 	// requested via IPC
 	ErrIPCShutdownFail = errors.New("failed to shutdown daemon process via IPC")
+
+	// ErrIPCForkFail is returned when trying to re-fork the daemon process
+	ErrIPCForkFail = errors.New("ipc fork failed")
 )
 
 type status struct {
@@ -62,7 +67,8 @@ func parseCommand(conn net.Conn, payload []byte) (uint8, error) {
 	return commandID, nil
 }
 
-func fork() error {
+// runFork is used when the user executed the run command
+func runFork() error {
 	s, err := getDaemonStatus()
 	if err == nil {
 		fmt.Printf("[Fatal] Localrelay already running on PID: %d\n", s.Pid)
@@ -82,5 +88,15 @@ func fork() error {
 	}
 
 	fmt.Printf("[Info] Relays running in background on PID: %d\n", cmd.Process.Pid)
+	return nil
+}
+
+func fork() error {
+	cmd := exec.Command(os.Args[0], append([]string{"-" + forkIdentifier}, os.Args[1:]...)...)
+	err := cmd.Start()
+	if err != nil {
+		return err
+	}
+
 	return nil
 }

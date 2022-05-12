@@ -29,3 +29,7 @@ func getDaemonStatus() (*status, error) {
 func stopDaemon() error {
 	return errors.New(daemonNotSupported)
 }
+
+func forkDeamon() error {
+	return errors.New(daemonNotSupported)
+}

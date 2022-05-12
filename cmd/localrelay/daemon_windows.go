@@ -66,6 +66,33 @@ func stopDaemon() error {
 	return nil
 }
 
+func forkDeamon() error {
+	fmt.Println("Attempting to connect to daemon")
+	conn, err := npipe.DialTimeout(`\\.\pipe\`+serviceName, time.Second*2)
+	if err != nil {
+		return err
+	}
+
+	fmt.Println("Connected to daemon")
+
+	_, err = conn.Write([]byte{0, 1, daemonFork})
+	if err != nil {
+		return err
+	}
+
+	buf := make([]byte, 1)
+	if _, err := conn.Read(buf); err != nil {
+		return err
+	}
+
+	// check if response is 1 for success
+	if buf[0] != 1 {
+		return ErrIPCForkFail
+	}
+
+	return nil
+}
+
 func launchDaemon() {
 	conn, err := npipe.DialTimeout(`\\.\pipe\`+serviceName, time.Second*2)
 	if err == nil {
@@ -143,6 +170,30 @@ func handleDaemonConn(conn net.Conn, l *npipe.PipeListener) {
 
 			conn.Write([]byte{1})
 			os.Exit(0)
+		case daemonFork:
+			if err := fork(); err != nil {
+				log.Printf("[Info] Fork error: %s\n", err)
+
+				conn.Write([]byte{0})
+				return
+			}
+
+			l.Close()
+
+			for _, r := range runningRelays() {
+				log.Printf("[Info] Closing relay: %s\n", r.Name)
+				if err := r.Close(); err != nil {
+					log.Printf("[Error] Closing relay: %s with error: %s\n", r.Name, err)
+				}
+			}
+
+			log.Printf("[Info] All relays closed:\n")
+
+			conn.Write([]byte{1})
+			os.Exit(0)
+		default:
+			// unknown command return failed result
+			conn.Write([]byte{0})
 		}
 	}
 }

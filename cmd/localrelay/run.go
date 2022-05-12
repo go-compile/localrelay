@@ -29,7 +29,7 @@ func runRelays(opt *options, i int, cmd []string) error {
 	// if detach is enable fork process and start daemon
 	if opt.detach {
 		if !opt.isFork {
-			return fork()
+			return runFork()
 		}
 
 		// if we are the fork child start the daemon listener
