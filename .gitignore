@@ -1,2 +1,4 @@
 cmd/localrelay/*.toml
 bin/
+cmd/localrelay/localrelay
+*.exe
