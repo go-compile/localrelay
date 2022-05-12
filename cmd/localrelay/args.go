@@ -205,6 +205,8 @@ func help() {
 	fmt.Printf("  %-28s %s\n", "-output, -o", "Set output file path")
 	fmt.Printf("  %-28s %s\n", "-proxy_ignore", "Destination indexes to ignore proxy settings")
 	fmt.Printf("  %-28s %s\n", "-version", "View version page")
+	fmt.Printf("  %-28s %s\n", "-timeout", "Set dial timeout for non proxied relays")
+	fmt.Printf("  %-28s %s\n", "-detach=true", "Run relay service in background")
 }
 
 func version() {
