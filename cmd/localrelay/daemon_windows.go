@@ -8,6 +8,7 @@ import (
 	"log"
 	"net"
 	"os"
+	"time"
 
 	"gopkg.in/natefinch/npipe.v2"
 )
@@ -105,6 +106,8 @@ func launchDaemon() {
 }
 
 func startDaemon() error {
+	daemonStarted = time.Now()
+
 	l, err := npipe.Listen(`\\.\pipe\` + serviceName)
 	if err != nil {
 		return err
@@ -162,6 +165,7 @@ func handleDaemonConn(conn net.Conn, l *npipe.PipeListener) {
 				Relays:  relays,
 				Pid:     os.Getpid(),
 				Version: VERSION,
+				Started: daemonStarted.Unix(),
 
 				Metrics: relayMetrics,
 			})

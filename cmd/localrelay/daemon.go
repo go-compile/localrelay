@@ -37,6 +37,9 @@ var (
 	ErrIPCForkFail = errors.New("ipc fork failed")
 
 	ipcTimeout = time.Second
+
+	// daemonStarted stores the time when the daemon was created
+	daemonStarted time.Time
 )
 
 type status struct {
@@ -45,6 +48,8 @@ type status struct {
 	Version string
 	// Metrics contains relay name as the index
 	Metrics map[string]metrics
+	// Started is a unix timestamp of when the daemon was created
+	Started int64
 }
 
 type metrics struct {
