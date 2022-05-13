@@ -26,6 +26,9 @@ type options struct {
 	proxyIgnore []int
 	logs        string
 
+	certificate string
+	key         string
+
 	commands []string
 	detach   bool
 
@@ -76,6 +79,20 @@ func parseArgs() (*options, error) {
 			}
 
 			opt.logs = value
+		case "cert", "certificate":
+			value, err := getAnswer(args, arg, &i)
+			if err != nil {
+				return nil, err
+			}
+
+			opt.certificate = value
+		case "key":
+			value, err := getAnswer(args, arg, &i)
+			if err != nil {
+				return nil, err
+			}
+
+			opt.key = value
 		case "detach", "bg":
 			opt.detach = true
 		case "timeout":
@@ -213,6 +230,8 @@ func help() {
 	fmt.Printf("  %-28s %s\n", "-timeout", "Set dial timeout for non proxied relays")
 	fmt.Printf("  %-28s %s\n", "-detach", "Run relay service in background")
 	fmt.Printf("  %-28s %s\n", "-log", "Specify the file to write logs to")
+	fmt.Printf("  %-28s %s\n", "-cert", "Set TLS certificate file")
+	fmt.Printf("  %-28s %s\n", "-key", "Set TLS key file")
 }
 
 func version() {
