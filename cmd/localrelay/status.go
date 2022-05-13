@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/containerd/console"
 )
@@ -52,9 +53,11 @@ func relayStatus() error {
 		active += int(m.Active)
 	}
 
+	fmt.Println("\r")
 	fmt.Printf("Total Conns: [%d]\r\n", totalConns)
 	fmt.Printf("Active:      [%d]\r\n", active)
-	fmt.Printf("In/Out:      [%d/%d]\r\n", in, out)
+	fmt.Printf("In/Out:      [%d/%d]\r\n", in, out) //TODO: format in bytes/kb/mb/gb
+	fmt.Printf("Uptime:      [%d minutes]\r\n", time.Unix(s.Started, 0).Minute())
 
 	for i := range s.Relays {
 		fmt.Printf("  \x1b[90m%.2d\x1b[0m: %s\r\n      %s -> %s\r\n", i+1, s.Relays[i].Name, s.Relays[i].Host, s.Relays[i].ForwardAddr)
