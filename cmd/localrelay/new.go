@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/chzyer/readline"
@@ -19,6 +20,10 @@ func newRelay(opt *options, i int, cmd []string) error {
 	if len(opt.commands)-1 <= i {
 		fmt.Println("[WARN] Relay name was not provided.")
 		return nil
+	}
+
+	if err := createConfigDir(); err != nil {
+		return err
 	}
 
 	name := cmd[i+1]
@@ -131,4 +136,35 @@ func parseBool(input string) (bool, error) {
 	default:
 		return false, ErrParseBool
 	}
+}
+
+func createConfigDir() error {
+
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return err
+	}
+
+	dir := filepath.Join(home, configDirSuffix)
+
+	exists, err := pathExists(dir)
+	if err != nil {
+		return err
+	}
+
+	// already exists, don't recreate it
+	if exists {
+		return nil
+	}
+
+	return os.Mkdir(dir, 0644)
+}
+
+func pathExists(path string) (bool, error) {
+	_, err := os.Stat(path)
+	if err == nil {
+		return true, nil
+	}
+
+	return !os.IsNotExist(err), nil
 }

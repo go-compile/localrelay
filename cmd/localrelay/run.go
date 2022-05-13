@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"path/filepath"
 	"strings"
 	"sync"
 	"time"
@@ -27,6 +28,10 @@ var (
 	logDescriptors map[string]*io.Closer
 
 	forkIdentifier = "exec.signal-forked-process-true"
+
+	// configDirSuffix is prepended with the user's home dir.
+	// This is where the relay configs are stored.
+	configDirSuffix = ".localrelay/"
 )
 
 func runRelays(opt *options, i int, cmd []string) error {
@@ -44,9 +49,20 @@ func runRelays(opt *options, i int, cmd []string) error {
 		// now execute like normal
 	}
 
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return err
+	}
+
 	// Read all relay config files and decode them
 	relays := make([]Relay, 0, len(cmd[i+1:]))
 	for _, file := range cmd[i+1:] {
+
+		// if @ used as prefix grab the file from the user profile's
+		// config location
+		if strings.HasPrefix(file, "@") {
+			file = filepath.Join(home, configDirSuffix, file[1:])
+		}
 
 		f, err := os.Open(file)
 		if err != nil {
