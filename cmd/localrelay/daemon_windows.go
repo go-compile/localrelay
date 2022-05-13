@@ -165,6 +165,8 @@ func handleDaemonConn(conn net.Conn, l *npipe.PipeListener) {
 				}
 			}
 
+			closeLogDescriptors()
+
 			log.Printf("[Info] All relays closed:\n")
 
 			conn.Write([]byte{1})
@@ -185,6 +187,8 @@ func handleDaemonConn(conn net.Conn, l *npipe.PipeListener) {
 					log.Printf("[Error] Closing relay: %s with error: %s\n", r.Name, err)
 				}
 			}
+
+			closeLogDescriptors()
 
 			log.Printf("[Info] All relays closed:\n")
 

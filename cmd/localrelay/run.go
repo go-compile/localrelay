@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"net/url"
@@ -20,6 +21,10 @@ var (
 	// activeRelays is a list of relays being ran
 	activeRelays  map[string]*localrelay.Relay
 	activeRelaysM sync.Mutex
+
+	// logDescriptors is a list of filename to file descriptor
+	// this is used when shutting down.
+	logDescriptors map[string]*io.Closer
 
 	forkIdentifier = "exec.signal-forked-process-true"
 )
@@ -73,6 +78,7 @@ func launchRelays(relays []Relay) error {
 
 	wg := sync.WaitGroup{}
 	activeRelays = make(map[string]*localrelay.Relay, len(relays))
+	logDescriptors = make(map[string]*io.Closer, len(relays))
 
 	for i, r := range relays {
 		fmt.Printf("[Info] [Relay:%d] Starting %q on %q\n", i+1, r.Name, r.Host)
@@ -82,8 +88,19 @@ func launchRelays(relays []Relay) error {
 			return nil
 		}
 
-		// TODO: add logging to file
 		w := os.Stdout
+		if r.Logging != "stdout" {
+			fmt.Printf("[Info] [Relay:%s] Log output writing to: %q\n", r.Name, r.Logging)
+
+			f, err := os.OpenFile(r.Logging, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
+			if err != nil {
+				return err
+			}
+
+			addLogDescriptor(f, r.Logging)
+			w = f
+		}
+
 		relay := localrelay.New(r.Name, r.Host, r.Destination, w)
 
 		switch r.Kind {
@@ -122,6 +139,7 @@ func launchRelays(relays []Relay) error {
 				}
 
 				removeRelay(relay.Name)
+				removeLogDescriptor(r.Logging)
 				wg.Done()
 			}(relay)
 		case localrelay.ProxyHTTP, localrelay.ProxyHTTPS:
@@ -172,6 +190,7 @@ func launchRelays(relays []Relay) error {
 				}
 
 				removeRelay(relay.Name)
+				removeLogDescriptor(r.Logging)
 				wg.Done()
 			}(relay)
 
@@ -195,6 +214,28 @@ func removeRelay(name string) {
 	activeRelaysM.Unlock()
 }
 
+func addLogDescriptor(c io.Closer, path string) {
+	activeRelaysM.Lock()
+	logDescriptors[path] = &c
+	activeRelaysM.Unlock()
+}
+
+func removeLogDescriptor(path string) {
+	activeRelaysM.Lock()
+	delete(logDescriptors, path)
+	activeRelaysM.Unlock()
+}
+
+func closeLogDescriptors() {
+	activeRelaysM.Lock()
+	for _, c := range logDescriptors {
+		closer := *c
+
+		closer.Close()
+	}
+	activeRelaysM.Unlock()
+}
+
 func runningRelays() []*localrelay.Relay {
 	activeRelaysM.Lock()
 
@@ -205,6 +246,14 @@ func runningRelays() []*localrelay.Relay {
 	activeRelaysM.Unlock()
 
 	return relays
+}
+
+func closeDescriptor(path string) error {
+	activeRelaysM.Lock()
+	defer activeRelaysM.Unlock()
+
+	closer := *logDescriptors[path]
+	return closer.Close()
 }
 
 // runningRelaysCopy makes a copy instead of returning the
