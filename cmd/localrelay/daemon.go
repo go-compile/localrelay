@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	serviceName = "localrelay-pipe"
+	serviceName = "com.go-compile.localrelay.ipc.clipipe"
 )
 
 const (
@@ -25,6 +25,7 @@ const (
 	daemonStop
 
 	daemonFork
+	daemonMetrics
 )
 
 var (
@@ -42,6 +43,13 @@ type status struct {
 	Relays  []localrelay.Relay
 	Pid     int
 	Version string
+	// Metrics contains relay name as the index
+	Metrics map[string]metrics
+}
+
+type metrics struct {
+	In, Out, Active, DialAvg int
+	TotalConns               uint64
 }
 
 func readCommand(conn net.Conn) ([]byte, error) {

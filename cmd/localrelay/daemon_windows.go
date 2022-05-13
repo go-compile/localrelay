@@ -144,10 +144,26 @@ func handleDaemonConn(conn net.Conn, l *npipe.PipeListener) {
 		case daemonStatus:
 			respBuf := bytes.NewBuffer(nil)
 
+			relayMetrics := make(map[string]metrics)
+
+			relays := runningRelaysCopy()
+			for _, r := range relays {
+				active, total := r.Metrics.Connections()
+				relayMetrics[r.Name] = metrics{
+					In:         r.Metrics.Download(),
+					Out:        r.Metrics.Upload(),
+					Active:     active,
+					DialAvg:    r.DialerAvg(),
+					TotalConns: total,
+				}
+			}
+
 			json.NewEncoder(respBuf).Encode(&status{
-				Relays:  runningRelaysCopy(),
+				Relays:  relays,
 				Pid:     os.Getpid(),
 				Version: VERSION,
+
+				Metrics: relayMetrics,
 			})
 
 			lenbuf := make([]byte, 2)
