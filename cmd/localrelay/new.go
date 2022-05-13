@@ -33,6 +33,14 @@ func newRelay(opt *options, i int, cmd []string) error {
 		return nil
 	}
 
+	switch strings.ToLower(opt.proxy.Protocol) {
+	case "", "socks5":
+		// validate socks5 or empty is ok
+	default:
+		fmt.Println("[WARN] Unsupported proxy type.")
+		return nil
+	}
+
 	// TODO: add TLS certificate options
 	// TODO: add logging options
 	relay := Relay{
