@@ -67,17 +67,7 @@ func parseArgs() (*options, error) {
 
 			opt.host = value
 		case "detach", "bg":
-			value, err := getAnswer(args, arg, &i)
-			if err != nil {
-				return nil, err
-			}
-
-			toggle, err := parseBool(value)
-			if err != nil {
-				return nil, err
-			}
-
-			opt.detach = toggle
+			opt.detach = true
 		case "timeout":
 			value, err := getAnswer(args, arg, &i)
 			if err != nil {
@@ -192,7 +182,12 @@ func help() {
 	fmt.Println("    -output=<file_location> -tcp -http -https -proxy socks5://127.0.0.1:9050")
 	fmt.Println()
 	fmt.Println("  localrelay run <relay_config>")
+	fmt.Println("  localrelay run <relay_config> -detach")
 	fmt.Println("  localrelay run <relay_config> <relay_config2>...")
+	fmt.Println()
+	fmt.Println("  localrelay status")
+	fmt.Println("  localrelay stop")
+	fmt.Println("  localrelay restart")
 	fmt.Println()
 	fmt.Println("Arguments:")
 	fmt.Printf("  %-28s %s\n", "-host, -lhost", "Set listen host")
@@ -206,7 +201,7 @@ func help() {
 	fmt.Printf("  %-28s %s\n", "-proxy_ignore", "Destination indexes to ignore proxy settings")
 	fmt.Printf("  %-28s %s\n", "-version", "View version page")
 	fmt.Printf("  %-28s %s\n", "-timeout", "Set dial timeout for non proxied relays")
-	fmt.Printf("  %-28s %s\n", "-detach=true", "Run relay service in background")
+	fmt.Printf("  %-28s %s\n", "-detach", "Run relay service in background")
 }
 
 func version() {
