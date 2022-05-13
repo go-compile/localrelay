@@ -39,8 +39,9 @@ var (
 )
 
 type status struct {
-	Relays []localrelay.Relay
-	Pid    int
+	Relays  []localrelay.Relay
+	Pid     int
+	Version string
 }
 
 func readCommand(conn net.Conn) ([]byte, error) {

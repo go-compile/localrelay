@@ -145,8 +145,9 @@ func handleDaemonConn(conn net.Conn, l *npipe.PipeListener) {
 			respBuf := bytes.NewBuffer(nil)
 
 			json.NewEncoder(respBuf).Encode(&status{
-				Relays: runningRelaysCopy(),
-				Pid:    os.Getpid(),
+				Relays:  runningRelaysCopy(),
+				Pid:     os.Getpid(),
+				Version: VERSION,
 			})
 
 			lenbuf := make([]byte, 2)

@@ -26,6 +26,7 @@ func relayStatus() error {
 
 	fmt.Printf("\r\nDaemon:     \x1b[102m\x1b[30m [RUNNING] \x1b[0m\r\n")
 	fmt.Printf("PID:        [%d]\r\n", s.Pid)
+	fmt.Printf("Version:    [%s]\r\n", s.Version)
 	fmt.Printf("Relays:     [%d]\r\n", len(s.Relays))
 
 	for i := range s.Relays {
