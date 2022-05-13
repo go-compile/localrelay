@@ -24,6 +24,7 @@ type options struct {
 	proxy       Proxy
 	output      string
 	proxyIgnore []int
+	logs        string
 
 	commands []string
 	detach   bool
@@ -42,7 +43,9 @@ localrelay run ./nextcloud.toml ./git.toml -metrics=5s -logs=./relay.log
 func parseArgs() (*options, error) {
 	args := os.Args[1:]
 
-	opt := &options{}
+	opt := &options{
+		logs: "stdout",
+	}
 
 	for i := 0; i < len(args); i++ {
 		if !strings.HasPrefix(args[i], "-") {
@@ -66,6 +69,13 @@ func parseArgs() (*options, error) {
 			}
 
 			opt.host = value
+		case "log", "logs":
+			value, err := getAnswer(args, arg, &i)
+			if err != nil {
+				return nil, err
+			}
+
+			opt.logs = value
 		case "detach", "bg":
 			opt.detach = true
 		case "timeout":
@@ -202,6 +212,7 @@ func help() {
 	fmt.Printf("  %-28s %s\n", "-version", "View version page")
 	fmt.Printf("  %-28s %s\n", "-timeout", "Set dial timeout for non proxied relays")
 	fmt.Printf("  %-28s %s\n", "-detach", "Run relay service in background")
+	fmt.Printf("  %-28s %s\n", "-log", "Specify the file to write logs to")
 }
 
 func version() {
