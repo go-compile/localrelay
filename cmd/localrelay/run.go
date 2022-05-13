@@ -77,6 +77,11 @@ func launchRelays(relays []Relay) error {
 	for i, r := range relays {
 		fmt.Printf("[Info] [Relay:%d] Starting %q on %q\n", i+1, r.Name, r.Host)
 
+		if r.Proxy.Host != "" && strings.ToLower(r.Proxy.Protocol) != "socks5" {
+			fmt.Printf("[Warn] Proxy type %q not supported.\n", r.Proxy.Protocol)
+			return nil
+		}
+
 		// TODO: add logging to file
 		w := os.Stdout
 		relay := localrelay.New(r.Name, r.Host, r.Destination, w)
