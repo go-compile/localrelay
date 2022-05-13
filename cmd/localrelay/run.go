@@ -22,7 +22,7 @@ var (
 	activeRelays  map[string]*localrelay.Relay
 	activeRelaysM sync.Mutex
 
-	// logDescriptors is a list of filename to file descriptor
+	// logDescriptors is a list of relay name to file descriptor
 	// this is used when shutting down.
 	logDescriptors map[string]*io.Closer
 
@@ -97,7 +97,7 @@ func launchRelays(relays []Relay) error {
 				return err
 			}
 
-			addLogDescriptor(f, r.Logging)
+			addLogDescriptor(f, r.Name)
 			w = f
 		}
 
@@ -139,7 +139,7 @@ func launchRelays(relays []Relay) error {
 				}
 
 				removeRelay(relay.Name)
-				removeLogDescriptor(r.Logging)
+				removeLogDescriptor(r.Name)
 				wg.Done()
 			}(relay)
 		case localrelay.ProxyHTTP, localrelay.ProxyHTTPS:
@@ -190,7 +190,7 @@ func launchRelays(relays []Relay) error {
 				}
 
 				removeRelay(relay.Name)
-				removeLogDescriptor(r.Logging)
+				removeLogDescriptor(r.Name)
 				wg.Done()
 			}(relay)
 
@@ -214,15 +214,15 @@ func removeRelay(name string) {
 	activeRelaysM.Unlock()
 }
 
-func addLogDescriptor(c io.Closer, path string) {
+func addLogDescriptor(c io.Closer, name string) {
 	activeRelaysM.Lock()
-	logDescriptors[path] = &c
+	logDescriptors[name] = &c
 	activeRelaysM.Unlock()
 }
 
-func removeLogDescriptor(path string) {
+func removeLogDescriptor(name string) {
 	activeRelaysM.Lock()
-	delete(logDescriptors, path)
+	delete(logDescriptors, name)
 	activeRelaysM.Unlock()
 }
 
