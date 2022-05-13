@@ -9,9 +9,20 @@ import (
 
 func relayStatus() error {
 
+	// we don't set terminal to raw here because print statements don't use
+	// carriage returns
 	s, err := getDaemonStatus()
 	if err != nil {
+
+		// make terminal raw to allow the use of colour on windows terminals
+		current := console.Current()
+
+		if err := current.SetRaw(); err != nil {
+			log.Fatal(err)
+		}
+
 		fmt.Printf("Daemon:    \x1b[31m [OFFLINE] \x1b[0m\r\n")
+		current.Reset()
 
 		return nil
 	}
