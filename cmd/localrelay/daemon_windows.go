@@ -156,7 +156,6 @@ func handleDaemonConn(conn net.Conn, l *npipe.PipeListener) {
 			conn.Write(respBuf.Bytes())
 
 		case daemonStop:
-			l.Close()
 
 			for _, r := range runningRelays() {
 				log.Printf("[Info] Closing relay: %s\n", r.Name)
@@ -170,6 +169,7 @@ func handleDaemonConn(conn net.Conn, l *npipe.PipeListener) {
 			log.Printf("[Info] All relays closed:\n")
 
 			conn.Write([]byte{1})
+			l.Close()
 			os.Exit(0)
 		case daemonFork:
 			if err := fork(); err != nil {
@@ -179,8 +179,6 @@ func handleDaemonConn(conn net.Conn, l *npipe.PipeListener) {
 				return
 			}
 
-			l.Close()
-
 			for _, r := range runningRelays() {
 				log.Printf("[Info] Closing relay: %s\n", r.Name)
 				if err := r.Close(); err != nil {
@@ -193,6 +191,7 @@ func handleDaemonConn(conn net.Conn, l *npipe.PipeListener) {
 			log.Printf("[Info] All relays closed:\n")
 
 			conn.Write([]byte{1})
+			l.Close()
 			os.Exit(0)
 		default:
 			// unknown command return failed result
