@@ -193,7 +193,7 @@ func handleDaemonConn(conn net.Conn, l *npipe.PipeListener) {
 			l.Close()
 			os.Exit(0)
 		case daemonFork:
-			if err := fork(); err != nil {
+			if _, err := fork(); err != nil {
 				log.Printf("[Info] Fork error: %s\n", err)
 
 				conn.Write([]byte{0})

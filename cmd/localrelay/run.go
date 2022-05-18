@@ -91,6 +91,7 @@ func runRelays(opt *options, i int, cmd []string) error {
 }
 
 func launchRelays(relays []Relay) error {
+	// TODO: listen for sigterm signal and softly shutdown
 
 	wg := sync.WaitGroup{}
 	activeRelays = make(map[string]*localrelay.Relay, len(relays))

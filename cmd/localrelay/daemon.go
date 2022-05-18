@@ -5,6 +5,7 @@ import (
 	"encoding/binary"
 	"fmt"
 	"io"
+	"log"
 	"net"
 	"os"
 	"os/exec"
@@ -98,22 +99,58 @@ func runFork() error {
 
 	fmt.Println("Daemon not running, forking & starting relay daemon now")
 
-	cmd := exec.Command(os.Args[0], append([]string{"-" + forkIdentifier}, os.Args[1:]...)...)
-	err = cmd.Start()
+	p, err := fork()
 	if err != nil {
 		return err
 	}
 
-	fmt.Printf("[Info] Relays running in background on PID: %d\n", cmd.Process.Pid)
+	fmt.Printf("[Info] Relays running in background on PID: %d\n", p.Pid)
 	return nil
 }
 
-func fork() error {
-	cmd := exec.Command(os.Args[0], append([]string{"-" + forkIdentifier}, os.Args[1:]...)...)
-	err := cmd.Start()
+func fork() (*os.Process, error) {
+
+	// srv, err := daemon.New("localrelay", "localrelay daemon", daemon.SystemDaemon)
+	// if err != nil {
+	// 	log.Println("Error: ", err)
+	// 	os.Exit(1)
+	// }
+	// service := &Service{srv}
+	// fmt.Println(service.Daemon.Install())
+	// fmt.Println("sTART")
+	// fmt.Println(service.Daemon.Start())
+
+	// return &os.Process{}, nil
+
+	binary, err := exec.LookPath(os.Args[0])
 	if err != nil {
-		return err
+		log.Fatalln("Failed to lookup binary:", err)
 	}
 
-	return nil
+	cwd, err := os.Getwd()
+	if err != nil {
+		return nil, err
+	}
+
+	// BUG: when closing the terminal window once detached the process is still killed
+	p, err := os.StartProcess(binary, append([]string{binary, "-" + forkIdentifier}, os.Args[1:]...), &os.ProcAttr{Dir: cwd, Env: nil,
+		// Files: []*os.File{os.Stdin, os.Stdout, os.Stderr},
+		Files: []*os.File{nil, nil, nil},
+		Sys:   nil,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	// cmd := exec.Command(os.Args[0], append([]string{"-" + forkIdentifier}, os.Args[1:]...)...)
+	// err := cmd.Start()
+	// if err != nil {
+	// 	return nil, err
+	// }
+
+	// if err := cmd.Process.Release(); err != nil {
+	// 	return nil, err
+	// }
+
+	return p, nil
 }
