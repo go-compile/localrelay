@@ -173,3 +173,14 @@ The binary will be created in the current directory (`./cmd/localrelay`).
 ```bash
 GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -trimpath -o ./bin/localrelay-linux-64 ./cmd/localrelay
 ```
+
+### Build & Install
+
+```bash
+git clone github.com/go-compile/localrelay
+cd localrelay
+
+go install cmd/localrelay
+
+localrelay version
+```
