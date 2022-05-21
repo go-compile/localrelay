@@ -15,7 +15,7 @@ Access your local or remote services securely over [Tor](https://www.torproject.
 
 Many apps such as Nextcloud, Termis and Bitwarden do not allow you to specify a proxy when connecting to your self-hosted server. Localrelay allows you to host a local reverse proxy on your devices loopback. This relay then encrypts the outgoing traffic through your set SOCKS5 proxy (Tor: 127.0.0.1:9050).
 
-When at **home connect locally**, when away **connect over Tor**. Securely connect to remotely without port forwarding AND when at home connect directly with high speeds.
+When at **home connect locally**, when away **connect over Tor**. Securely connect remotely over Tor without port forwarding AND when at home connect directly with high speeds.
 
 # This Repository
 
@@ -180,7 +180,7 @@ GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -trimpath -o ./bin/localrelay-
 git clone github.com/go-compile/localrelay
 cd localrelay
 
-go install cmd/localrelay
+go install ./cmd/localrelay
 
 localrelay version
 ```
