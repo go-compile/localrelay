@@ -168,6 +168,9 @@ func parseArgs() (*options, error) {
 			opt.proxyType = localrelay.ProxyFailOverTCP
 		case "help", "h", "?":
 			help()
+			if len(os.Args) >= 3 {
+				fmt.Println("\n\n[Warn] It looks like you accidentally used -h instead of -host")
+			}
 			return nil, nil
 		default:
 			fmt.Printf("Unknown argument %q\n", arg)
