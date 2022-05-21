@@ -34,6 +34,9 @@ func main() {
 		case "help", "h", "?":
 			help()
 			return
+		case "version", "v":
+			version()
+			return
 		case "new":
 			if err := newRelay(opt, i, opt.commands); err != nil {
 				fmt.Println(err)
