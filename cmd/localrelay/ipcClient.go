@@ -3,7 +3,10 @@ package main
 import (
 	"bytes"
 	"encoding/binary"
-	"log"
+	"encoding/json"
+	"fmt"
+
+	"github.com/pkg/errors"
 )
 
 // serviceRun takes paths to relay config files and then connects via IPC to
@@ -11,7 +14,7 @@ import (
 func serviceRun(relays []string) error {
 	conn, err := IPCConnect()
 	if err != nil {
-		return err
+		return errors.Wrap(err, "connecting to IPC")
 	}
 
 	defer conn.Close()
@@ -35,16 +38,42 @@ func serviceRun(relays []string) error {
 		response := make([]byte, 1)
 		_, err := conn.Read(response)
 		if err != nil {
-			return err
+			return errors.Wrap(err, "reading from ipc conn")
 		}
 
 		// TODO: add "already running" error code
 		if response[0] != 1 {
-			log.Printf("[Error] Relay %q could not be started\n", relay)
+			fmt.Printf("[Error] Relay %q could not be started\n", relay)
 		} else {
-			log.Printf("[Info] Relay %q has been started\n", relay)
+			fmt.Printf("[Info] Relay %q has been started\n", relay)
 		}
 	}
 
 	return nil
+}
+
+func serviceStatus() (*status, error) {
+	conn, err := IPCConnect()
+	if err != nil {
+		return nil, err
+	}
+
+	defer conn.Close()
+
+	_, err = conn.Write([]byte{0, 3, daemonStatus, 0, 0})
+	if err != nil {
+		return nil, err
+	}
+
+	payload, err := readCommand(conn)
+	if err != nil {
+		return nil, err
+	}
+
+	var s status
+	if err := json.Unmarshal(payload, &s); err != nil {
+		return nil, err
+	}
+
+	return &s, nil
 }

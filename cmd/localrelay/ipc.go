@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/binary"
+	"encoding/json"
 	"io"
 	"log"
 	"net"
@@ -22,6 +23,7 @@ const (
 
 const (
 	daemonRun uint8 = iota
+	daemonStatus
 
 	maxErrors = 40
 )
@@ -128,12 +130,45 @@ func ipcLoop(conn io.ReadWriteCloser) error {
 			return err
 		}
 
+		// TODO: check if relay with same name is running
+
 		if err := launchRelays([]Relay{relay}, false); err != nil {
 			return err
 		}
 
 		// send success response
 		conn.Write([]byte{1})
+	case daemonStatus:
+		respBuf := bytes.NewBuffer(nil)
+
+		relayMetrics := make(map[string]metrics)
+
+		relays := runningRelaysCopy()
+		for _, r := range relays {
+			active, total := r.Metrics.Connections()
+			relayMetrics[r.Name] = metrics{
+				In:         r.Metrics.Download(),
+				Out:        r.Metrics.Upload(),
+				Active:     active,
+				DialAvg:    r.DialerAvg(),
+				TotalConns: total,
+			}
+		}
+
+		json.NewEncoder(respBuf).Encode(&status{
+			Relays:  relays,
+			Pid:     os.Getpid(),
+			Version: VERSION,
+			Started: daemonStarted.Unix(),
+
+			Metrics: relayMetrics,
+		})
+
+		lenbuf := make([]byte, 2)
+		binary.BigEndian.PutUint16(lenbuf, uint16(respBuf.Len()))
+
+		conn.Write(lenbuf)
+		conn.Write(respBuf.Bytes())
 	default:
 		// send unsuccessful response
 		conn.Write([]byte{0})

@@ -8,15 +8,11 @@ import (
 	"github.com/containerd/console"
 )
 
-func getDaemonStatus() (*status, error) {
-	return nil, nil
-}
-
 func relayStatus() error {
 
 	// we don't set terminal to raw here because print statements don't use
 	// carriage returns
-	s, err := getDaemonStatus()
+	s, err := serviceStatus()
 	if err != nil {
 
 		// make terminal raw to allow the use of colour on windows terminals
@@ -27,6 +23,7 @@ func relayStatus() error {
 		}
 
 		fmt.Printf("Daemon:    \x1b[31m [OFFLINE] \x1b[0m\r\n")
+		fmt.Println(err)
 		current.Reset()
 
 		return nil

@@ -82,9 +82,11 @@ func runRelays(opt *options, i int, cmd []string) error {
 
 	// if detach is enable fork process and start daemon
 	if opt.detach {
+		fmt.Println("[Warn] Elevated privileges required.")
+
 		running, err := daemonService.Status()
 		if err != nil {
-			return err
+			return errors.Wrap(err, "fetching service status")
 		}
 
 		if running != service.StatusRunning {

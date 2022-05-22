@@ -9,6 +9,7 @@ import (
 
 // IPCListen for windows uses name pipes to communicate
 func IPCListen() error {
+
 	l, err := npipe.Listen(`\\.\pipe\` + serviceName)
 	if err != nil {
 		return err

@@ -70,6 +70,7 @@ func main() {
 			}
 
 			return
+			// stop will shutdown the daemon service
 		case "stop":
 			if err := s.Stop(); err != nil {
 				log.Fatalf("[Error] Failed to stop service: %s\n", err)
@@ -77,6 +78,7 @@ func main() {
 
 			fmt.Println("Daemon has been shutdown")
 			return
+			// install will register the daemon service
 		case "install":
 			if err := s.Install(); err != nil {
 				fmt.Println("[Warn] Administrator privileges are required to install.")
@@ -86,22 +88,27 @@ func main() {
 			fmt.Println("Daemon service has been installed.")
 
 			return
+		case "uninstall":
+			if err := s.Uninstall(); err != nil {
+				fmt.Println("[Warn] Administrator privileges are required to uninstall.")
+				log.Fatalf("[Error] Failed to uninstall service: %s\n", err)
+			}
+
+			fmt.Println("Daemon service has been uninstalled.")
+
+			return
+			// start-service-daemon will run as the service daemon
 		case "start-service-daemon":
 			if err := s.Run(); err != nil {
 				log.Fatalf("[Error] Failed to run service: %s\n", err)
 			}
 
 			return
+			// restart will rerun the service but will not restore previously ran relays
 		case "restart":
-			if err := relayStatus(); err != nil {
-				fmt.Println(err)
-				return
+			if err := s.Restart(); err != nil {
+				log.Fatalf("[Error] Failed to restart service: %s\n", err)
 			}
-
-			// if err := forkDeamon(); err != nil {
-			// 	fmt.Println("Could not restart/fork daemon")
-			// 	return
-			// }
 
 			fmt.Println("Daemon has been restarted")
 			return
