@@ -132,9 +132,13 @@ func ipcLoop(conn io.ReadWriteCloser) error {
 
 		f.Close()
 
-		// TODO: check if relay with same name is running
+		if isRunning(relay.Name) {
+			conn.Write([]byte{2})
+			return nil
+		}
 
 		if err := launchRelays([]Relay{relay}, false); err != nil {
+			conn.Write([]byte{0})
 			return err
 		}
 

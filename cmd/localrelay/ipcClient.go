@@ -41,11 +41,13 @@ func serviceRun(relays []string) error {
 			return errors.Wrap(err, "reading from ipc conn")
 		}
 
-		// TODO: add "already running" error code
-		if response[0] != 1 {
-			fmt.Printf("[Error] Relay %q could not be started\n", relay)
-		} else {
-			fmt.Printf("[Info] Relay %q has been started\n", relay)
+		switch response[0] {
+		case 0:
+			fmt.Printf("[Error] Relay %q could not be started.\n", relay)
+		case 1:
+			fmt.Printf("[Info] Relay %q has been started.\n", relay)
+		case 2:
+			fmt.Printf("[Info] Relay %q is already running.\n", relay)
 		}
 	}
 

@@ -276,6 +276,14 @@ func closeLogDescriptors() {
 	activeRelaysM.Unlock()
 }
 
+func isRunning(relay string) bool {
+	activeRelaysM.Lock()
+	defer activeRelaysM.Unlock()
+
+	_, found := activeRelays[relay]
+	return found
+}
+
 func runningRelays() []*localrelay.Relay {
 	activeRelaysM.Lock()
 
