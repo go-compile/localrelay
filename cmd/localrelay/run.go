@@ -59,6 +59,11 @@ func runRelays(opt *options, i int, cmd []string) error {
 			file = filepath.Join(home, configDirSuffix, file[1:])
 		}
 
+		file, err = filepath.Abs(file)
+		if err != nil {
+			return err
+		}
+
 		f, err := os.Open(file)
 		if err != nil {
 			return errors.Wrapf(err, "file:%q", file)
@@ -102,6 +107,9 @@ func runRelays(opt *options, i int, cmd []string) error {
 			}
 
 			fmt.Println("[Info] Service has been started.")
+
+			// wait for proccess to launch
+			time.Sleep(time.Millisecond * 50)
 		}
 
 		return serviceRun(relayPaths)
