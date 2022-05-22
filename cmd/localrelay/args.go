@@ -94,6 +94,11 @@ func parseArgs() (*options, error) {
 
 			opt.key = value
 		case "detach", "bg":
+			// if runtime.GOOS != "windows" {
+			// 	fmt.Println("[Warn] Detach not supported on your platform.")
+			// 	return nil, nil
+			// }
+
 			opt.detach = true
 		case "timeout":
 			value, err := getAnswer(args, arg, &i)

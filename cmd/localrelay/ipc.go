@@ -16,8 +16,8 @@ import (
 type daemon struct{}
 
 const (
-	serviceName        = "Localrelay Service"
-	ipcSocket          = "com.go-compile.localrelay.ipc.clipipe"
+	serviceName        = "localrelayd"
+	ipcSocket          = "localrelay.ipc.socket"
 	serviceDescription = "Localrelay daemon relay runner"
 )
 
@@ -103,6 +103,7 @@ func ipcLoop(conn io.ReadWriteCloser) error {
 
 	cmdID, data, err := parseCommand(cmdBuf)
 	if err != nil {
+		conn.Write([]byte{4})
 		return err
 	}
 
@@ -111,11 +112,12 @@ func ipcLoop(conn io.ReadWriteCloser) error {
 		relayFile := string(data)
 		exists, err := pathExists(relayFile)
 		if err != nil {
+			conn.Write([]byte{4})
 			return err
 		}
 
 		if !exists {
-			conn.Write([]byte{0})
+			conn.Write([]byte{3})
 			return os.ErrNotExist
 		}
 
@@ -138,7 +140,12 @@ func ipcLoop(conn io.ReadWriteCloser) error {
 		}
 
 		if err := launchRelays([]Relay{relay}, false); err != nil {
-			conn.Write([]byte{0})
+			msgLen := make([]byte, 2)
+			binary.BigEndian.PutUint16(msgLen, uint16(len(err.Error())))
+
+			conn.Write([]byte{0, msgLen[0], msgLen[1]})
+			conn.Write([]byte(err.Error()))
+
 			return err
 		}
 
@@ -177,7 +184,12 @@ func ipcLoop(conn io.ReadWriteCloser) error {
 		conn.Write(respBuf.Bytes())
 	default:
 		// send unsuccessful response
-		conn.Write([]byte{0})
+		msg := "Unknown command"
+		msgLen := make([]byte, 2)
+		binary.BigEndian.PutUint16(msgLen, uint16(len(msg)))
+
+		conn.Write([]byte{0, msgLen[0], msgLen[1]})
+		conn.Write([]byte(msg))
 	}
 
 	return nil

@@ -44,10 +44,27 @@ func serviceRun(relays []string) error {
 		switch response[0] {
 		case 0:
 			fmt.Printf("[Error] Relay %q could not be started.\n", relay)
+
+			errlenBuf := make([]byte, 2)
+			if _, err := conn.Read(errlenBuf); err != nil {
+				return err
+			}
+
+			fmt.Println("1")
+			msg := make([]byte, binary.BigEndian.Uint16(errlenBuf))
+			if _, err := conn.Read(msg); err != nil {
+				return err
+			}
+
+			fmt.Println(string(msg))
 		case 1:
 			fmt.Printf("[Info] Relay %q has been started.\n", relay)
 		case 2:
 			fmt.Printf("[Info] Relay %q is already running.\n", relay)
+		case 3:
+			fmt.Printf("[Info] Relay %q does not exist.\n", relay)
+		case 4:
+			fmt.Printf("[Info] Relay %q errored when creating.\n", relay)
 		}
 	}
 
