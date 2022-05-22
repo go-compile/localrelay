@@ -75,12 +75,13 @@ func formatBytes(bytes int) string {
 	}
 
 	if unit := 1000000; bytes < unit {
-		return strconv.Itoa(bytes/unit) + "kb"
+		return strconv.FormatFloat(float64(bytes)/1000, 'f', 2, 64) + "kb"
 	}
 
 	if unit := 1000000000; bytes < unit {
-		return strconv.Itoa(bytes/unit) + "mb"
+		return strconv.FormatFloat(float64(bytes)/1000000, 'f', 2, 64) + "mb"
 	}
 
-	return strconv.Itoa(bytes/1000000000) + "gb"
+	return strconv.FormatFloat(float64(bytes)/1000000000, 'f', 2, 64) + "gb"
+
 }
