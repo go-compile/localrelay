@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/go-compile/localrelay"
+	"github.com/kardianos/service"
 	"github.com/naoina/toml"
 	"github.com/pkg/errors"
 	"golang.org/x/net/proxy"
@@ -36,23 +37,12 @@ var (
 
 func runRelays(opt *options, i int, cmd []string) error {
 
-	// if detach is enable fork process and start daemon
-	if opt.detach {
-		if !opt.isFork {
-			return runFork()
-		}
-
-		// if we are the fork child start the daemon listener
-		fmt.Println("Daemon launching daemon service")
-		launchDaemon()
-
-		// now execute like normal
-	}
-
 	home, err := os.UserHomeDir()
 	if err != nil {
 		return err
 	}
+
+	relayPaths := make([]string, 0, len(cmd[i+1:]))
 
 	// Read all relay config files and decode them
 	relays := make([]Relay, 0, len(cmd[i+1:]))
@@ -76,6 +66,9 @@ func runRelays(opt *options, i int, cmd []string) error {
 		}
 
 		relays = append(relays, relay)
+		// append path here so we validate the config first before sending to
+		// service.
+		relayPaths = append(relayPaths, file)
 
 		f.Close()
 	}
@@ -87,10 +80,30 @@ func runRelays(opt *options, i int, cmd []string) error {
 
 	fmt.Printf("Loaded: %d relays\n", len(relays))
 
-	return launchRelays(relays)
+	// if detach is enable fork process and start daemon
+	if opt.detach {
+		running, err := daemonService.Status()
+		if err != nil {
+			return err
+		}
+
+		if running != service.StatusRunning {
+			fmt.Println("[Info] Service not running.")
+
+			if err := daemonService.Start(); err != nil {
+				log.Fatalf("[Error] Failed to start service: %s\n", err)
+			}
+
+			fmt.Println("[Info] Service has been started.")
+		}
+
+		return serviceRun(relayPaths)
+	}
+
+	return launchRelays(relays, true)
 }
 
-func launchRelays(relays []Relay) error {
+func launchRelays(relays []Relay, wait bool) error {
 	// TODO: listen for sigterm signal and softly shutdown
 
 	wg := sync.WaitGroup{}
@@ -214,8 +227,11 @@ func launchRelays(relays []Relay) error {
 		}
 	}
 
-	wg.Wait()
-	fmt.Println("[Info] All relays closed.")
+	if wait {
+		wg.Wait()
+		fmt.Println("[Info] All relays closed.")
+	}
+
 	return nil
 }
 

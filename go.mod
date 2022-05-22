@@ -5,6 +5,7 @@ go 1.17
 require (
 	github.com/chzyer/readline v0.0.0-20180603132655-2972be24d48e
 	github.com/containerd/console v1.0.3
+	github.com/kardianos/service v1.2.1
 	github.com/naoina/toml v0.1.1
 	github.com/pkg/errors v0.9.1
 	github.com/tam7t/hpkp v0.0.0-20160821193359-2b70b4024ed5

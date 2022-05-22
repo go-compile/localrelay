@@ -8,6 +8,10 @@ import (
 	"github.com/containerd/console"
 )
 
+func getDaemonStatus() (*status, error) {
+	return nil, nil
+}
+
 func relayStatus() error {
 
 	// we don't set terminal to raw here because print statements don't use
