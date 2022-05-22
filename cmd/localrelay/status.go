@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"strconv"
 	"time"
 
 	"github.com/containerd/console"
@@ -57,7 +58,7 @@ func relayStatus() error {
 	fmt.Println("\r")
 	fmt.Printf("Total Conns: [%d]\r\n", totalConns)
 	fmt.Printf("Active:      [%d]\r\n", active)
-	fmt.Printf("In/Out:      [%d/%d]\r\n", in, out) //TODO: format in bytes/kb/mb/gb
+	fmt.Printf("In/Out:      [%s/%s]\r\n", formatBytes(in), formatBytes(out))
 	fmt.Printf("Uptime:      [%d minutes]\r\n", time.Unix(s.Started, 0).Minute())
 	// BUG: uptime incorrect
 
@@ -66,4 +67,20 @@ func relayStatus() error {
 	}
 
 	return nil
+}
+
+func formatBytes(bytes int) string {
+	if unit := 1000; bytes < unit {
+		return strconv.Itoa(bytes) + "bytes"
+	}
+
+	if unit := 1000000; bytes < unit {
+		return strconv.Itoa(bytes/unit) + "kb"
+	}
+
+	if unit := 1000000000; bytes < unit {
+		return strconv.Itoa(bytes/unit) + "mb"
+	}
+
+	return strconv.Itoa(bytes/1000000000) + "gb"
 }
