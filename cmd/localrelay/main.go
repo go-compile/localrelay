@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"strings"
+	"time"
 
 	"github.com/go-compile/localrelay"
 	"github.com/kardianos/service"
@@ -99,6 +100,7 @@ func main() {
 			return
 			// start-service-daemon will run as the service daemon
 		case "start-service-daemon":
+			daemonStarted = time.Now()
 			if err := s.Run(); err != nil {
 				log.Fatalf("[Error] Failed to run service: %s\n", err)
 			}

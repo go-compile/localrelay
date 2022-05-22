@@ -35,6 +35,11 @@ var (
 	configDirSuffix = ".localrelay/"
 )
 
+func init() {
+	activeRelays = make(map[string]*localrelay.Relay, 3)
+	logDescriptors = make(map[string]*io.Closer, 3)
+}
+
 func runRelays(opt *options, i int, cmd []string) error {
 
 	home, err := os.UserHomeDir()
@@ -64,13 +69,13 @@ func runRelays(opt *options, i int, cmd []string) error {
 			f.Close()
 			return err
 		}
+		f.Close()
 
 		relays = append(relays, relay)
 		// append path here so we validate the config first before sending to
 		// service.
 		relayPaths = append(relayPaths, file)
 
-		f.Close()
 	}
 
 	if len(relays) == 0 {
@@ -109,10 +114,10 @@ func launchRelays(relays []Relay, wait bool) error {
 	// TODO: listen for sigterm signal and softly shutdown
 
 	wg := sync.WaitGroup{}
-	activeRelays = make(map[string]*localrelay.Relay, len(relays))
-	logDescriptors = make(map[string]*io.Closer, len(relays))
 
-	for i, r := range relays {
+	for i := range relays {
+		r := relays[i]
+
 		fmt.Printf("[Info] [Relay:%d] Starting %q on %q\n", i+1, r.Name, r.Host)
 
 		if r.Proxy.Host != "" && strings.ToLower(r.Proxy.Protocol) != "socks5" {
