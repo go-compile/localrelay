@@ -223,6 +223,8 @@ func help() {
 	fmt.Println("  localrelay status")
 	fmt.Println("  localrelay stop")
 	fmt.Println("  localrelay restart")
+	fmt.Println("  localrelay install")
+	fmt.Println("  localrelay uninstall")
 	fmt.Println()
 	fmt.Println("Arguments:")
 	fmt.Printf("  %-28s %s\n", "-host, -lhost", "Set listen host")
