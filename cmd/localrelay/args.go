@@ -218,6 +218,7 @@ func help() {
 	fmt.Println("  localrelay run <relay_config> -detach")
 	fmt.Println("  localrelay run <relay_config> <relay_config2>...")
 	fmt.Println()
+	fmt.Println("  localrelay start")
 	fmt.Println("  localrelay status")
 	fmt.Println("  localrelay stop")
 	fmt.Println("  localrelay restart")
@@ -240,6 +241,7 @@ func help() {
 	fmt.Printf("  %-28s %s\n", "-log", "Specify the file to write logs to")
 	fmt.Printf("  %-28s %s\n", "-cert", "Set TLS certificate file")
 	fmt.Printf("  %-28s %s\n", "-key", "Set TLS key file")
+	fmt.Printf("  %-28s %s\n", "-noauto", "Set relay to not autostart")
 }
 
 func version() {
