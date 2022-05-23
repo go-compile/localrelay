@@ -70,7 +70,7 @@ const (
 	ProxyFailOverTCP
 
 	// VERSION uses semantic versioning
-	VERSION = "v1.2.0.beta10"
+	VERSION = "v1.2.0.beta11"
 )
 
 var (

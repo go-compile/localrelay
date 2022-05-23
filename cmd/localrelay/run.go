@@ -32,7 +32,7 @@ var (
 
 	// configDirSuffix is prepended with the user's home dir.
 	// This is where the relay configs are stored.
-	configDirSuffix = ".localrelay/"
+	configDirSuffix = "localrelay/"
 )
 
 func init() {
@@ -42,10 +42,7 @@ func init() {
 
 func runRelays(opt *options, i int, cmd []string) error {
 
-	home, err := os.UserHomeDir()
-	if err != nil {
-		return err
-	}
+	home := configDir()
 
 	relayPaths := make([]string, 0, len(cmd[i+1:]))
 
@@ -59,24 +56,17 @@ func runRelays(opt *options, i int, cmd []string) error {
 			file = filepath.Join(home, configDirSuffix, file[1:])
 		}
 
-		file, err = filepath.Abs(file)
+		file, err := filepath.Abs(file)
 		if err != nil {
 			return err
 		}
 
-		f, err := os.Open(file)
+		relay, err := readRelayConfig(file)
 		if err != nil {
-			return errors.Wrapf(err, "file:%q", file)
-		}
-
-		var relay Relay
-		if err := toml.NewDecoder(f).Decode(&relay); err != nil {
-			f.Close()
 			return err
 		}
-		f.Close()
 
-		relays = append(relays, relay)
+		relays = append(relays, *relay)
 		// append path here so we validate the config first before sending to
 		// service.
 		relayPaths = append(relayPaths, file)
@@ -324,4 +314,20 @@ func runningRelaysCopy() []localrelay.Relay {
 	activeRelaysM.Unlock()
 
 	return relays
+}
+
+func readRelayConfig(file string) (*Relay, error) {
+	f, err := os.Open(file)
+	if err != nil {
+		return nil, errors.Wrapf(err, "file:%q", file)
+	}
+
+	defer f.Close()
+
+	var relay Relay
+	if err := toml.NewDecoder(f).Decode(&relay); err != nil {
+		return nil, err
+	}
+
+	return &relay, nil
 }

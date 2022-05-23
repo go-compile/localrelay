@@ -140,11 +140,7 @@ func parseBool(input string) (bool, error) {
 
 func createConfigDir() error {
 
-	home, err := os.UserHomeDir()
-	if err != nil {
-		return err
-	}
-
+	home := configDir()
 	dir := filepath.Join(home, configDirSuffix)
 
 	exists, err := pathExists(dir)

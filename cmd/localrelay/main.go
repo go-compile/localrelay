@@ -113,6 +113,12 @@ func main() {
 			}
 
 			fmt.Println("Daemon has been restarted")
+		case "start":
+			if err := s.Start(); err != nil {
+				log.Fatalf("[Error] Failed to start service: %s\n", err)
+			}
+
+			fmt.Println("Daemon has been started")
 			return
 		case "status":
 			if err := relayStatus(); err != nil {
