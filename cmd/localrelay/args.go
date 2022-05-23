@@ -247,8 +247,9 @@ func help() {
 func version() {
 	fmt.Printf("LocalRelay CLI - %s\n", VERSION)
 	fmt.Println()
-	fmt.Println(" A reverse proxying program to allow services e.g. Nextcloud, Bitwarden etc to be accessed\n" +
-		" over Tor (SOCKS5) even when the client app do not support SOCKS proxies.")
+	fmt.Println(" A reverse proxying program to allow services e.g. Nextcloud, Bitwarden etc to\n" +
+		" be accessed over Tor (SOCKS5) even when the client app do not support\n" +
+		" SOCKS proxies.")
 	fmt.Println()
 	fmt.Println()
 	fmt.Println(" github.com/go-compile/localrelay")
