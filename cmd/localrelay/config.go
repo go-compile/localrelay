@@ -20,6 +20,8 @@ type Relay struct {
 	// ProxyIgnore is a list of destination indexes where
 	// the proxy settings should be ignored.
 	ProxyIgnore []int
+
+	DisableAutoStart bool
 }
 
 // Proxy is used for relay forwarding
