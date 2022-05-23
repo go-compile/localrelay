@@ -32,7 +32,8 @@ type options struct {
 	commands []string
 	detach   bool
 
-	isFork bool
+	isFork           bool
+	DisableAutoStart bool
 }
 
 /*
@@ -93,12 +94,9 @@ func parseArgs() (*options, error) {
 			}
 
 			opt.key = value
+		case "disable_autostart", "disable_auto_start", "nostart", "noauto":
+			opt.DisableAutoStart = true
 		case "detach", "bg":
-			// if runtime.GOOS != "windows" {
-			// 	fmt.Println("[Warn] Detach not supported on your platform.")
-			// 	return nil, nil
-			// }
-
 			opt.detach = true
 		case "timeout":
 			value, err := getAnswer(args, arg, &i)

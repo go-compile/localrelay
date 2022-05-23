@@ -56,7 +56,8 @@ func newRelay(opt *options, i int, cmd []string) error {
 		Certificate: opt.certificate,
 		Key:         opt.key,
 
-		Proxy: &opt.proxy,
+		Proxy:            &opt.proxy,
+		DisableAutoStart: opt.DisableAutoStart,
 	}
 
 	filename := name + ".toml"
