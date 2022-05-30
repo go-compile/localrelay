@@ -89,7 +89,6 @@ func runRelays(opt *options, i int, cmd []string) error {
 			return errors.Wrap(err, "fetching service status")
 		}
 
-		// BUG: service falsely returning as running on linux
 		if running != service.StatusRunning {
 			fmt.Println("[Info] Service not running.")
 

@@ -129,7 +129,6 @@ func main() {
 			// TODO: add logs. Connect via IPC and show live view
 			// TODO: add metrics with -interval=5s
 			// For attached and detached instances
-			// TODO: add autoload home dir config argument, use in addition of run configs
 		default:
 			fmt.Printf("Unrecognised command %q\n", opt.commands[i])
 			return

@@ -36,6 +36,8 @@ func (p daemon) Stop(s service.Service) error {
 
 func (p daemon) run() {
 
+	// TODO: listen to signals for reload from systemctl
+
 	if err := launchAutoStartRelays(); err != nil {
 		log.Fatal(err)
 	}
@@ -93,15 +95,12 @@ func launchAutoStartRelays() error {
 	return launchRelays(relays, false)
 }
 
+// configDir returns the parent config dir depending on the system.
+// A additional folder will be created within as a child inode.
 func configDir() string {
 	if runtime.GOOS == "windows" {
 		return "C:\\ProgramData"
 	}
 
-	home, err := os.UserHomeDir()
-	if err != nil {
-		log.Fatal("Error fetching home dir:", err)
-	}
-
-	return home
+	return "/etc"
 }
