@@ -67,7 +67,7 @@ To run a relay you must first create a relay config, this allows for permanent s
 
 ### Syntax
 
-```bash
+```sh
 # Create a simple TCP relay
 localrelay new <relay_name> -host <bind_addr> -destination <remote_addr>
 
@@ -89,7 +89,7 @@ localrelay new <relay_name> -host <bind_addr> -destination <remote_addr_(1)>,<re
 
 ### Examples
 
-```bash
+```sh
 # Create a simple TCP relay
 localrelay new example.com -host 127.0.0.1:8080 -destination example.com:80
 
@@ -112,7 +112,7 @@ Now you have your relay config toml files we can now launch them using the CLI.
 
 ### Syntax
 
-```bash
+```sh
 # Run 1 relay
 localrelay run <relay_config>
 
@@ -126,7 +126,7 @@ localrelay run <relay_config1> <relay_config2>...
 
 ### Examples
 
-```bash
+```sh
 # Run 1 relay
 localrelay run onion.toml
 
@@ -162,7 +162,7 @@ The binaries will be placed in `./bin/`.
 
 Open a terminal and cd into `./cmd/localrelay`.
 
-```bash
+```sh
 go build -trimpath -ldflags="-s -w"
 ```
 
@@ -170,13 +170,13 @@ The binary will be created in the current directory (`./cmd/localrelay`).
 
 ### Cross Compile
 
-```bash
+```sh
 GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -trimpath -o ./bin/localrelay-linux-64 ./cmd/localrelay
 ```
 
 ### Build & Install
 
-```bash
+```sh
 git clone github.com/go-compile/localrelay
 cd localrelay
 
@@ -184,3 +184,90 @@ go install ./cmd/localrelay
 
 localrelay version
 ```
+
+# Daemon/Service
+
+If you want Localrelay to start with system boot or just run in the background you can install the daemon. The daemon can be installed on either Windows, Mac or Linux. Currently only Windows and Linux have been tested.
+
+When interfacing with the Daemon **elevated privileges are required** for security. Either run in a administrator CMD window or run with SUDO on Unix based systems.
+
+
+
+## Installing Daemon/Service
+
+```sh
+# On Unix systems run with sudo
+# On Linux the daemon will be installed as a systemd service
+sudo localrelay install
+
+# On Windows open a administrator CMD
+# On Windows localrelay will be installed as a windows service
+# as LocalSystem.
+localrelay install
+```
+
+## Uninstalling Daemon/Service
+
+```sh
+# On Unix systems run with sudo
+sudo localrelay stop
+sudo localrelay uninstall
+
+# On Windows open a administrator CMD
+localrelay stop
+localrelay uninstall
+```
+
+## Starting a Relay
+
+To run a relay in the background a relay config can be ran with:
+```sh
+# Add new relay to the Daemon
+sudo localrelay run <relay.toml> -detach
+```
+
+*Remember on Windows use a admin CMD window*
+
+### Auto Start Relay
+
+If you want relays to auto start when the Daemon starts, you can add the relay configs into the appropriate directory.
+
+#### Windows
+```
+C:\ProgramData\localrelay\
+```
+
+#### Unix
+```
+/etc/localrelay/
+```
+
+*Note elevated privileges may be required.*
+
+Now when your system starts or you run `localrelay start` these relays will start too.
+
+### Stop/Restart/Status
+
+To manage the daemon you can use the following commands:
+```sh
+# Stop the relay and prevent it from auto restarting
+sudo localrelay stop
+
+# Restart the whole service proccess
+sudo localrelay restart
+
+# View relay stats and running relays
+sudo localrelay status
+```
+
+### View Daemon Output/Logs
+
+```sh
+# View all logs
+journalctl -u localrelayd
+
+# Follow log output
+journalctl -u localrelayd -f
+```
+
+*Daemon logs: Linux Only*
