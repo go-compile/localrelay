@@ -8,13 +8,18 @@ import (
 	"net"
 )
 
+var (
+	// ipcPathPrefix is the dir which comes before the unix socket
+	ipcPathPrefix = "/var/run/"
+)
+
 func IPCConnect() (io.ReadWriteCloser, error) {
-	return net.DialTimeout("unix", "/var/run/"+ipcSocket, ipcTimeout)
+	return net.DialTimeout("unix", ipcPathPrefix+ipcSocket, ipcTimeout)
 }
 
 func IPCListen() error {
 
-	l, err := net.Listen("unix", "/var/run/"+ipcSocket)
+	l, err := net.Listen("unix", ipcPathPrefix+ipcSocket)
 	if err != nil {
 		return err
 	}

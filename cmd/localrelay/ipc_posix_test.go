@@ -1,3 +1,6 @@
+//go:build darwin || dragonfly || freebsd || linux || netbsd || openbsd || solaris || !windows
+// +build darwin dragonfly freebsd linux netbsd openbsd solaris !windows
+
 package main
 
 import (
@@ -5,7 +8,9 @@ import (
 	"time"
 )
 
-func TestIPCWindows(t *testing.T) {
+func TestIPCPosix(t *testing.T) {
+
+	ipcPathPrefix = "./"
 	go func() {
 		if err := IPCListen(); err != nil {
 			t.Fatal(err)
