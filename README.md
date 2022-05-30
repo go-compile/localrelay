@@ -253,12 +253,14 @@ To manage the daemon you can use the following commands:
 # Stop the relay and prevent it from auto restarting
 sudo localrelay stop
 
-# Restart the whole service proccess
+# Restart the whole service processes
 sudo localrelay restart
 
 # View relay stats and running relays
 sudo localrelay status
 ```
+
+![Localrelay status](.github/images/service.status.png)
 
 ### View Daemon Output/Logs
 
