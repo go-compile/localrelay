@@ -31,20 +31,20 @@ build-linux:
 	echo "[BUILDING] arm64"
 	GOOS=linux GOARCH=arm64 go build -ldflags="-s -w" -trimpath -o ./bin/localrelay-linux-arm64 ./cmd/localrelay
 
-
+build-deb:
 # Build .deb packages
 	cp -r ./packages/deb ./packages/localrelay_$(version)_$(revision)_amd64
 	cp -r ./bin/localrelay-linux-64 ./packages/localrelay_$(version)_$(revision)_amd64/usr/bin
 	dpkg-deb --build --root-owner-group ./packages/localrelay_$(version)_$(revision)_amd64
 	mv ./packages/localrelay_$(version)_$(revision)_amd64.deb ./bin/localrelay_$(version)_$(revision)_amd64.deb
-	rm -rf ./packages/localrelay_$(version)_$(revision)_amd64
-
+	rm -rf ./packages/localrelay_$(version)_$(revision)_amd64	
+	
 	cp -r ./packages/deb ./packages/localrelay_$(version)_$(revision)_i386
 	cp -r ./bin/localrelay-linux ./packages/localrelay_$(version)_$(revision)_i386/usr/bin
 	dpkg-deb --build --root-owner-group ./packages/localrelay_$(version)_$(revision)_i386
 	mv ./packages/localrelay_$(version)_$(revision)_i386.deb ./bin/localrelay_$(version)_$(revision)_i386.deb
-	rm -rf ./packages/localrelay_$(version)_$(revision)_i386
-
+	rm -rf ./packages/localrelay_$(version)_$(revision)_i386	
+	
 	cp -r ./packages/deb ./packages/localrelay_$(version)_$(revision)_arm64
 	cp -r ./bin/localrelay-linux-arm64 ./packages/localrelay_$(version)_$(revision)_arm64/usr/bin
 	dpkg-deb --build --root-owner-group ./packages/localrelay_$(version)_$(revision)_arm64
@@ -79,6 +79,7 @@ cross-compile-linux:
 	make build-openbsd
 
 	make build-linux
+	make build-deb
 	
 cross-compile-cgo:
 # To cross compile from windows remove the whole CC variable
