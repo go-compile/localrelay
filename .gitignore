@@ -3,3 +3,5 @@ bin/
 cmd/localrelay/localrelay
 *.exe
 *.exe~
+.vscode
+*.deb
