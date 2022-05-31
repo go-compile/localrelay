@@ -99,46 +99,16 @@ func handleTCP(r *Relay, conn net.Conn) {
 
 func streamConns(client net.Conn, remote net.Conn, m *Metrics) {
 	go copierIn(client, remote, 128, m)
-	copierOut(remote, client, 128, m)
+	copierOut(client, remote, 128, m)
 }
 
-// NOTE: statics function for maximum performance
-func copierIn(src net.Conn, dst net.Conn, buffer int, m *Metrics) error {
+// NOTE: static function for maximum performance
+func copierIn(client net.Conn, dst net.Conn, buffer int, m *Metrics) error {
 
 	buf := make([]byte, buffer)
 	for {
 
-		n, err := src.Read(buf)
-		m.bandwidth(n, 0)
-		if err != nil {
-
-			// if we read some data, flush it then return a error
-			if n > 0 {
-				dst.Write(buf[:n])
-			}
-
-			src.Close()
-			dst.Close()
-
-			return err
-		}
-
-		if n2, err := dst.Write(buf[:n]); err != nil || n2 != n {
-			src.Close()
-			dst.Close()
-
-			return err
-		}
-	}
-}
-
-// NOTE: statics function for maximum performance
-func copierOut(src net.Conn, dst net.Conn, buffer int, m *Metrics) error {
-
-	buf := make([]byte, buffer)
-	for {
-
-		n, err := src.Read(buf)
+		n, err := dst.Read(buf)
 		m.bandwidth(0, n)
 		if err != nil {
 
@@ -147,14 +117,44 @@ func copierOut(src net.Conn, dst net.Conn, buffer int, m *Metrics) error {
 				dst.Write(buf[:n])
 			}
 
-			src.Close()
+			client.Close()
+			dst.Close()
+
+			return err
+		}
+
+		if n2, err := client.Write(buf[:n]); err != nil || n2 != n {
+			client.Close()
+			dst.Close()
+
+			return err
+		}
+	}
+}
+
+// NOTE: static function for maximum performance
+func copierOut(client net.Conn, dst net.Conn, buffer int, m *Metrics) error {
+
+	buf := make([]byte, buffer)
+	for {
+
+		n, err := client.Read(buf)
+		m.bandwidth(n, 0)
+		if err != nil {
+
+			// if we read some data, flush it then return a error
+			if n > 0 {
+				dst.Write(buf[:n])
+			}
+
+			client.Close()
 			dst.Close()
 
 			return err
 		}
 
 		if n2, err := dst.Write(buf[:n]); err != nil || n2 != n {
-			src.Close()
+			client.Close()
 			dst.Close()
 
 			return err

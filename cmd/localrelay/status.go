@@ -54,7 +54,7 @@ func relayStatus() error {
 		totalConns += int(m.TotalConns)
 		totalRequests += int(m.TotalRequests)
 		in += int(m.In)
-		out += int(m.In)
+		out += int(m.Out)
 		active += int(m.Active)
 	}
 
