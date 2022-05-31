@@ -227,8 +227,8 @@ Produced targets:
 | Windows          | `amd64 i386 arm64`  |   None   |
 | Linux            | `amd64 i386 arm64`  |   Deb    |
 | Darwin           |    `amd64 arm64`    |   None   |
-| FreeBSD          | `amd64 arm64 arm64` |   None   |
-| OpenBSD          | `amd64 arm64 arm64` |   None   |
+| FreeBSD          | `amd64 i386 arm64` |   None   |
+| OpenBSD          | `amd64 i386 arm64` |   None   |
 
 From linux you can run:
 
@@ -243,8 +243,8 @@ Produced targets:
 | Windows          | `amd64 i386`        |   None   |
 | Linux            | `amd64 i386 arm64`  |   Deb    |
 | Darwin           | `amd64 arm64`       |   None   |
-| FreeBSD          | `amd64 arm64 arm64` |   None   |
-| OpenBSD          | `amd64 arm64 arm64` |   None   |
+| FreeBSD          | `amd64 i386 arm64` |   None   |
+| OpenBSD          | `amd64 i386 arm64` |   None   |
 
 The binaries will be placed in `./bin/`.
 
