@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"sort"
 	"strconv"
 	"time"
 
@@ -63,6 +64,11 @@ func relayStatus() error {
 	fmt.Printf("In/Out:      [%s/%s]\r\n", formatBytes(in), formatBytes(out))
 	fmt.Printf("Uptime:      [%d minutes]\r\n", time.Unix(s.Started, 0).Minute())
 	// BUG: uptime incorrect
+
+	// sort alphabetically
+	sort.SliceStable(s.Relays, func(i, j int) bool {
+		return s.Relays[i].Name < s.Relays[j].Name
+	})
 
 	for i := range s.Relays {
 		fmt.Printf("  \x1b[90m%.2d\x1b[0m: %s\r\n      %s -> %s\r\n", i+1, s.Relays[i].Name, s.Relays[i].Host, s.Relays[i].ForwardAddr)
