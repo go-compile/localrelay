@@ -27,12 +27,16 @@ func handleHTTP(w http.ResponseWriter, r *http.Request, re *Relay) {
 
 	re.Metrics.requests(1)
 
+	remoteURL := re.ForwardAddr + r.URL.Path + "?" + r.URL.Query().Encode()
+
 	// BUG: sometimes requests redirect and cause a loop (Loop is auto stopped)
-	req, err := http.NewRequest(r.Method, re.ForwardAddr+r.URL.Path+"?"+r.URL.Query().Encode(), r.Body)
+	req, err := http.NewRequest(r.Method, remoteURL, r.Body)
 	if err != nil {
 		re.logger.Error.Println("BUILD REQUEST ERROR: ", err)
 		return
 	}
+
+	re.Metrics.bandwidth(int(req.ContentLength)+len(remoteURL), 0)
 
 	// Append request headers
 	for k, v := range r.Header {
@@ -54,5 +58,7 @@ func handleHTTP(w http.ResponseWriter, r *http.Request, re *Relay) {
 
 	w.WriteHeader(response.StatusCode)
 
-	io.Copy(w, response.Body)
+	in, _ := io.Copy(w, response.Body)
+	re.Metrics.bandwidth(0, int(in))
+
 }
