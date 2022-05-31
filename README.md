@@ -129,7 +129,7 @@ localrelay new onion -host 127.0.0.1:8080 -destination 192.168.1.240:80,2gzyxa5i
 
 Download the deb file and open a terminal in the same directory.
 ```sh
-sudo dpkg -i localrelay-linux-64.deb
+sudo dpkg -i <localrelay_VERSION_REVISION_ARCH.deb>
 ```
 
 ## Linux Other:
