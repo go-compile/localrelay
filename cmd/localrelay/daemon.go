@@ -32,6 +32,6 @@ type status struct {
 }
 
 type metrics struct {
-	In, Out, Active, DialAvg int
-	TotalConns               uint64
+	In, Out, Active, DialAvg  int
+	TotalConns, TotalRequests uint64
 }

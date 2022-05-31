@@ -44,19 +44,21 @@ func relayStatus() error {
 	fmt.Printf("Relays:      [%d]\r\n", len(s.Relays))
 
 	totalConns := 0
+	totalRequests := 0
 	in := 0
 	out := 0
 	active := 0
 
 	for _, m := range s.Metrics {
 		totalConns += int(m.TotalConns)
+		totalRequests += int(m.TotalRequests)
 		in += int(m.In)
 		out += int(m.In)
 		active += int(m.Active)
 	}
 
 	fmt.Println("\r")
-	fmt.Printf("Total Conns: [%d]\r\n", totalConns)
+	fmt.Printf("Total Conns: [%d] Total Requests: [%d]\r\n", totalConns, totalRequests)
 	fmt.Printf("Active:      [%d]\r\n", active)
 	fmt.Printf("In/Out:      [%s/%s]\r\n", formatBytes(in), formatBytes(out))
 	fmt.Printf("Uptime:      [%d minutes]\r\n", time.Unix(s.Started, 0).Minute())

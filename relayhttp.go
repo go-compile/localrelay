@@ -25,6 +25,8 @@ func HandleHTTP(relay *Relay) http.HandlerFunc {
 
 func handleHTTP(w http.ResponseWriter, r *http.Request, re *Relay) {
 
+	re.Metrics.requests(1)
+
 	// BUG: sometimes requests redirect and cause a loop (Loop is auto stopped)
 	req, err := http.NewRequest(r.Method, re.ForwardAddr+r.URL.Path+"?"+r.URL.Query().Encode(), r.Body)
 	if err != nil {

@@ -12,6 +12,7 @@ type Metrics struct {
 	dialFail, dialSuccess uint64
 	activeConns           int
 	totalConns            uint64
+	totalRequests         uint64
 
 	// dialTimes holds recent durations of how long it takes a
 	// relay to dial a remote
@@ -42,6 +43,14 @@ func (m *Metrics) Connections() (active int, total uint64) {
 	defer m.m.RUnlock()
 
 	return m.activeConns, m.totalConns
+}
+
+// Requests returns the amount of requests made via http
+func (m *Metrics) Requests() uint64 {
+	m.m.RLock()
+	defer m.m.RUnlock()
+
+	return m.totalRequests
 }
 
 // Dialer returns the successful dials and failed dials
@@ -106,4 +115,12 @@ func (m *Metrics) connections(delta int) {
 	}
 
 	m.activeConns += delta
+}
+
+// requests will update the requests metric
+func (m *Metrics) requests(delta int) {
+	m.m.Lock()
+	defer m.m.Unlock()
+
+	m.totalRequests += uint64(delta)
 }

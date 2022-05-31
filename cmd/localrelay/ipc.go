@@ -160,11 +160,12 @@ func ipcLoop(conn io.ReadWriteCloser) error {
 		for _, r := range relays {
 			active, total := r.Metrics.Connections()
 			relayMetrics[r.Name] = metrics{
-				In:         r.Metrics.Download(),
-				Out:        r.Metrics.Upload(),
-				Active:     active,
-				DialAvg:    r.DialerAvg(),
-				TotalConns: total,
+				In:            r.Metrics.Download(),
+				Out:           r.Metrics.Upload(),
+				Active:        active,
+				DialAvg:       r.DialerAvg(),
+				TotalConns:    total,
+				TotalRequests: r.Metrics.Requests(),
 			}
 		}
 
