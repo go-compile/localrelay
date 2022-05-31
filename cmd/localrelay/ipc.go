@@ -84,6 +84,12 @@ func handleConn(conn io.ReadWriteCloser, l io.Closer) {
 		// run in loop and handle errors here
 		if err := ipcLoop(conn); err != nil {
 			i++ //increase error counter
+
+			// connection has closed
+			if err == io.EOF {
+				return
+			}
+
 			log.Printf("[Error] IPC: %s\n", err)
 
 			// if connection closed quit
