@@ -106,6 +106,62 @@ localrelay new onion -host 127.0.0.1:8080 -destination 2gzyxa5ihm7nsggfxnu52rck2
 localrelay new onion -host 127.0.0.1:8080 -destination 192.168.1.240:80,2gzyxa5ihm7nsggfxnu52rck2vv4rvmdlkiu3zzui5du4xyclen53wid.onion:80 -failover -ignore_proxy=0 -proxy socks5://127.0.0.1:9050
 ```
 
+# Install/Download
+
+[Download the appropriate release](https://github.com/go-compile/localrelay/releases) for you platform.
+
+| Operating System/Distro | Recommended File           |
+| :---------------------- | :------------------------- |
+| Windows                 | localrelay-windows-x64.exe |
+| Debian/Ubuntu           | localrelay-linux-64.deb    |
+| Linux Other             | localrelay-linux-64        |
+| Android                 | localrelay-linux-arm64     |
+| Macos                   | localrelay-darwin          |
+| Macos (M1)              | localrelay-darwin-arm64    |
+| FreeBSD                 | localrelay-freebsd-64      |
+| OpenBSD                 | localrelay-openbsd-64      |
+
+> Depending on your systems arch you will need to select the right
+> one. **Most systems are amd64**. If you are running on a Raspberry Pi
+> You will want either **arm32** or **arm64**
+
+## Debian/Ubuntu:
+
+Download the deb file and open a terminal in the same directory.
+```sh
+sudo dpkg -i localrelay-linux-64.deb
+```
+
+## Linux Other:
+
+Download the binary file and open a terminal in the same directory.
+```sh
+# Give executable permissions
+chmod +x localrelay-linux-64
+# Rename to localrelay
+mv localrelay-linux-64 localrelay
+# Move to PATH
+sudo mv localrelay-linux-64 /usr/bin
+```
+
+## Windows:
+
+Steps for Windows 10. The *Environment Variables Settings* app will be slightly different if you're on Windows 8 or 7.
+
+1. Download the binary file. (ends in .exe)
+2. Rename to `"localrelay.exe"`
+3. Create a bin directory in documents (or anywhere else). `md %USERPROFILE%\Documents\bin`
+4. Copy the binary file to your new directory
+5. Open Environment variables settings. Use Windows search to type: *"Edit environment variables"* and open the application.
+6. On the user section (top) click the variable `"Path"` and then the button `"Edit..."`
+7. Then click new on the top right corner
+8. A input field will apear in the listbox. Input: `%USERPROFILE%\Documents\bin` then press enter.
+9. Finally open a NEW cmd window and type `localrelay version`.
+
+## Verify Binary Signature
+
+Make sure to check the binary SHA256 checksum with the signed checksums on the release page against my public GPG key.
+
 ## Run Relay
 
 Now you have your relay config toml files we can now launch them using the CLI.
@@ -144,17 +200,51 @@ localrelay run onion.toml bitwarden.toml
 localrelay run onion.toml bitwarden.toml nextcloud.toml piped.toml
 ```
 
-# Build
+# Build from Source
 
 This repository contains two code bases. The Localrelay package in the root and the CLI app in `./cmd/localrelay`. To compile the CLI you have two options. Compile for all targets (via the Makefile) or compile directly.
 
-## Compile For All Targets
+## Compile For Win, Linux & Darwin
 
 Open a terminal in the root of the repository and execute:
 
 ```
 make
 ```
+
+## Cross Compile
+
+From windows you can run:
+
+```sh
+make cross-compile-win
+```
+
+Produced targets:
+
+| Operating System |       Arches        | Packages |
+| :--------------- | :-----------------: | :------: |
+| Windows          | `amd64 i386 arm64`  |   None   |
+| Linux            | `amd64 i386 arm64`  |   Deb    |
+| Darwin           |    `amd64 arm64`    |   None   |
+| FreeBSD          | `amd64 arm64 arm64` |   None   |
+| OpenBSD          | `amd64 arm64 arm64` |   None   |
+
+From linux you can run:
+
+```sh
+make cross-compile-linux
+```
+
+Produced targets:
+
+| Operating System | Arches              | Packages |
+| :--------------- | :------------------ | :------: |
+| Windows          | `amd64 i386`        |   None   |
+| Linux            | `amd64 i386 arm64`  |   Deb    |
+| Darwin           | `amd64 arm64`       |   None   |
+| FreeBSD          | `amd64 arm64 arm64` |   None   |
+| OpenBSD          | `amd64 arm64 arm64` |   None   |
 
 The binaries will be placed in `./bin/`.
 
@@ -191,8 +281,6 @@ If you want Localrelay to start with system boot or just run in the background y
 
 When interfacing with the Daemon **elevated privileges are required** for security. Either run in a administrator CMD window or run with SUDO on Unix based systems.
 
-
-
 ## Installing Daemon/Service
 
 ```sh
@@ -221,34 +309,38 @@ localrelay uninstall
 ## Starting a Relay
 
 To run a relay in the background a relay config can be ran with:
+
 ```sh
 # Add new relay to the Daemon
 sudo localrelay run <relay.toml> -detach
 ```
 
-*Remember on Windows use a admin CMD window*
+_Remember on Windows use a admin CMD window_
 
 ### Auto Start Relay
 
 If you want relays to auto start when the Daemon starts, you can add the relay configs into the appropriate directory.
 
 #### Windows
+
 ```
 C:\ProgramData\localrelay\
 ```
 
 #### Unix
+
 ```
 /etc/localrelay/
 ```
 
-*Note elevated privileges may be required.*
+_Note elevated privileges may be required._
 
 Now when your system starts or you run `localrelay start` these relays will start too.
 
 ### Stop/Restart/Status
 
 To manage the daemon you can use the following commands:
+
 ```sh
 # Stop the relay and prevent it from auto restarting
 sudo localrelay stop
@@ -272,4 +364,4 @@ journalctl -u localrelayd
 journalctl -u localrelayd -f
 ```
 
-*Daemon logs: Linux Only*
+_Daemon logs: Linux Only_
