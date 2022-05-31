@@ -21,6 +21,7 @@ type Relay struct {
 	// the proxy settings should be ignored.
 	ProxyIgnore []int
 
+	// DisableAutoStart will stop the daemon from auto starting this relay
 	DisableAutoStart bool
 }
 

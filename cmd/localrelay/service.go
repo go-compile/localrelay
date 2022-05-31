@@ -54,7 +54,7 @@ func launchAutoStartRelays() error {
 		return err
 	}
 
-	home := configDir()
+	home := configSystemDir()
 	prefix := filepath.Join(home, configDirSuffix)
 
 	// read config dir in home folder
@@ -95,12 +95,16 @@ func launchAutoStartRelays() error {
 	return launchRelays(relays, false)
 }
 
-// configDir returns the parent config dir depending on the system.
+// configSystemDir returns the parent config dir depending on the system.
 // A additional folder will be created within as a child inode.
-func configDir() string {
+func configSystemDir() string {
 	if runtime.GOOS == "windows" {
 		return "C:\\ProgramData"
 	}
 
 	return "/etc"
+}
+
+func relaysDir() string {
+	return filepath.Join(configSystemDir(), configDirSuffix)
 }

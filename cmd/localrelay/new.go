@@ -64,6 +64,9 @@ func newRelay(opt *options, i int, cmd []string) error {
 	// If output file has been set use that instead
 	if opt.output != "" {
 		filename = opt.output
+	} else if opt.store {
+		// store config file in daemon config dir
+		filename = filepath.Join(relaysDir(), filename)
 	}
 
 	f, err := os.OpenFile(filename, os.O_WRONLY, os.ModeExclusive)
@@ -141,7 +144,7 @@ func parseBool(input string) (bool, error) {
 
 func createConfigDir() error {
 
-	home := configDir()
+	home := configSystemDir()
 	dir := filepath.Join(home, configDirSuffix)
 
 	exists, err := pathExists(dir)

@@ -34,6 +34,7 @@ type options struct {
 
 	isFork           bool
 	DisableAutoStart bool
+	store            bool
 }
 
 /*
@@ -98,6 +99,8 @@ func parseArgs() (*options, error) {
 			opt.DisableAutoStart = true
 		case "detach", "bg":
 			opt.detach = true
+		case "store":
+			opt.store = true
 		case "timeout":
 			value, err := getAnswer(args, arg, &i)
 			if err != nil {
@@ -241,7 +244,8 @@ func help() {
 	fmt.Printf("  %-28s %s\n", "-log", "Specify the file to write logs to")
 	fmt.Printf("  %-28s %s\n", "-cert", "Set TLS certificate file")
 	fmt.Printf("  %-28s %s\n", "-key", "Set TLS key file")
-	fmt.Printf("  %-28s %s\n", "-noauto", "Set relay to not autostart")
+	fmt.Printf("  %-28s %s\n", "-noauto", "Set relay to not autostart with daemon")
+	fmt.Printf("  %-28s %s\n", "-store", "Output relay configs to config dir")
 }
 
 func version() {
