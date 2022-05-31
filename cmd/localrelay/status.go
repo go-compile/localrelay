@@ -62,8 +62,7 @@ func relayStatus() error {
 	fmt.Printf("Total Conns: [%d] Total Requests: [%d]\r\n", totalConns, totalRequests)
 	fmt.Printf("Active:      [%d]\r\n", active)
 	fmt.Printf("In/Out:      [%s/%s]\r\n", formatBytes(in), formatBytes(out))
-	fmt.Printf("Uptime:      [%d minutes]\r\n", time.Unix(s.Started, 0).Minute())
-	// BUG: uptime incorrect
+	fmt.Printf("Uptime:      [%.2f minutes]\r\n", time.Since(time.Unix(s.Started, 0)).Minutes())
 
 	// sort alphabetically
 	sort.SliceStable(s.Relays, func(i, j int) bool {
