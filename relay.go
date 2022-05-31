@@ -70,7 +70,7 @@ const (
 	ProxyFailOverTCP
 
 	// VERSION uses semantic versioning
-	VERSION = "v1.2.0.beta13"
+	VERSION = "v1.2.0.beta14"
 )
 
 var (
@@ -153,6 +153,11 @@ func (r *Relay) SetHTTP(server http.Server) error {
 		server.Addr = r.Host
 	} else if server.Addr != r.Host {
 		return ErrAddrNotMatch
+	}
+
+	// if there is a trailing slash strip it
+	if len(r.ForwardAddr) > 1 && r.ForwardAddr[len(r.ForwardAddr)-1] == '/' {
+		r.ForwardAddr = r.ForwardAddr[:len(r.ForwardAddr)-1]
 	}
 
 	r.server = server
