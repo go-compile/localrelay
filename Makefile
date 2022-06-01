@@ -73,7 +73,7 @@ build-openbsd:
 # Cross compile from windows
 cross-compile-win:
 	make build-win
-	build-win-arm64
+	# build-win-arm64
 	make build-freebsd
 	make build-openbsd
 
