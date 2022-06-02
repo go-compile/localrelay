@@ -5,9 +5,39 @@ import (
 	"encoding/binary"
 	"encoding/json"
 	"fmt"
+	"io"
 
 	"github.com/pkg/errors"
 )
+
+// commandDataIPC will send a command with a data section
+func commandDataIPC(w io.Writer, id uint8, data []byte) error {
+	// calculate packet length
+	payloadLen := make([]byte, 2)
+	binary.BigEndian.PutUint16(payloadLen, uint16(len(data)+3))
+
+	if _, err := w.Write(payloadLen); err != nil {
+		return err
+	}
+
+	if _, err := w.Write([]byte{id}); err != nil {
+		return err
+	}
+
+	// write buf len
+	lenBuf := make([]byte, 2)
+	binary.BigEndian.PutUint16(lenBuf, uint16(len(data)))
+
+	if _, err := w.Write(lenBuf); err != nil {
+		return err
+	}
+
+	if _, err := w.Write([]byte(data)); err != nil {
+		return err
+	}
+
+	return nil
+}
 
 // serviceRun takes paths to relay config files and then connects via IPC to
 // instruct the service to run these relays
@@ -95,4 +125,37 @@ func serviceStatus() (*status, error) {
 	}
 
 	return &s, nil
+}
+
+func stopRelay(relayName string) error {
+	conn, err := IPCConnect()
+	if err != nil {
+		return err
+	}
+
+	defer conn.Close()
+
+	if err := commandDataIPC(conn, daemonStop, []byte(relayName)); err != nil {
+		return nil
+	}
+
+	response := make([]byte, 1)
+	if _, err := conn.Read(response); err != nil {
+		return err
+	}
+
+	switch response[0] {
+	case 0:
+		fmt.Println("Failed to stop relay.")
+	case 1:
+		fmt.Printf("Relay %q has been stopped.\n", relayName)
+	case 3:
+		fmt.Printf("Relay %q is not running.\n", relayName)
+	case 4:
+		fmt.Printf("Remote daemon failed to parse command.\n")
+	default:
+		fmt.Printf("Unknown response %d.\n", response[0])
+	}
+
+	return nil
 }

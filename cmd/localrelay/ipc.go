@@ -8,7 +8,9 @@ import (
 	"log"
 	"net"
 	"os"
+	"strings"
 
+	"github.com/go-compile/localrelay"
 	"github.com/naoina/toml"
 	"github.com/pkg/errors"
 )
@@ -24,6 +26,7 @@ const (
 const (
 	daemonRun uint8 = iota
 	daemonStatus
+	daemonStop
 
 	maxErrors = 40
 )
@@ -114,6 +117,31 @@ func ipcLoop(conn io.ReadWriteCloser) error {
 	}
 
 	switch cmdID {
+	case daemonStop:
+		relayName := string(data)
+
+		var relay *localrelay.Relay
+		for _, r := range runningRelays() {
+			if r.Name == strings.ToLower(relayName) {
+				relay = r
+				break
+			}
+		}
+
+		// relay not found
+		if relay == nil {
+			// send not found response
+			conn.Write([]byte{3})
+			return nil
+		}
+
+		if err := relay.Close(); err != nil {
+			conn.Write([]byte{0})
+			return err
+		}
+
+		// send success
+		conn.Write([]byte{1})
 	case daemonRun:
 		relayFile := string(data)
 		exists, err := pathExists(relayFile)

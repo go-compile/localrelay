@@ -73,13 +73,23 @@ func main() {
 			return
 			// stop will shutdown the daemon service
 		case "stop":
-			if err := s.Stop(); err != nil {
+
+			if len(opt.commands) == 1 {
+				if err := s.Stop(); err != nil {
+					log.Fatalf("[Error] Failed to stop service: %s\n", err)
+				}
+
+				fmt.Println("Daemon has been shutdown")
+				return
+			}
+
+			if err := stopRelay(opt.commands[1]); err != nil {
 				log.Fatalf("[Error] Failed to stop service: %s\n", err)
 			}
 
-			fmt.Println("Daemon has been shutdown")
 			return
-			// install will register the daemon service
+
+		// install will register the daemon service
 		case "install":
 			if err := s.Install(); err != nil {
 				fmt.Println("[Warn] Administrator privileges are required to install.")
