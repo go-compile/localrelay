@@ -62,7 +62,7 @@ func relayStatus() error {
 	fmt.Printf("Total Conns: [%d] Total Requests: [%d]\r\n", totalConns, totalRequests)
 	fmt.Printf("Active:      [%d]\r\n", active)
 	fmt.Printf("In/Out:      [%s/%s]\r\n", formatBytes(in), formatBytes(out))
-	fmt.Printf("Uptime:      [%.2f minutes]\r\n", time.Since(time.Unix(s.Started, 0)).Minutes())
+	fmt.Printf("Uptime:      [%s]\r\n", formatDuration(time.Since(time.Unix(s.Started, 0))))
 
 	// sort alphabetically
 	sort.SliceStable(s.Relays, func(i, j int) bool {
@@ -91,4 +91,20 @@ func formatBytes(bytes int) string {
 
 	return strconv.FormatFloat(float64(bytes)/1000000000, 'f', 2, 64) + "gb"
 
+}
+
+func formatDuration(d time.Duration) string {
+	if d.Minutes() < 1 {
+		return strconv.FormatFloat(d.Seconds(), 'f', 2, 64) + " secs"
+	}
+
+	if d.Hours() < 1 {
+		return strconv.FormatFloat(d.Minutes(), 'f', 2, 64) + " minutes"
+	}
+
+	if d.Hours()/24 < 1 {
+		return strconv.FormatFloat(d.Hours(), 'f', 2, 64) + " hours"
+	}
+
+	return strconv.FormatFloat(d.Hours()/24, 'f', 2, 64) + " days"
 }
