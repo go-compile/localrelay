@@ -1,13 +1,17 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
+	"log"
 	"os"
 	"os/signal"
+	"runtime"
 	"sort"
 	"strings"
 	"time"
 
+	"github.com/containerd/console"
 	"github.com/pkg/errors"
 )
 
@@ -26,6 +30,17 @@ func relayMetrics(opt *options) error {
 	status, err := serviceStatus()
 	if err != nil {
 		return err
+	}
+
+	// setting terminal to raw on linux results in SIGTERM not registering
+	if runtime.GOOS == "windows" {
+		// make terminal raw to allow the use of colour on windows terminals
+		current := console.Current()
+		defer current.Reset()
+
+		if err := current.SetRaw(); err != nil {
+			log.Fatal(err)
+		}
 	}
 
 	relays := []string{}
@@ -47,6 +62,23 @@ func relayMetrics(opt *options) error {
 	sig := make(chan os.Signal, 1)
 	go func() {
 		signal.Notify(sig, os.Interrupt)
+
+		if runtime.GOOS == "windows" {
+			// listen for interrupt
+			for {
+				buf := make([]byte, 4)
+				n, err := os.Stdin.Read(buf)
+				if err != nil {
+					os.Exit(0)
+					return
+				}
+
+				if bytes.Equal(buf[:n], []byte{3}) || bytes.Equal(buf[:n], []byte{8}) {
+					close(sig)
+					break
+				}
+			}
+		}
 	}()
 
 	for {
