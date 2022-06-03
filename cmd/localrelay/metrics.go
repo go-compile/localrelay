@@ -57,8 +57,6 @@ func relayMetrics(opt *options) error {
 		}
 	}
 
-	// lock := sync.Mutex{}
-
 	sig := make(chan os.Signal, 1)
 	go func() {
 		signal.Notify(sig, os.Interrupt)
@@ -81,6 +79,7 @@ func relayMetrics(opt *options) error {
 		}
 	}()
 
+	running := 0
 	for {
 		select {
 		case <-sig:
@@ -98,7 +97,14 @@ func relayMetrics(opt *options) error {
 				return err
 			}
 
-			metrics := make([]namedMetrics, 0, len(status.Metrics))
+			// if relay has gone offline clear bottom of screen
+			if x := len(status.Metrics); x < running {
+				fmt.Printf("\x1b[0J")
+			}
+
+			running = len(status.Metrics)
+
+			metrics := make([]namedMetrics, 0, running)
 			for k, m := range status.Metrics {
 				metrics = append(metrics, namedMetrics{k, m})
 			}
@@ -129,7 +135,7 @@ func relayMetrics(opt *options) error {
 				}
 			}
 
-			fmt.Printf("\r\n\x1b[2K [Running Relays: %d]\r\n", len(status.Metrics))
+			fmt.Printf("\r\n\x1b[2K [Running Relays: %d]\r\n", running)
 			fmt.Printf("\x1b[%dA", (count*2)+2)
 			time.Sleep(opt.interval)
 		}
