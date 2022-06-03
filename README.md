@@ -348,6 +348,9 @@ To manage the daemon you can use the following commands:
 # Stop the relay and prevent it from auto restarting
 sudo localrelay stop
 
+# Stop a single relay
+sudo localrelay stop <relay-name>
+
 # Restart the whole service processes
 sudo localrelay restart
 
