@@ -75,13 +75,17 @@ func relayStatus() error {
 
 		switch s.Relays[i].ProxyType {
 		case localrelay.ProxyTCP:
-			badges += "\x1b[30m [TCP] \x1b[0m"
+			badges += "\x1b[90m [TCP] \x1b[0m"
 		case localrelay.ProxyFailOverTCP:
-			badges += "\x1b[30m [FAIL-OVER] \x1b[0m"
+			badges += "\x1b[90m [FAIL-OVER] \x1b[0m"
 		case localrelay.ProxyHTTP:
-			badges += "\x1b[30m [HTTP] \x1b[0m"
+			badges += "\x1b[90m [HTTP] \x1b[0m"
 		case localrelay.ProxyHTTPS:
-			badges += "\x1b[30m [HTTPS] \x1b[0m"
+			badges += "\x1b[90m [HTTPS] \x1b[0m"
+		}
+
+		if s.Relays[i].ProxyEnabled {
+			badges += "\x1b[92m [PROXY] \x1b[0m"
 		}
 
 		fmt.Printf("  \x1b[90m%.2d\x1b[0m: %s %s\r\n      %s -> %s\r\n", i+1, s.Relays[i].Name, badges, s.Relays[i].Host, s.Relays[i].ForwardAddr)

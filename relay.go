@@ -30,7 +30,9 @@ type Relay struct {
 	// ProxyType is used to forward or manipulate the connection
 	ProxyType ProxyType
 
-	proxies []*proxy.Dialer
+	// ProxyEnabled is set to true when a proxy has been set for this relay
+	ProxyEnabled bool
+	proxies      []*proxy.Dialer
 	// remoteProxyIgnore is a list of indexes in the ForwardAddr array
 	// to which the proxy settings should be ignored
 	remoteProxyIgnore []int
@@ -70,7 +72,7 @@ const (
 	ProxyFailOverTCP
 
 	// VERSION uses semantic versioning
-	VERSION = "v1.3.0-beta1"
+	VERSION = "v1.3.0-beta2"
 )
 
 var (
@@ -119,7 +121,7 @@ func (r *Relay) setRunning(toggle bool) {
 // DisableProxy will disable the proxy settings when connecting
 // to the remote at the index provided.
 //
-// OPTION ONLY AVALIABLE FOR FAIL OVER TCP PROXY TYPE!
+// OPTION ONLY AVAILABLE FOR FAIL OVER TCP PROXY TYPE!
 func (r *Relay) DisableProxy(remoteIndex ...int) {
 	r.remoteProxyIgnore = remoteIndex
 }
@@ -168,6 +170,10 @@ func (r *Relay) SetHTTP(server http.Server) error {
 // SetClient will set the http client used by the relay
 func (r *Relay) SetClient(client *http.Client) {
 	r.httpClient = client
+
+	if r.httpClient.Transport != nil {
+		r.ProxyEnabled = true
+	}
 }
 
 // SetTLS sets the TLS certificates for use in the ProxyHTTPS relay.
@@ -184,6 +190,7 @@ func (r *Relay) SetTLS(certificateFile, keyFile string) {
 // or a list of proxies
 func (r *Relay) SetProxy(dialer ...*proxy.Dialer) {
 	r.proxies = dialer
+	r.ProxyEnabled = true
 }
 
 // Close will close the relay's listener
