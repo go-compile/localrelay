@@ -99,6 +99,9 @@ localrelay new example.com -host 127.0.0.1:8080 -destination http://example.com 
 # Create HTTPS relay
 localrelay new example.com -host 127.0.0.1:8080 -destination https://example.com -https -certificate=cert.pem key=key.pem
 
+# Create a TCP relay and store it in the config dir to auto start on system boot (daemon required)
+sudo localrelay new example.com -host 127.0.0.1:8080 -destination example.com:80 -store
+
 # Use proxy
 localrelay new onion -host 127.0.0.1:8080 -destination 2gzyxa5ihm7nsggfxnu52rck2vv4rvmdlkiu3zzui5du4xyclen53wid.onion:80 -proxy socks5://127.0.0.1:9050
 
