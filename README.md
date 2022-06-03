@@ -51,13 +51,13 @@ For examples of API usage visit [examples/](https://github.com/go-compile/localr
 
 Proxy your services whilst stripping personal information such as User-Agent, accept language or even cookies. Route the traffic through Tor to access the service anywhere in the word even behind a firewall.
 
-<center>
+<div align="center">
 
 ![Relay spoofing useragent & using Tor](/examples/http-privacy/access-tor.png)
 
 ![Relay spoofing useragent & accept language](/examples/http-privacy/ifconfig.me.png)
 
-</center>
+</div>
 
 # CLI Usage
 
@@ -115,7 +115,7 @@ localrelay new onion -host 127.0.0.1:8080 -destination 192.168.1.240:80,2gzyxa5i
 
 # Install/Download
 
-<center>
+<div align="center">
 
 [Download the appropriate release](https://github.com/go-compile/localrelay/releases) for you platform.
 
@@ -130,7 +130,7 @@ localrelay new onion -host 127.0.0.1:8080 -destination 192.168.1.240:80,2gzyxa5i
 | FreeBSD                 | localrelay-freebsd-64      |
 | OpenBSD                 | localrelay-openbsd-64      |
 
-</center>
+</div>
 
 > Depending on your systems arch you will need to select the right
 > one. **Most systems are amd64**. If you are running on a Raspberry Pi
@@ -233,7 +233,7 @@ From windows you can run:
 make cross-compile-win
 ```
 
-<center>
+<div align="center">
 
 
 Produced targets
@@ -246,7 +246,7 @@ Produced targets
 | FreeBSD          | `amd64 i386 arm64` |   None   |
 | OpenBSD          | `amd64 i386 arm64` |   None   |
 
-</center>
+</div>
 
 
 From linux you can run:
@@ -255,7 +255,7 @@ From linux you can run:
 make cross-compile-linux
 ```
 
-<center>
+<div align="center">
 
 Produced targets
 
@@ -270,7 +270,7 @@ Produced targets
 
 The binaries will be placed in `./bin/`.
 
-</center>
+</div>
 
 ## Compile For One Platform
 
@@ -393,11 +393,11 @@ sudo localrelay monitor <relay-name-(1)> <relay-name-(2)>...
 sudo localrelay status
 ```
 
-<center>
+<div align="center">
 
 ![Localrelay status](.github/images/service.status.png)
 
-</center>
+</div>
 ### View Daemon Output/Logs
 
 ```sh
