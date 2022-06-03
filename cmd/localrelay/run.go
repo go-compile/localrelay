@@ -206,7 +206,9 @@ func launchRelays(relays []Relay, wait bool) error {
 					panic(err)
 				}
 
-				prox.User = userinfo
+				if len(r.Proxy.Username) != 0 {
+					prox.User = userinfo
+				}
 
 				relay.SetClient(&http.Client{
 					Transport: &http.Transport{
