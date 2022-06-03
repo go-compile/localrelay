@@ -131,6 +131,7 @@ localrelay new onion -host 127.0.0.1:8080 -destination 192.168.1.240:80,2gzyxa5i
 ## Debian/Ubuntu:
 
 Download the deb file and open a terminal in the same directory.
+
 ```sh
 sudo dpkg -i <localrelay_VERSION_REVISION_ARCH.deb>
 ```
@@ -138,6 +139,7 @@ sudo dpkg -i <localrelay_VERSION_REVISION_ARCH.deb>
 ## Linux Other:
 
 Download the binary file and open a terminal in the same directory.
+
 ```sh
 # Give executable permissions
 chmod +x localrelay-linux-64
@@ -149,13 +151,13 @@ sudo mv localrelay-linux-64 /usr/bin
 
 ## Windows:
 
-Steps for Windows 10. The *Environment Variables Settings* app will be slightly different if you're on Windows 8 or 7.
+Steps for Windows 10. The _Environment Variables Settings_ app will be slightly different if you're on Windows 8 or 7.
 
 1. Download the binary file. (ends in .exe)
 2. Rename to `"localrelay.exe"`
 3. Create a bin directory in documents (or anywhere else). `md %USERPROFILE%\Documents\bin`
 4. Copy the binary file to your new directory
-5. Open Environment variables settings. Use Windows search to type: *"Edit environment variables"* and open the application.
+5. Open Environment variables settings. Use Windows search to type: _"Edit environment variables"_ and open the application.
 6. On the user section (top) click the variable `"Path"` and then the button `"Edit..."`
 7. Then click new on the top right corner
 8. A input field will apear in the listbox. Input: `%USERPROFILE%\Documents\bin` then press enter.
@@ -225,11 +227,11 @@ make cross-compile-win
 
 Produced targets:
 
-| Operating System |       Arches        | Packages |
-| :--------------- | :-----------------: | :------: |
-| Windows          | `amd64 i386 arm64`  |   None   |
-| Linux            | `amd64 i386 arm64`  |   Deb    |
-| Darwin           |    `amd64 arm64`    |   None   |
+| Operating System |       Arches       | Packages |
+| :--------------- | :----------------: | :------: |
+| Windows          | `amd64 i386 arm64` |   None   |
+| Linux            | `amd64 i386 arm64` |   Deb    |
+| Darwin           |   `amd64 arm64`    |   None   |
 | FreeBSD          | `amd64 i386 arm64` |   None   |
 | OpenBSD          | `amd64 i386 arm64` |   None   |
 
@@ -241,11 +243,11 @@ make cross-compile-linux
 
 Produced targets:
 
-| Operating System | Arches              | Packages |
-| :--------------- | :------------------ | :------: |
-| Windows          | `amd64 i386`        |   None   |
-| Linux            | `amd64 i386 arm64`  |   Deb    |
-| Darwin           | `amd64 arm64`       |   None   |
+| Operating System | Arches             | Packages |
+| :--------------- | :----------------- | :------: |
+| Windows          | `amd64 i386`       |   None   |
+| Linux            | `amd64 i386 arm64` |   Deb    |
+| Darwin           | `amd64 arm64`      |   None   |
 | FreeBSD          | `amd64 i386 arm64` |   None   |
 | OpenBSD          | `amd64 i386 arm64` |   None   |
 
@@ -353,6 +355,20 @@ sudo localrelay stop <relay-name>
 
 # Restart the whole service processes
 sudo localrelay restart
+
+# Monitor live auto updated metrics
+sudo localrelay monitor
+
+# Monitor live auto updated metrics with a custom refresh rate
+# ms Micro Seconds
+# s Seconds
+# m Minutes
+# h Hours
+# d Days
+sudo localrelay monitor -interval=5s
+
+# Monitor live auto updated metrics for specific relays
+sudo localrelay monitor <relay-name-(1)> <relay-name-(2)>...
 
 # View relay stats and running relays
 sudo localrelay status
