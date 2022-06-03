@@ -103,10 +103,13 @@ func relayMetrics(opt *options) error {
 			}
 
 			running = len(status.Metrics)
+			totalInOut := [2]int{}
 
 			metrics := make([]namedMetrics, 0, running)
 			for k, m := range status.Metrics {
 				metrics = append(metrics, namedMetrics{k, m})
+				totalInOut[0] += m.In
+				totalInOut[1] += m.Out
 			}
 
 			// sort alphabetically
@@ -135,7 +138,7 @@ func relayMetrics(opt *options) error {
 				}
 			}
 
-			fmt.Printf("\r\n\x1b[2K [Running Relays: %d]\r\n", running)
+			fmt.Printf("\r\n\x1b[2K  [Running Relays: %d] [In/Out: %s/%s]\r\n", running, formatBytes(totalInOut[0]), formatBytes(totalInOut[1]))
 			fmt.Printf("\x1b[%dA", (count*2)+2)
 			time.Sleep(opt.interval)
 		}
