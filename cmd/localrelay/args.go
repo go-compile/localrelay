@@ -35,6 +35,8 @@ type options struct {
 	isFork           bool
 	DisableAutoStart bool
 	store            bool
+
+	interval time.Duration
 }
 
 /*
@@ -49,7 +51,8 @@ func parseArgs() (*options, error) {
 	args := os.Args[1:]
 
 	opt := &options{
-		logs: "stdout",
+		logs:     "stdout",
+		interval: time.Second,
 	}
 
 	for i := 0; i < len(args); i++ {
@@ -67,6 +70,18 @@ func parseArgs() (*options, error) {
 		case "version":
 			version()
 			return nil, nil
+		case "interval", "refresh":
+			value, err := getAnswer(args, arg, &i)
+			if err != nil {
+				return nil, err
+			}
+
+			dur, err := time.ParseDuration(value)
+			if err != nil {
+				return nil, err
+			}
+
+			opt.interval = dur
 		case "host", "lhost":
 			value, err := getAnswer(args, arg, &i)
 			if err != nil {
@@ -223,6 +238,7 @@ func help() {
 	fmt.Println()
 	fmt.Println("  localrelay start")
 	fmt.Println("  localrelay status")
+	fmt.Println("  localrelay monitor")
 	fmt.Println("  localrelay stop")
 	fmt.Println("  localrelay stop <relay>")
 	fmt.Println("  localrelay restart")
@@ -247,6 +263,7 @@ func help() {
 	fmt.Printf("  %-28s %s\n", "-key", "Set TLS key file")
 	fmt.Printf("  %-28s %s\n", "-noauto", "Set relay to not autostart with daemon")
 	fmt.Printf("  %-28s %s\n", "-store", "Output relay configs to config dir")
+	fmt.Printf("  %-28s %s\n", "-interval", "Metrics refresh interval")
 }
 
 func version() {

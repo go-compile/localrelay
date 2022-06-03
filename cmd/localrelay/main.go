@@ -137,8 +137,12 @@ func main() {
 
 			return
 			// TODO: add logs. Connect via IPC and show live view
-			// TODO: add metrics with -interval=5s
-			// For attached and detached instances
+		case "metrics", "monitor":
+			if err := relayMetrics(opt); err != nil {
+				fmt.Println(err)
+			}
+
+			return
 		default:
 			fmt.Printf("Unrecognised command %q\n", opt.commands[i])
 			return
