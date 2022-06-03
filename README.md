@@ -235,7 +235,6 @@ make cross-compile-win
 
 <div align="center">
 
-
 Produced targets
 
 | Operating System |       Arches       | Packages |
@@ -246,8 +245,9 @@ Produced targets
 | FreeBSD          | `amd64 i386 arm64` |   None   |
 | OpenBSD          | `amd64 i386 arm64` |   None   |
 
-</div>
+The binaries will be placed in `./bin/`.
 
+</div>
 
 From linux you can run:
 
@@ -258,7 +258,6 @@ make cross-compile-linux
 <div align="center">
 
 Produced targets
-
 
 | Operating System | Arches             | Packages |
 | :--------------- | :----------------- | :------: |
@@ -398,6 +397,7 @@ sudo localrelay status
 ![Localrelay status](.github/images/service.status.png)
 
 </div>
+
 ### View Daemon Output/Logs
 
 ```sh
