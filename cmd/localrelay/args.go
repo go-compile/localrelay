@@ -224,6 +224,7 @@ func help() {
 	fmt.Println("  localrelay start")
 	fmt.Println("  localrelay status")
 	fmt.Println("  localrelay stop")
+	fmt.Println("  localrelay stop <relay>")
 	fmt.Println("  localrelay restart")
 	fmt.Println("  localrelay install")
 	fmt.Println("  localrelay uninstall")
