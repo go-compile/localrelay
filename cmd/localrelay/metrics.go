@@ -12,9 +12,8 @@ import (
 )
 
 var (
+	// ErrRelayNotRunning is returned if the selected relay isn't running
 	ErrRelayNotRunning = errors.New("relay not running")
-
-	tickFrames = []string{".", "..", "...", "-", "--", "---", "_", "__", "___"}
 )
 
 type namedMetrics struct {
@@ -74,10 +73,7 @@ func relayMetrics(opt *options) error {
 
 			// sort by bandwidth
 			sort.SliceStable(metrics, func(i, j int) bool {
-				x := metrics[i]
-				y := metrics[j]
-
-				return (x.In + x.Out) > (y.In + y.Out)
+				return metrics[i].name > metrics[j].name
 			})
 
 			count := len(relays)
