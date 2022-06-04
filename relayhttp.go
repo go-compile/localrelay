@@ -5,6 +5,7 @@ import (
 	"net"
 	"net/http"
 	"strings"
+	"time"
 )
 
 func relayHTTP(r *Relay, l net.Listener) error {
@@ -43,11 +44,14 @@ func handleHTTP(w http.ResponseWriter, r *http.Request, re *Relay) {
 		req.Header.Set(k, strings.Join(v, ","))
 	}
 
+	start := time.Now()
 	response, err := re.httpClient.Do(req)
 	if err != nil {
 		re.logger.Error.Println("FORWARD REQUEST ERROR: ", err)
 		return
 	}
+
+	re.Metrics.dial(1, 0, start)
 
 	defer response.Body.Close()
 
