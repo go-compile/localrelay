@@ -7,7 +7,13 @@ import (
 )
 
 func listener(r *Relay) (net.Listener, error) {
-	l, err := net.Listen("tcp", r.Host)
+
+	network := "tcp"
+	if r.ProxyType == ProxyUDP {
+		network = "udp"
+	}
+
+	l, err := net.Listen(network, r.Host)
 	if err != nil {
 		return nil, err
 	}

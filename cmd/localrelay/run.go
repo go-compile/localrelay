@@ -146,7 +146,7 @@ func launchRelays(relays []Relay, wait bool) error {
 		}
 
 		switch r.Kind {
-		case localrelay.ProxyTCP, localrelay.ProxyFailOverTCP:
+		case localrelay.ProxyTCP, localrelay.ProxyFailOverTCP, localrelay.ProxyUDP:
 			// If proxy enabled
 			if r.Proxy.Host != "" && strings.ToLower(r.Proxy.Protocol) == "socks5" {
 

@@ -74,6 +74,9 @@ const (
 	// it will use a failover address instead.
 	ProxyFailOverTCP
 
+	// ProxyUDP forwards UDP traffic
+	ProxyUDP
+
 	// VERSION uses semantic versioning
 	VERSION = "v1.3.0-beta3"
 )
@@ -230,6 +233,10 @@ func (r *Relay) ListenServe() error {
 		r.close = l
 
 		return relayTCP(r, l)
+	case ProxyUDP:
+		r.close = l
+
+		return relayUDP(r, l)
 	case ProxyHTTP:
 		r.close = l
 
@@ -264,6 +271,8 @@ func (r *Relay) Serve(l net.Listener) error {
 	switch r.ProxyType {
 	case ProxyTCP:
 		return relayTCP(r, l)
+	case ProxyUDP:
+		return relayUDP(r, l)
 	case ProxyHTTP:
 		return relayHTTP(r, l)
 	case ProxyHTTPS:
