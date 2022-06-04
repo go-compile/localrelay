@@ -4,6 +4,7 @@ import (
 	"io"
 	"net"
 	"net/http"
+	"strings"
 	"sync"
 
 	"github.com/pkg/errors"
@@ -56,6 +57,8 @@ type Relay struct {
 
 	running bool
 	m       sync.Mutex
+
+	protocolSwitching map[int]string
 }
 
 const (
@@ -72,7 +75,7 @@ const (
 	ProxyFailOverTCP
 
 	// VERSION uses semantic versioning
-	VERSION = "v1.3.0-beta2"
+	VERSION = "v1.3.0-beta3"
 )
 
 var (
@@ -99,7 +102,8 @@ func New(name, host, destination string, logger io.Writer) *Relay {
 
 		httpClient: http.DefaultClient,
 
-		logger: NewLogger(logger, name),
+		logger:            NewLogger(logger, name),
+		protocolSwitching: make(map[int]string, strings.Count(destination, ",")),
 	}
 }
 
@@ -143,6 +147,12 @@ func (r *Relay) ignoreProxySettings(remoteIndex int) bool {
 // the next will be attempted.
 func (r *Relay) SetFailOverTCP() {
 	r.ProxyType = ProxyFailOverTCP
+}
+
+// SetProtocolSwitch allows you to switch the outgoing protocol
+// NOTE: If a proxy is enabled protocol switching is disabled
+func (r *Relay) SetProtocolSwitch(index int, protocol string) {
+	r.protocolSwitching[index] = protocol
 }
 
 // SetHTTP is used to set the relay as a type HTTP relay

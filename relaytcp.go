@@ -31,11 +31,11 @@ func relayTCP(r *Relay, l net.Listener) error {
 			continue
 		}
 
-		go handleTCP(r, conn)
+		go handleConn(r, conn, "tcp")
 	}
 }
 
-func handleTCP(r *Relay, conn net.Conn) {
+func handleConn(r *Relay, conn net.Conn, network string) {
 	defer func() {
 		conn.Close()
 		r.Metrics.connections(-1)
@@ -81,7 +81,16 @@ func handleTCP(r *Relay, conn net.Conn) {
 	// Not using proxy so dial with standard dialer
 
 	r.logger.Info.Println("DIALLING FORWARD ADDRESS")
-	c, err := net.DialTimeout("tcp", r.ForwardAddr, Timeout)
+
+	proto := network
+
+	// if protocol switching enabled set the new network
+	if protocol, ok := r.protocolSwitching[0]; ok {
+		r.logger.Info.Printf("SWITCHING PROTOCOL FROM %q TO %q\n", network, protocol)
+		proto = protocol
+	}
+
+	c, err := net.DialTimeout(proto, r.ForwardAddr, Timeout)
 	if err != nil {
 		r.Metrics.dial(0, 1, start)
 

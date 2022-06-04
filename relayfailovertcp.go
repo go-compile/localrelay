@@ -30,11 +30,11 @@ func relayFailOverTCP(r *Relay, l net.Listener) error {
 			continue
 		}
 
-		go handleFailOverTCP(r, conn)
+		go handleFailOver(r, conn, "tcp")
 	}
 }
 
-func handleFailOverTCP(r *Relay, conn net.Conn) {
+func handleFailOver(r *Relay, conn net.Conn, network string) {
 	defer func() {
 		conn.Close()
 		r.Metrics.connections(-1)
@@ -47,7 +47,7 @@ func handleFailOverTCP(r *Relay, conn net.Conn) {
 	start := time.Now()
 
 	// If using a proxy dial with proxy
-	if r.proxies != nil {
+	if r.proxies != nil && len(r.protocolSwitching) == 0 {
 		r.logger.Info.Println("CREATING PROXY DIALER")
 
 		// Use proxies list as failover list
@@ -58,7 +58,7 @@ func handleFailOverTCP(r *Relay, conn net.Conn) {
 				if r.ignoreProxySettings(x) {
 					r.logger.Info.Printf("REMOTE [%d] IGNORING PROXY %d\n", x+1, i+1)
 
-					if err := tcpDial(r, conn, remoteAddress, x, start); err != nil {
+					if err := dial(r, conn, remoteAddress, x, network, start); err != nil {
 						continue
 					}
 
@@ -92,7 +92,15 @@ func handleFailOverTCP(r *Relay, conn net.Conn) {
 
 	// Not using proxy so dial with standard dialer
 	for i, remoteAddress := range strings.Split(r.ForwardAddr, ",") {
-		if err := tcpDial(r, conn, remoteAddress, i, start); err != nil {
+		proto := network
+
+		// if protocol switching enabled set the new network
+		if protocol, ok := r.protocolSwitching[i]; ok {
+			r.logger.Info.Printf("SWITCHING PROTOCOL FROM %q TO %q\n", network, protocol)
+			proto = protocol
+		}
+
+		if err := dial(r, conn, remoteAddress, i, proto, start); err != nil {
 			// dial next host
 			continue
 		}
@@ -101,10 +109,10 @@ func handleFailOverTCP(r *Relay, conn net.Conn) {
 	}
 }
 
-func tcpDial(r *Relay, conn net.Conn, remoteAddress string, i int, start time.Time) error {
+func dial(r *Relay, conn net.Conn, remoteAddress string, i int, network string, start time.Time) error {
 	r.logger.Info.Printf("DIALLING FORWARD ADDRESS [%d]\n", i+1)
 
-	c, err := net.DialTimeout("tcp", remoteAddress, Timeout)
+	c, err := net.DialTimeout(network, remoteAddress, Timeout)
 	if err != nil {
 		r.Metrics.dial(0, 1, start)
 
