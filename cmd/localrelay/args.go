@@ -181,6 +181,8 @@ func parseArgs() (*options, error) {
 			opt.proxy.Password = pw
 		case "tcp":
 			opt.proxyType = localrelay.ProxyTCP
+		case "udp":
+			opt.proxyType = localrelay.ProxyUDP
 		case "http":
 			opt.proxyType = localrelay.ProxyHTTP
 		case "https":
@@ -249,6 +251,7 @@ func help() {
 	fmt.Printf("  %-28s %s\n", "-host, -lhost", "Set listen host")
 	fmt.Printf("  %-28s %s\n", "-destination, -dst, -rhost", "Set forward address")
 	fmt.Printf("  %-28s %s\n", "-tcp", "Set relay to TCP relay")
+	fmt.Printf("  %-28s %s\n", "-udp", "Set relay to UDP relay")
 	fmt.Printf("  %-28s %s\n", "-http", "Set relay to HTTP relay")
 	fmt.Printf("  %-28s %s\n", "-https", "Set relay to HTTPS relay")
 	fmt.Printf("  %-28s %s\n", "-failover", "Set relay to TCP failover relay")
