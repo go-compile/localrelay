@@ -137,6 +137,13 @@ func launchRelays(relays []Relay, wait bool) error {
 		}
 
 		relay := localrelay.New(r.Name, r.Host, r.Destination, w)
+		for index, proto := range r.ProtocolSwitch {
+			if len(proto) == 0 {
+				continue
+			}
+
+			relay.SetProtocolSwitch(index, proto)
+		}
 
 		switch r.Kind {
 		case localrelay.ProxyTCP, localrelay.ProxyFailOverTCP:

@@ -23,6 +23,11 @@ type Relay struct {
 
 	// DisableAutoStart will stop the daemon from auto starting this relay
 	DisableAutoStart bool
+
+	// ProtocolSwitch allows the outbound protocol to be switched
+	// this only works for TCP and UDP.
+	// NOTE: If a proxy is enabled protocol switching is disabled
+	ProtocolSwitch []string
 }
 
 // Proxy is used for relay forwarding
