@@ -48,6 +48,7 @@ func handleHTTP(w http.ResponseWriter, r *http.Request, re *Relay) {
 	response, err := re.httpClient.Do(req)
 	if err != nil {
 		re.logger.Error.Println("FORWARD REQUEST ERROR: ", err)
+		re.Metrics.dial(0, 1, start)
 		return
 	}
 
