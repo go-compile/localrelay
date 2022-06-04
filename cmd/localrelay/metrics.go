@@ -80,6 +80,11 @@ func relayMetrics(opt *options) error {
 	}()
 
 	running := 0
+	// set ticker to micro second to triger metrics to render instantly
+	// then change tricker within case statement to correct interval
+	ticker := time.NewTicker(time.Microsecond)
+	defer ticker.Stop()
+
 	for {
 		select {
 		case <-sig:
@@ -91,7 +96,8 @@ func relayMetrics(opt *options) error {
 			}
 
 			return nil
-		default:
+		case <-ticker.C:
+			ticker.Reset(opt.interval)
 			status, err := serviceStatus()
 			if err != nil {
 				return err
@@ -140,7 +146,6 @@ func relayMetrics(opt *options) error {
 
 			fmt.Printf("\r\n\x1b[2K  [Running Relays: %d] [In/Out: %s/%s]\r\n", running, formatBytes(totalInOut[0]), formatBytes(totalInOut[1]))
 			fmt.Printf("\x1b[%dA", (count*2)+2)
-			time.Sleep(opt.interval)
 		}
 	}
 }
