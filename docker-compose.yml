@@ -1,0 +1,9 @@
+version: "3"
+services:
+  localrelay:
+    container_name: localrelay
+    image: localrelay:latest
+    network_mode: "host"
+    restart: unless-stopped
+    volumes:
+      - ./localrelay:/etc/localrelay:ro
