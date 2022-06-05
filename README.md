@@ -1,11 +1,21 @@
 # LocalRelay
 
-[![go.dev reference](https://img.shields.io/badge/go.dev-reference-007d9c?logo=go&logoColor=white)](https://pkg.go.dev/github.com/go-compile/localrelay)
+[![GitHub release](https://img.shields.io/github/release/go-compile/localrelay.svg)](https://github.com/go-compile/localrelay/releases)
 [![Go Report Card](https://goreportcard.com/badge/go-compile/localrelay)](https://goreportcard.com/report/go-compile/localrelay)
+[![go.dev reference](https://img.shields.io/badge/go.dev-reference-007d9c?logo=go&logoColor=white)](https://pkg.go.dev/github.com/go-compile/localrelay)
+[![Docker Size](https://img.shields.io/docker/image-size/gocompile/localrelay?sort=date)](https://hub.docker.com/r/gocompile/localrelay/)
 
-<!-- [![GitHub release](https://img.shields.io/github/release/go-compile/localrelay.svg)](https://github.com/go-compile/localrelay/releases) -->
+
 
 A cross platform CLI & lib which acts as a reverse proxy allowing the destination address to be customised and allows the use of a SOCKS5 proxy. Supporting both raw TCP connections and HTTP/HTTPS connections with options such as; IP locking, Certificate pinning. This app allows you to host services e.g. Nextcloud on Tor and access it on your mobile or laptop anywhere.
+
+<div align=center>
+
+[Download Release](https://github.com/go-compile/localrelay/releases/latest) 
+
+[Docker Image](https://hub.docker.com/r/gocompile/localrelay)
+
+</div>
 
 # Use Cases
 
@@ -409,3 +419,27 @@ journalctl -u localrelayd -f
 ```
 
 _Daemon logs: Linux Only_
+
+# Docker
+
+[View on Dockerhub](https://hub.docker.com/r/gocompile/localrelay). Supported arches: `amd64,arm64,arm/v7`. Compressed image size: `<3mb`. Super small light weight, low CPU, RAM and disk usage container perfect for low power devices.
+
+> docker-compose.yaml
+
+```yaml
+version: "3"
+services:
+  localrelay:
+    container_name: localrelay
+    image: gocompile/localrelay:latest
+    network_mode: "host"
+    restart: unless-stopped
+    volumes:
+      - ./localrelay:/etc/localrelay:ro
+```
+
+```sh
+docker-compose up -d
+```
+
+Place your relay configs in ./localrelay/. The configs will be loaded when the relay starts.
