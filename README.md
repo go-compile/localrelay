@@ -12,8 +12,8 @@ A cross platform CLI & lib which acts as a reverse proxy allowing the destinatio
 
 <div align=center>
 
-[Download Release](https://github.com/go-compile/localrelay/releases/latest) 
-[Docker Image](https://hub.docker.com/r/gocompile/localrelay)
+[\[ Download Release \]](https://github.com/go-compile/localrelay/releases/latest) 
+[\[ Docker Image \]](https://hub.docker.com/r/gocompile/localrelay)
 
 </div>
 
