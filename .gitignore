@@ -5,3 +5,4 @@ cmd/localrelay/localrelay
 *.exe~
 .vscode
 *.deb
+/localrelay
