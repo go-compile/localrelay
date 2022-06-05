@@ -1,5 +1,7 @@
 FROM golang:1.18-alpine AS builder
 
+ARG TARGETPLATFORM
+
 WORKDIR /app/src
 
 COPY ./cmd/localrelay /app/src/
@@ -12,8 +14,9 @@ RUN go get github.com/go-compile/localrelay@master
 # Build as static binary
 RUN CGO_ENABLED=0 go build -v -ldflags="-s -w -extldflags -static" -tags osusergo,netgo -o /app/localrelay
 
-RUN apk add upx
-RUN upx --ultra-brute /app/localrelay
+# RUN arch=$TARGETPLATFORM; amd64="linux/amd64"
+# RUN if [ $arch = $amd64 ]; then apk add upx; fi
+# RUN if [ $arch = $amd64 ]; then upx --ultra-brute /app/localrelay; fi
 
 RUN rm -rf /app/src
 
