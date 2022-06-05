@@ -33,6 +33,8 @@ var (
 	// configDirSuffix is prepended with the user's home dir.
 	// This is where the relay configs are stored.
 	configDirSuffix = "localrelay/"
+
+	ErrInvalidRelayName = errors.New("invalid relay name")
 )
 
 func init() {
@@ -115,6 +117,10 @@ func launchRelays(relays []Relay, wait bool) error {
 
 	for i := range relays {
 		r := relays[i]
+
+		if !validateName(r.Name) {
+			return ErrInvalidRelayName
+		}
 
 		fmt.Printf("[Info] [Relay:%d] Starting %q on %q\n", i+1, r.Name, r.Host)
 

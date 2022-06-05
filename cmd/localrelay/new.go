@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 
 	"github.com/chzyer/readline"
@@ -14,6 +15,8 @@ import (
 var (
 	// ErrParseBool is returned when a boolean can not be parsed
 	ErrParseBool = errors.New("cannot parse boolean")
+
+	relayNameFormat = regexp.MustCompile("^[a-zA-Z0-9]+(?:-[a-zA-Z0-9]+)*$")
 )
 
 func newRelay(opt *options, i int, cmd []string) error {
@@ -27,6 +30,10 @@ func newRelay(opt *options, i int, cmd []string) error {
 	}
 
 	name := cmd[i+1]
+	if !validateName(name) {
+		fmt.Println("[WARN] Invalid relay name.")
+		return nil
+	}
 
 	if opt.host == "" {
 		fmt.Println("[WARN] Host was not set.")
@@ -167,4 +174,8 @@ func pathExists(path string) (bool, error) {
 	}
 
 	return !os.IsNotExist(err), nil
+}
+
+func validateName(name string) bool {
+	return relayNameFormat.MatchString(name)
 }

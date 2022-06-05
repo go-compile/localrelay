@@ -48,6 +48,11 @@ func relayMetrics(opt *options) error {
 	// build filter list for relays
 	if len(opt.commands) > 1 {
 		for _, relayName := range opt.commands[1:] {
+			if !validateName(relayName) {
+				fmt.Println("[WARN] Invalid relay name.")
+				return nil
+			}
+
 			if _, ok := status.Metrics[strings.ToLower(relayName)]; !ok {
 				fmt.Printf("Relay %q is not running.\n", relayName)
 				return nil
