@@ -1,4 +1,4 @@
-version := 1.2.0
+version := 1.3.0
 revision := 1
 # Install in ubuntu/deb: sudo apt install gcc-aarch64-linux-gnu binutils-aarch64-linux-gnu
 # arch64_cc is only required if cgo_enabled=1
@@ -38,16 +38,18 @@ build-deb:
 	mkdir -p ./packages/deb_i386/usr/bin
 	mkdir -p ./packages/deb_amd64/usr/bin
 
-	cp ./bin/localrelay-linux-64 ./packages/localrelay 
+	cp ./bin/localrelay-linux-64 ./packages/localrelay
 	cp -r ./packages/deb_amd64/ ./packages/localrelay_$(version)_$(revision)_amd64
 	mv ./packages/localrelay ./packages/localrelay_$(version)_$(revision)_amd64/usr/bin
+	sed -i -E 's/^(#)?Version: <VERSION>/Version: $(version)/' ./packages/localrelay_$(version)_$(revision)_amd64/DEBIAN/control
 	dpkg-deb --build --root-owner-group ./packages/localrelay_$(version)_$(revision)_amd64
 	mv ./packages/localrelay_$(version)_$(revision)_amd64.deb ./bin/localrelay_$(version)_$(revision)_amd64.deb
-	rm -rf ./packages/localrelay_$(version)_$(revision)_amd64	
+	rm -rf ./packages/localrelay_$(version)_$(revision)_amd64
 
 	cp ./bin/localrelay-linux ./packages/localrelay
 	cp -r ./packages/deb_i386/ ./packages/localrelay_$(version)_$(revision)_i386
 	mv ./packages/localrelay ./packages/localrelay_$(version)_$(revision)_i386/usr/bin
+	sed -i -E 's/^(#)?Version: <VERSION>/Version: $(version)/' ./packages/localrelay_$(version)_$(revision)_i386/DEBIAN/control
 	dpkg-deb --build --root-owner-group ./packages/localrelay_$(version)_$(revision)_i386
 	mv ./packages/localrelay_$(version)_$(revision)_i386.deb ./bin/localrelay_$(version)_$(revision)_i386.deb
 	rm -rf ./packages/localrelay_$(version)_$(revision)_i386
@@ -55,7 +57,8 @@ build-deb:
 	
 	cp ./bin/localrelay-linux-arm64 ./packages/localrelay
 	cp -r ./packages/deb_arm64/ ./packages/localrelay_$(version)_$(revision)_arm64
-	mv ./packages/localrelay  ./packages/localrelay_$(version)_$(revision)_arm64/usr/bin
+	mv ./packages/localrelay ./packages/localrelay_$(version)_$(revision)_arm64/usr/bin
+	sed -i -E 's/^(#)?Version: <VERSION>/Version: $(version)/' ./packages/localrelay_$(version)_$(revision)_arm64/DEBIAN/control
 	dpkg-deb --build --root-owner-group ./packages/localrelay_$(version)_$(revision)_arm64
 	mv ./packages/localrelay_$(version)_$(revision)_arm64.deb ./bin/localrelay_$(version)_$(revision)_arm64.deb
 	rm -rf ./packages/localrelay_$(version)_$(revision)_arm64
@@ -82,7 +85,7 @@ cross-compile-win:
 	GOOS=linux GOARCH=arm64 go build -ldflags="-s -w" -trimpath -o ./bin/localrelay-linux-arm64 ./cmd/localrelay
 
 cross-compile-linux:
-	build-win
+	make build-win
 
 	make build-freebsd
 	make build-openbsd

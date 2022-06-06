@@ -1,5 +1,5 @@
 Package: localrelay
-Version: 1.2.0
+Version: <VERSION>
 Architecture: amd64
 Maintainer: Go Compile
 Homepage: https://github.com/go-compile/localrelay
