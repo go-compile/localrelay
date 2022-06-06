@@ -404,7 +404,17 @@ sudo localrelay status
 
 <div align="center">
 
+> localrelay status
+
 ![Localrelay status](.github/images/service.status.png)
+
+</div>
+
+<div align="center">
+
+> localrelay monitor
+
+![Localrelay status](.github/images/monitor.png)
 
 </div>
 
