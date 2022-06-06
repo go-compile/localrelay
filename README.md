@@ -164,7 +164,7 @@ chmod +x localrelay-linux-64
 # Rename to localrelay
 mv localrelay-linux-64 localrelay
 # Move to PATH
-sudo mv localrelay-linux-64 /usr/bin
+sudo mv localrelay /usr/bin
 ```
 
 ## Windows:
