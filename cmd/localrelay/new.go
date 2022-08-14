@@ -26,7 +26,7 @@ func newRelay(opt *options, i int, cmd []string) error {
 	}
 
 	if err := createConfigDir(); err != nil {
-		return err
+		fmt.Printf("[WARN] Failed to create config dir: %s\n", err)
 	}
 
 	name := cmd[i+1]
