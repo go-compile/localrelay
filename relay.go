@@ -78,7 +78,7 @@ const (
 	ProxyUDP
 
 	// VERSION uses semantic versioning
-	VERSION = "v1.3.0"
+	VERSION = "v1.3.1"
 )
 
 var (

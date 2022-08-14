@@ -341,7 +341,7 @@ func readRelayConfig(file string) (*Relay, error) {
 
 	var relay Relay
 	if err := toml.NewDecoder(f).Decode(&relay); err != nil {
-		return nil, err
+		return nil, errors.Wrapf(err, "file:%q", file)
 	}
 
 	return &relay, nil
