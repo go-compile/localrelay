@@ -16,7 +16,7 @@ A cross platform CLI & lib which acts as a reverse proxy allowing the destinatio
 
 </div>
 
-# Use Cases
+## Use Cases
 
 If you self host a service for example; [Bitwarden](https://github.com/dani-garcia/vaultwarden), [Nextcloud](https://github.com/nextcloud), [Syncthing](https://github.com/syncthing/syncthing), [Grafana](https://github.com/grafana/grafana), [Gitea](https://github.com/go-gitea/gitea)... You may not want to expose your public IP address to the internet. Especially considering some self-hosted platforms such as [Plex](https://www.plex.tv/) has been exploited with code execution [vulnerabilities](https://www.cvedetails.com/vulnerability-list.php?vendor_id=14994). You may consider to protect it behind Tor (however this isn't full proof).
 
@@ -26,13 +26,13 @@ Many apps such as Nextcloud, Termis and Bitwarden do not allow you to specify a 
 
 When at **home connect locally**, when away **connect over Tor**. Securely connect remotely over Tor without port forwarding AND when at home connect directly with high speeds.
 
-# This Repository
+## This Repository
 
 This repository contains the library written in Go, for it's cross platform capabilities, and contains the CLI application which can be ran on all major operating systems including [Android via Termux](https://termux.com/).
 
 For examples of API usage visit [examples/](https://github.com/go-compile/localrelay/tree/master/examples).
 
-# Library Features
+## Library Features
 
 - Create relays with custom remote address
 - Proxy remote address through SOCKS5 proxy
@@ -56,7 +56,7 @@ For examples of API usage visit [examples/](https://github.com/go-compile/localr
   - Dialler 10 point average response time
     - When using Tor this is the circuit build time
 
-# Privacy Proxies
+## Privacy Proxies
 
 Proxy your services whilst stripping personal information such as User-Agent, accept language or even cookies. Route the traffic through Tor to access the service anywhere in the word even behind a firewall.
 
@@ -68,17 +68,17 @@ Proxy your services whilst stripping personal information such as User-Agent, ac
 
 </div>
 
-# CLI Usage
+## CLI Usage
 
 You can download the CLI from the [releases tab](https://github.com/go-compile/localrelay/releases) or compile it your self by building [./cmd/localrelay](https://github.com/go-compile/localrelay/tree/cli.v1.0.0-alpha/cmd/localrelay). All releases hashed with SHA256 and signed.
 
 Once you've downloaded the CLI you will need to give it execute permission if you're on a Unix based system. This is done with `chmod +x localrelay`. You don't need root permission to run the relay nor should you use it even if you want to run on a privileged port. Use `sudo setcap CAP_NET_BIND_SERVICE=+eip /path/to/localrelay` instead.
 
-## Create Relay
+### Create Relay
 
 To run a relay you must first create a relay config, this allows for permanent storage of relay configuration and easy management. You can create as many of these as you like.
 
-### Syntax
+#### Syntax
 
 ```sh
 # Create a simple TCP relay
@@ -100,7 +100,7 @@ localrelay new <relay_name> -host <bind_addr> -destination <remote_addr> -output
 localrelay new <relay_name> -host <bind_addr> -destination <remote_addr_(1)>,<remote_addr_(2)> -failover
 ```
 
-### Examples
+#### Examples
 
 ```sh
 # Create a simple TCP relay
@@ -145,7 +145,7 @@ localrelay new onion -host 127.0.0.1:8080 -destination 192.168.1.240:80,2gzyxa5i
 > one. **Most systems are amd64**. If you are running on a Raspberry Pi
 > You will want either **arm32** or **arm64**
 
-## Debian/Ubuntu:
+### Debian/Ubuntu:
 
 Download the deb file and open a terminal in the same directory.
 
@@ -153,7 +153,7 @@ Download the deb file and open a terminal in the same directory.
 sudo dpkg -i <localrelay_VERSION_REVISION_ARCH.deb>
 ```
 
-## Linux Other:
+### Linux Other:
 
 Download the binary file and open a terminal in the same directory.
 
@@ -166,7 +166,7 @@ mv localrelay-linux-64 localrelay
 sudo mv localrelay /usr/bin
 ```
 
-## Windows:
+### Windows:
 
 Steps for Windows 10. The _Environment Variables Settings_ app will be slightly different if you're on Windows 8 or 7.
 
@@ -180,15 +180,15 @@ Steps for Windows 10. The _Environment Variables Settings_ app will be slightly 
 8. A input field will apear in the listbox. Input: `%USERPROFILE%\Documents\bin` then press enter.
 9. Finally open a NEW cmd window and type `localrelay version`.
 
-## Verify Binary Signature
+### Verify Binary Signature
 
 Make sure to check the binary SHA256 checksum with the signed checksums on the release page against my public GPG key.
 
-## Run Relay
+### Run Relay
 
 Now you have your relay config toml files we can now launch them using the CLI.
 
-### Syntax
+#### Syntax
 
 ```sh
 # Run 1 relay
@@ -202,7 +202,7 @@ localrelay run <relay_config1> <relay_config2>
 localrelay run <relay_config1> <relay_config2>...
 ```
 
-### Examples
+#### Examples
 
 ```sh
 # Run 1 relay
@@ -222,11 +222,11 @@ localrelay run onion.toml bitwarden.toml
 localrelay run onion.toml bitwarden.toml nextcloud.toml piped.toml
 ```
 
-# Build from Source
+## Build from Source
 
 This repository contains two code bases. The Localrelay package in the root and the CLI app in `./cmd/localrelay`. To compile the CLI you have two options. Compile for all targets (via the Makefile) or compile directly.
 
-## Compile For Win, Linux & Darwin
+### Compile For Win, Linux & Darwin
 
 Open a terminal in the root of the repository and execute:
 
@@ -234,7 +234,7 @@ Open a terminal in the root of the repository and execute:
 make
 ```
 
-## Cross Compile
+### Cross Compile
 
 From windows you can run:
 
@@ -280,7 +280,7 @@ The binaries will be placed in `./bin/`.
 
 </div>
 
-## Compile For One Platform
+### Compile For One Platform
 
 Open a terminal and cd into `./cmd/localrelay`.
 
@@ -290,13 +290,13 @@ go build -trimpath -ldflags="-s -w"
 
 The binary will be created in the current directory (`./cmd/localrelay`).
 
-### Cross Compile
+#### Cross Compile
 
 ```sh
 GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -trimpath -o ./bin/localrelay-linux-64 ./cmd/localrelay
 ```
 
-### Build & Install
+#### Build & Install
 
 ```sh
 git clone github.com/go-compile/localrelay
@@ -307,13 +307,13 @@ go install ./cmd/localrelay
 localrelay version
 ```
 
-# Daemon/Service
+## Daemon/Service
 
 If you want Localrelay to start with system boot or just run in the background you can install the daemon. The daemon can be installed on either Windows, Mac or Linux. Currently only Windows and Linux have been tested.
 
 When interfacing with the Daemon **elevated privileges are required** for security. Either run in a administrator CMD window or run with SUDO on Unix based systems.
 
-## Installing Daemon/Service
+### Installing Daemon/Service
 
 ```sh
 # On Unix systems run with sudo
@@ -326,7 +326,7 @@ sudo localrelay install
 localrelay install
 ```
 
-## Uninstalling Daemon/Service
+### Uninstalling Daemon/Service
 
 ```sh
 # On Unix systems run with sudo
@@ -338,7 +338,7 @@ localrelay stop
 localrelay uninstall
 ```
 
-## Starting a Relay
+### Starting a Relay
 
 To run a relay in the background a relay config can be ran with:
 
@@ -353,7 +353,7 @@ _Remember on Windows use a admin CMD window_
 
 If you want relays to auto start when the Daemon starts, you can add the relay configs into the appropriate directory.
 
-#### Windows
+##### Windows
 
 ```
 C:\ProgramData\localrelay\
@@ -429,7 +429,7 @@ journalctl -u localrelayd -f
 
 _Daemon logs: Linux Only_
 
-# Docker
+## Docker
 
 [View on Dockerhub](https://hub.docker.com/r/gocompile/localrelay). Supported arches: `amd64,arm64,arm/v7`. Compressed image size: `<3mb`. Super small light weight, low CPU, RAM and disk usage container perfect for low power devices.
 
