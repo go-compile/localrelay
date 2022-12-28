@@ -5,7 +5,7 @@
 [![go.dev reference](https://img.shields.io/badge/go.dev-reference-007d9c?logo=go&logoColor=white)](https://pkg.go.dev/github.com/go-compile/localrelay)
 [![Docker Size](https://img.shields.io/docker/image-size/gocompile/localrelay?sort=date)](https://hub.docker.com/r/gocompile/localrelay/)
 [![Docker Version](https://img.shields.io/docker/v/gocompile/localrelay?label=docker%20version&sort=semver)](https://hub.docker.com/r/gocompile/localrelay/)
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/go-compile/localrelay/CodeQL)
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/go-compile/localrelay/.github/workflows/go.yml)
 
 A cross platform CLI & lib which acts as a reverse proxy allowing the destination address to be customised and allows the use of a SOCKS5 proxy. Supporting both raw TCP connections and HTTP/HTTPS connections with options such as; IP locking, Certificate pinning. This app allows you to host services e.g. Nextcloud on Tor and access it on your mobile or laptop anywhere.
 
