@@ -1,0 +1,9 @@
+---
+kind: pipeline
+name: go-1-18
+
+steps:
+- name: test
+  image: golang:1.18
+  commands:
+  - go test
