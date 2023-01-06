@@ -7,3 +7,13 @@ steps:
   image: golang:1.18
   commands:
   - go test
+
+---
+kind: pipeline
+name: go-1-19
+
+steps:
+- name: test
+  image: golang:1.19
+  commands:
+  - go test
