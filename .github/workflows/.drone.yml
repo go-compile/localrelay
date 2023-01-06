@@ -30,3 +30,14 @@ steps:
   commands:
   - go test ./...
   - go build -v ./cmd/localrelay
+
+---
+kind: pipeline
+name: osv-dependency-scan
+
+steps:
+- name: osv-vuln-dep-scanner
+  image: golang
+  commands:
+  - go install github.com/google/osv-scanner/cmd/osv-scanner@v1
+  - osv-scanner -r ./
