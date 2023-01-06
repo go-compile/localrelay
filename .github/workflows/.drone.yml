@@ -6,7 +6,7 @@ steps:
 - name: test
   image: golang:1.18
   commands:
-  - go test
+  - go test -v ./...
 
 ---
 kind: pipeline
@@ -16,4 +16,4 @@ steps:
 - name: test
   image: golang:1.19
   commands:
-  - go test
+  - go test -v ./...
