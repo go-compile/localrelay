@@ -1,9 +1,12 @@
 package localrelay
 
 import (
-	"errors"
+	"io"
 	"net"
+	"sync"
 	"time"
+
+	"github.com/pkg/errors"
 )
 
 func listener(r *Relay) (net.Listener, error) {
@@ -74,7 +77,11 @@ func handleConn(r *Relay, conn net.Conn, network string) {
 			r.Metrics.dial(1, 0, start)
 
 			r.logger.Info.Printf("CONNECTED TO %s\n", r.ForwardAddr)
-			streamConns(conn, c, r.Metrics)
+
+			err = streamConns(conn, c, r.Metrics)
+			if err != nil {
+				r.logger.Info.Printf("ERROR FROM %q ON %q: ERR=%s\n", conn.RemoteAddr(), conn.LocalAddr(), err)
+			}
 
 			r.logger.Info.Printf("CONNECTION CLOSED %q ON %q\n", conn.RemoteAddr(), conn.LocalAddr())
 			return
@@ -107,14 +114,38 @@ func handleConn(r *Relay, conn net.Conn, network string) {
 	r.Metrics.dial(1, 0, start)
 
 	r.logger.Info.Printf("CONNECTED TO %s\n", r.ForwardAddr)
-	streamConns(conn, c, r.Metrics)
+	err = streamConns(conn, c, r.Metrics)
+	if err != nil {
+		r.logger.Info.Printf("ERROR FROM %q ON %q: ERR=%s\n", conn.RemoteAddr(), conn.LocalAddr(), err)
+	}
 
 	r.logger.Info.Printf("CONNECTION CLOSED %q ON %q\n", conn.RemoteAddr(), conn.LocalAddr())
 }
 
-func streamConns(client net.Conn, remote net.Conn, m *Metrics) {
-	go copierIn(client, remote, 128, m)
-	copierOut(client, remote, 128, m)
+func streamConns(client net.Conn, remote net.Conn, m *Metrics) error {
+	wg := sync.WaitGroup{}
+
+	var copyInErr error
+
+	wg.Add(1)
+	go func() {
+		copyInErr = copierIn(client, remote, 128, m)
+		wg.Done()
+	}()
+
+	wg.Add(1)
+	err := copierOut(client, remote, 128, m)
+	wg.Done()
+
+	// if error is reporting that the conn is closed ignore both
+	if errors.Is(copyInErr, io.EOF) || errors.Is(err, io.EOF) || errors.Is(copyInErr, net.ErrClosed) {
+		// if any of the errors are EOFs or ErrClosed we are not
+		//  bothered with any additional errors.
+		return nil
+	}
+
+	// else propagate error
+	return err
 }
 
 // NOTE: static function for maximum performance
@@ -122,27 +153,52 @@ func copierIn(client net.Conn, dst net.Conn, buffer int, m *Metrics) error {
 
 	buf := make([]byte, buffer)
 	for {
-
 		n, err := dst.Read(buf)
 		m.bandwidth(0, n)
 		if err != nil {
 
+			var err1 error
 			// if we read some data, flush it then return a error
 			if n > 0 {
-				dst.Write(buf[:n])
+				_, err1 = dst.Write(buf[:n])
 			}
 
-			client.Close()
-			dst.Close()
+			err2 := client.Close()
+			err3 := dst.Close()
 
-			return err
+			// wrap all errors into one
+			if err1 != nil {
+				err = errors.Wrap(err, err1.Error())
+			}
+
+			// wrap all errors into one
+			if err2 != nil {
+				err = errors.Wrap(err, err2.Error())
+			}
+
+			// wrap all errors into one
+			if err3 != nil {
+				err = errors.Wrap(err, err3.Error())
+			}
+
+			return errors.WithStack(err)
 		}
 
 		if n2, err := client.Write(buf[:n]); err != nil || n2 != n {
-			client.Close()
-			dst.Close()
+			err1 := client.Close()
+			err2 := dst.Close()
 
-			return err
+			// wrap all errors into one
+			if err1 != nil {
+				err = errors.Wrap(err, err1.Error())
+			}
+
+			// wrap all errors into one
+			if err2 != nil {
+				err = errors.Wrap(err, err2.Error())
+			}
+
+			return errors.WithStack(err)
 		}
 	}
 }
@@ -157,22 +213,48 @@ func copierOut(client net.Conn, dst net.Conn, buffer int, m *Metrics) error {
 		m.bandwidth(n, 0)
 		if err != nil {
 
+			var err1 error
 			// if we read some data, flush it then return a error
 			if n > 0 {
-				dst.Write(buf[:n])
+				_, err1 = dst.Write(buf[:n])
 			}
 
-			client.Close()
-			dst.Close()
+			err2 := client.Close()
+			err3 := dst.Close()
 
-			return err
+			// wrap all errors into one
+			if err1 != nil {
+				err = errors.Wrap(err, err1.Error())
+			}
+
+			// wrap all errors into one
+			if err2 != nil {
+				err = errors.Wrap(err, err2.Error())
+			}
+
+			// wrap all errors into one
+			if err3 != nil {
+				err = errors.Wrap(err, err3.Error())
+			}
+
+			return errors.WithStack(err)
 		}
 
 		if n2, err := dst.Write(buf[:n]); err != nil || n2 != n {
-			client.Close()
-			dst.Close()
+			err1 := client.Close()
+			err2 := dst.Close()
 
-			return err
+			// wrap all errors into one
+			if err1 != nil {
+				err = errors.Wrap(err, err1.Error())
+			}
+
+			// wrap all errors into one
+			if err2 != nil {
+				err = errors.Wrap(err, err2.Error())
+			}
+
+			return errors.WithStack(err)
 		}
 	}
 }
