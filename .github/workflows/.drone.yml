@@ -6,7 +6,8 @@ steps:
 - name: test
   image: golang:1.18
   commands:
-  - go test -v ./...
+  - go test ./...
+  - go build -v ./cmd/localrelay
 
 ---
 kind: pipeline
@@ -16,4 +17,38 @@ steps:
 - name: test
   image: golang:1.19
   commands:
-  - go test -v ./...
+  - go test ./...
+  - go build -v ./cmd/localrelay
+
+---
+kind: pipeline
+name: go-1-17
+
+steps:
+- name: test
+  image: golang:1.17
+  commands:
+  - go test ./...
+  - go build -v ./cmd/localrelay
+
+---
+kind: pipeline
+name: go-1-16
+
+steps:
+- name: test
+  image: golang:1.16
+  commands:
+  - go test ./...
+  - go build -v ./cmd/localrelay
+
+---
+kind: pipeline
+name: go-1-15
+
+steps:
+- name: test
+  image: golang:1.15
+  commands:
+  - go test ./...
+  - go build -v ./cmd/localrelay
