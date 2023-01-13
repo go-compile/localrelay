@@ -34,6 +34,7 @@ For examples of API usage visit [examples/](https://github.com/go-compile/localr
 
 ## Library Features
 
+Min Go version: `v1.17`
 - Create relays with custom remote address
 - Proxy remote address through SOCKS5 proxy
 - Close relay concurrently
