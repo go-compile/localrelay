@@ -1,4 +1,4 @@
-version := 1.3.3
+version := 1.3.4
 revision := 1
 # Install in ubuntu/deb: sudo apt install gcc-aarch64-linux-gnu binutils-aarch64-linux-gnu
 # arch64_cc is only required if cgo_enabled=1
