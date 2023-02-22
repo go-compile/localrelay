@@ -6,3 +6,4 @@ cmd/localrelay/localrelay
 .vscode
 *.deb
 /localrelay
+packages/
