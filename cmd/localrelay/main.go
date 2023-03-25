@@ -6,13 +6,12 @@ import (
 	"strings"
 	"time"
 
-	"github.com/go-compile/localrelay"
 	"github.com/kardianos/service"
 )
 
-const (
+var (
 	// VERSION uses semantic versioning
-	VERSION = localrelay.VERSION
+	VERSION = "(Unknown)"
 )
 
 var (

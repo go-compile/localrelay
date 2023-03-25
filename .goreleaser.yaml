@@ -12,6 +12,7 @@ builds:
     binary: "localrelay"
     ldflags:
       - "-s -w"
+      - "-X main.VERSION={{.Version}}"
     env:
       - CGO_ENABLED=0
     goos:
