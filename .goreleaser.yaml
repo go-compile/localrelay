@@ -7,11 +7,12 @@ before:
     # you may remove this if you don't need go generate
     - go generate ./...
 builds:
-  - id: "localrelay_cli"
   - main: ./cmd/localrelay
+  - ldflags:
+    - "-s -w"
   - env:
       - CGO_ENABLED=0
-    goos:
+  - goos:
       - linux
       - windows
       - darwin
@@ -20,8 +21,7 @@ builds:
       - netbsd
       - plan9
       - solaris
-  - ldflags:
-      - "-s -w"
+
 archives:
   - format: tar.gz
     # this name template makes the OS and Arch compatible with the results of uname.
@@ -66,7 +66,7 @@ nfpms:
   # note that this is an array of nfpm configs
   - # ID of the nfpm config, must be unique.
     # Defaults to "default".
-    id: default
+    id: nfpms-build
 
     # You can change the file name of the package.
     #
