@@ -119,3 +119,7 @@ nfpms:
 
       # Compression algorithm (gzip (default), lzma or xz).
       compression: lzma
+
+signs:
+  - artifacts: checksum
+    output: true
