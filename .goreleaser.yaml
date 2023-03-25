@@ -23,6 +23,11 @@ builds:
       - netbsd
       - plan9
       - solaris
+    ignore:
+      - goos: windows
+        goarch: arm64
+      - goos: windows
+        goarch: arm
 
 archives:
   - format: tar.gz
