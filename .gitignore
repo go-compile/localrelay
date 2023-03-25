@@ -7,3 +7,4 @@ cmd/localrelay/localrelay
 *.deb
 /localrelay
 packages/
+dist/
