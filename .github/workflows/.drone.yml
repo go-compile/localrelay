@@ -10,6 +10,17 @@ steps:
       - go test ./...
       - go build -v ./cmd/localrelay
 
+  - name: build-failed-notification
+    image: curlimages/curl:8.00.1
+    environment:
+      notify:
+        from_secret: notification_webhook
+    when:
+      status:
+        - failure
+    commands:
+      - "curl -v $notify -F 'title=Build Failed: ${DRONE_REPO}' -F $'message=[Build Failed] ${DRONE_REPO}\n[COMMIT] ${DRONE_COMMIT}\n[BRANCH] ${DRONE_BRANCH}\n'"
+
 ---
 kind: pipeline
 type: docker
@@ -21,6 +32,17 @@ steps:
     commands:
       - go test ./...
       - go build -v ./cmd/localrelay
+
+  - name: build-failed-notification
+    image: curlimages/curl:8.00.1
+    environment:
+      notify:
+        from_secret: notification_webhook
+    when:
+      status:
+        - failure
+    commands:
+      - "curl -v $notify -F 'title=Build Failed: ${DRONE_REPO}' -F $'message=[Build Failed] ${DRONE_REPO}\n[COMMIT] ${DRONE_COMMIT}\n[BRANCH] ${DRONE_BRANCH}\n'"
 
 ---
 kind: pipeline
@@ -34,6 +56,17 @@ steps:
       - go test ./...
       - go build -v ./cmd/localrelay
 
+  - name: build-failed-notification
+    image: curlimages/curl:8.00.1
+    environment:
+      notify:
+        from_secret: notification_webhook
+    when:
+      status:
+        - failure
+    commands:
+      - "curl -v $notify -F 'title=Build Failed: ${DRONE_REPO}' -F $'message=[Build Failed] ${DRONE_REPO}\n[COMMIT] ${DRONE_COMMIT}\n[BRANCH] ${DRONE_BRANCH}\n'"
+
 ---
 kind: pipeline
 type: docker
@@ -45,3 +78,13 @@ steps:
     commands:
       - go install github.com/google/osv-scanner/cmd/osv-scanner@v1
       - osv-scanner -r ./
+  - name: build-failed-notification
+    image: curlimages/curl:8.00.1
+    environment:
+      notify:
+        from_secret: notification_webhook
+    when:
+      status:
+        - failure
+    commands:
+      - "curl -v $notify -F 'title=Vulnerability In ${DRONE_REPO}' -F $'message=[Build Failed] ${DRONE_REPO}\n[COMMIT] ${DRONE_COMMIT}\n[BRANCH] ${DRONE_BRANCH}'"
