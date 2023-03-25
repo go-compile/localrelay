@@ -8,11 +8,13 @@ before:
     - go generate ./...
 builds:
   - main: ./cmd/localrelay
-  - ldflags:
-    - "-s -w"
-  - env:
+    id: "cli"
+    binary: "localrelay"
+    ldflags:
+      - "-s -w"
+    env:
       - CGO_ENABLED=0
-  - goos:
+    goos:
       - linux
       - windows
       - darwin
