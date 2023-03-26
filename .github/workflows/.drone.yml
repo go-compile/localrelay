@@ -15,6 +15,11 @@ steps:
     commands:
       - goreleaser check
 
+  - name: run gitleaks
+    image: plugins/gitleaks
+    settings:
+      path: .
+      
   - name: build-failed-notification
     image: curlimages/curl:8.00.1
     environment:
@@ -115,12 +120,17 @@ steps:
     when:
       event:
         - tag
+      status:
+        - success
+
   - name: release-failed-notification
     image: curlimages/curl:8.00.1
     environment:
       notify:
         from_secret: notification_webhook
     when:
+      event: 
+        - tag
       status:
         - failure
     commands:
