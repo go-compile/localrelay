@@ -10,6 +10,11 @@ steps:
       - go test ./...
       - go build -v ./cmd/localrelay
 
+  - name: goreleaser-validate
+    image: goreleaser/goreleaser
+    commands:
+      - goreleaser check
+
   - name: build-failed-notification
     image: curlimages/curl:8.00.1
     environment:
@@ -20,7 +25,6 @@ steps:
         - failure
     commands:
       - "curl -v $notify -F 'title=Build Failed: ${DRONE_REPO}' -F $'message=[Build Failed] ${DRONE_REPO}\n[COMMIT] ${DRONE_COMMIT}\n[BRANCH] ${DRONE_BRANCH}\n'"
-
 ---
 kind: pipeline
 type: docker
@@ -88,3 +92,46 @@ steps:
         - failure
     commands:
       - "curl -v $notify -F 'title=Vulnerability In ${DRONE_REPO}' -F $'message=[Build Failed] ${DRONE_REPO}\n[COMMIT] ${DRONE_COMMIT}\n[BRANCH] ${DRONE_BRANCH}'"
+
+---
+kind: pipeline
+type: docker
+name: automatic-build
+
+depends_on:
+  - "osv-dependency-scan"
+  - "go-1-17"
+  - "go-1-18"
+  - "go-1-19"
+
+steps:
+  - name: release
+    image: goreleaser/goreleaser
+    environment:
+      GITEA_TOKEN:
+        from_secret: gitea_token
+    commands:
+      - goreleaser release --skip-sign
+    when:
+      event:
+        - tag
+  - name: release-failed-notification
+    image: curlimages/curl:8.00.1
+    environment:
+      notify:
+        from_secret: notification_webhook
+    when:
+      status:
+        - failure
+    commands:
+      - "curl -v $notify -F 'title=Release Failed ${DRONE_REPO}' -F $'message=[Release Failed] ${DRONE_REPO}\n[COMMIT] ${DRONE_COMMIT}\n[BRANCH] ${DRONE_BRANCH}'"
+  - name: release-success-notification
+    image: curlimages/curl:8.00.1
+    environment:
+      notify:
+        from_secret: notification_webhook
+    when:
+      status:
+        - success
+    commands:
+      - "curl -v $notify -F 'title=Successfully Released ${DRONE_REPO}' -F $'message=Released ${DRONE_REPO} [${DRONE_BRANCH}]'"
