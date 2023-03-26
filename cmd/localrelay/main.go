@@ -109,6 +109,7 @@ func main() {
 			return
 			// start-service-daemon will run as the service daemon
 		case "start-service-daemon":
+			log.Printf("[Version] %s\n", VERSION)
 			daemonStarted = time.Now()
 			if err := s.Run(); err != nil {
 				log.Fatalf("[Error] Failed to run service: %s\n", err)
