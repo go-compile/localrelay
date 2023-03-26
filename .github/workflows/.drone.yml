@@ -131,6 +131,8 @@ steps:
       notify:
         from_secret: notification_webhook
     when:
+      event: 
+        - tag
       status:
         - success
     commands:
