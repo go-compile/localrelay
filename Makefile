@@ -8,7 +8,7 @@ publish:
 	goreleaser release --clean
 
 install:
-	go install ./cmd/localrelay
+	cd ./cmd/localrelay/ && go install -v -ldflags="-s -w -X main.VERSION=${VERSION}"
 
 install-deps:
 	# Install developer dependencies
