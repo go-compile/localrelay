@@ -1,4 +1,5 @@
-VERSION="Unkown"
+VERSION=$(shell git describe --tags --abbrev=0)
+COMMIT=$(shell git rev-parse HEAD)
 
 build:
 	goreleaser release --snapshot --clean --skip-sign --skip-publish
@@ -19,7 +20,6 @@ docker:
 	docker build . --tag localrelay --build-arg VERSION=${VERSION}
 
 docker-push:
-	# TODO: auto insert tag version
 	docker buildx build --platform linux/amd64,linux/arm/v7,linux/arm64 . --tag gocompile/localrelay:latest --build-arg VERSION=${VERSION} --push
 	docker buildx build --platform linux/amd64,linux/arm/v7,linux/arm64 . --tag gocompile/localrelay:${VERSION} --build-arg VERSION=${VERSION} --push
 
