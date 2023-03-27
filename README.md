@@ -165,7 +165,7 @@ chmod +x localrelay
 sudo mv ./localrelay /usr/bin
 ```
 
-### Windows Install With Go:
+### Install With Go:
 
 ```
 go install github.com/go-compile/localrelay/cmd/localrelay
