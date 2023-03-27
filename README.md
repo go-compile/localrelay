@@ -129,22 +129,20 @@ localrelay new onion -host 127.0.0.1:8080 -destination 192.168.1.240:80,2gzyxa5i
 
 [Download the appropriate release](https://github.com/go-compile/localrelay/releases) for you platform.
 
-| Operating System/Distro | Recommended File           |
-| :---------------------- | :------------------------- |
-| Windows                 | localrelay-windows-x64.exe |
-| Debian/Ubuntu           | localrelay-linux-64.deb    |
-| Linux Other             | localrelay-linux-64        |
-| Android                 | localrelay-linux-arm64     |
-| Macos                   | localrelay-darwin          |
-| Macos (M1)              | localrelay-darwin-arm64    |
-| FreeBSD                 | localrelay-freebsd-64      |
-| OpenBSD                 | localrelay-openbsd-64      |
+| Operating System/Distro     | Recommended File                      |
+| :-------------------------- | :------------------------------------ |
+| Windows                     | localrelay_Windows_x86_64.zip         |
+| Debian/Ubuntu               | localrelay_1.3.5_amd64.deb            |
+| RHEL Based (CentOs, Redhat) | localrelay-1.3.5.x86_64.rpm           |
+| Arch linux                  | localrelay-1.3.5-1-x86_64.pkg.tar.zst |
+| Linux Other                 | localrelay_Linux_x86_64.tar.gz        |
+| Android                     | localrelay_Linux_x86_64.tar.gz        |
+| Macos                       | localrelay_Darwin_x86_64.tar.gz       |
+| Macos (M1)                  | localrelay_Freebsd_arm64.tar.gz       |
+
+*More Operating Systems and Architectures Available on Release Page*
 
 </div>
-
-> Depending on your systems arch you will need to select the right
-> one. **Most systems are amd64**. If you are running on a Raspberry Pi
-> You will want either **arm32** or **arm64**
 
 ### Debian/Ubuntu:
 
@@ -154,25 +152,31 @@ Download the deb file and open a terminal in the same directory.
 sudo dpkg -i <localrelay_VERSION_REVISION_ARCH.deb>
 ```
 
-### Linux Other:
+### Linux Generic:
 
 Download the binary file and open a terminal in the same directory.
 
 ```sh
+# Extract the archive
+tar -xvf localrelay_Linux_x86_64.tar.gz
 # Give executable permissions
-chmod +x localrelay-linux-64
-# Rename to localrelay
-mv localrelay-linux-64 localrelay
+chmod +x localrelay
 # Move to PATH
-sudo mv localrelay /usr/bin
+sudo mv ./localrelay /usr/bin
 ```
 
-### Windows:
+### Windows Install With Go:
+
+```
+go install github.com/go-compile/localrelay/cmd/localrelay
+```
+
+### Windows Manual Install:
 
 Steps for Windows 10. The _Environment Variables Settings_ app will be slightly different if you're on Windows 8 or 7.
 
-1. Download the binary file. (ends in .exe)
-2. Rename to `"localrelay.exe"`
+1. Download the windows build (ends in .zip)
+2. Extract ZIP Archive
 3. Create a bin directory in documents (or anywhere else). `md %USERPROFILE%\Documents\bin`
 4. Copy the binary file to your new directory
 5. Open Environment variables settings. Use Windows search to type: _"Edit environment variables"_ and open the application.
@@ -227,83 +231,13 @@ localrelay run onion.toml bitwarden.toml nextcloud.toml piped.toml
 
 This repository contains two code bases. The Localrelay package in the root and the CLI app in `./cmd/localrelay`. To compile the CLI you have two options. Compile for all targets (via the Makefile) or compile directly.
 
-### Compile For Win, Linux & Darwin
-
-Open a terminal in the root of the repository and execute:
-
-```
-make
-```
-
-### Cross Compile
-
-From windows you can run:
-
-```sh
-make cross-compile-win
-```
-
-<div align="center">
-
-Produced targets
-
-| Operating System |       Arches       | Packages |
-| :--------------- | :----------------: | :------: |
-| Windows          | `amd64 i386 arm64` |   None   |
-| Linux            | `amd64 i386 arm64` |   Deb    |
-| Darwin           |   `amd64 arm64`    |   None   |
-| FreeBSD          | `amd64 i386 arm64` |   None   |
-| OpenBSD          | `amd64 i386 arm64` |   None   |
-
-The binaries will be placed in `./bin/`.
-
-</div>
-
-From linux you can run:
-
-```sh
-make cross-compile-linux
-```
-
-<div align="center">
-
-Produced targets
-
-| Operating System | Arches             | Packages |
-| :--------------- | :----------------- | :------: |
-| Windows          | `amd64 i386`       |   None   |
-| Linux            | `amd64 i386 arm64` |   Deb    |
-| Darwin           | `amd64 arm64`      |   None   |
-| FreeBSD          | `amd64 i386 arm64` |   None   |
-| OpenBSD          | `amd64 i386 arm64` |   None   |
-
-The binaries will be placed in `./bin/`.
-
-</div>
-
-### Compile For One Platform
-
-Open a terminal and cd into `./cmd/localrelay`.
-
-```sh
-go build -trimpath -ldflags="-s -w"
-```
-
-The binary will be created in the current directory (`./cmd/localrelay`).
-
-#### Cross Compile
-
-```sh
-GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -trimpath -o ./bin/localrelay-linux-64 ./cmd/localrelay
-```
-
-#### Build & Install
+#### Install
 
 ```sh
 git clone github.com/go-compile/localrelay
 cd localrelay
 
-go install ./cmd/localrelay
+make install
 
 localrelay version
 ```
