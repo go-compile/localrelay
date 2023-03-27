@@ -135,3 +135,16 @@ scoop:
   description: "Reverse proxy routing system allowing you to use fail overs, connect to onion hidden services."
   license: GPL-3.0
   skip_upload: true
+
+chocolateys:
+  - authors: "Go Compile"
+    title: "Localrelay"
+    project_source_url: "https://github.com/go-compile/localrelay"
+    url_template: "https://github.com/go-compile/localrelay/releases/download/{{.Tag}}/{{.ArtifactName }}"
+    license_url: "https://github.com/go-compile/localrelay/blob/master/LICENSE"
+    tags: "reverse proxy tor socks5 failover http https tcp"
+    description: "{{ .ProjectName }} is a reverse proxy routing system, allowing you to use fail overs and connect to onion hidden services."
+    release_notes: "https://github.com/go-compile/localrelay/releases/tag/v{{.Version}}"
+    api_key: "{{.Env.CHOCOLATEY_API_KEY }}"
+    source_repo: "https://push.chocolatey.org/"
+    skip_publish: false
