@@ -136,9 +136,9 @@ localrelay new onion -host 127.0.0.1:8080 -destination 192.168.1.240:80,2gzyxa5i
 | RHEL Based (CentOs, Redhat) | localrelay-1.3.5.x86_64.rpm           |
 | Arch linux                  | localrelay-1.3.5-1-x86_64.pkg.tar.zst |
 | Linux Other                 | localrelay_Linux_x86_64.tar.gz        |
-| Android                     | localrelay_Linux_x86_64.tar.gz        |
+| Android                     | localrelay_Linux_arm64.tar.gz         |
 | Macos                       | localrelay_Darwin_x86_64.tar.gz       |
-| Macos (M1)                  | localrelay_Freebsd_arm64.tar.gz       |
+| Macos (M1)                  | localrelay_Darwin_arm64.tar.gz        |
 
 *More Operating Systems and Architectures Available on Release Page*
 
