@@ -149,7 +149,7 @@ chocolateys:
     summary: "Localrelay is a light-weight reverse proxy"
     package_source_url: "https://github.com/go-compile/localrelay"
     require_license_acceptance: false
-    icon_url: ""
+    icon_url: "https://raw.githubusercontent.com/go-compile/localrelay/master/icon.png"
     description: "{{ .ProjectName }} is a reverse proxy routing system, allowing you to use fail overs and connect to onion hidden services."
     release_notes: "https://github.com/go-compile/localrelay/releases/tag/v{{.Version}}"
     api_key: "{{.Env.CHOCOLATEY_API_KEY }}"
