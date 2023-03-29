@@ -13,6 +13,8 @@ builds:
     ldflags:
       - "-s -w"
       - "-X main.VERSION={{.Version}}"
+      - "-X main.COMMIT={{.ShortCommit}}"
+      - "-X main.BRANCH={{.Branch}}"
     env:
       - CGO_ENABLED=0
     goos:
@@ -140,9 +142,14 @@ chocolateys:
   - authors: "Go Compile"
     title: "Localrelay"
     project_source_url: "https://github.com/go-compile/localrelay"
+    project_url: "https://github.com/go-compile/localrelay"
     url_template: "https://github.com/go-compile/localrelay/releases/download/{{.Tag}}/{{.ArtifactName }}"
     license_url: "https://github.com/go-compile/localrelay/blob/master/LICENSE"
     tags: "reverse proxy tor socks5 failover http https tcp"
+    summary: "Localrelay is a light-weight reverse proxy"
+    package_source_url: "https://github.com/go-compile/localrelay"
+    require_license_acceptance: false
+    icon_url: ""
     description: "{{ .ProjectName }} is a reverse proxy routing system, allowing you to use fail overs and connect to onion hidden services."
     release_notes: "https://github.com/go-compile/localrelay/releases/tag/v{{.Version}}"
     api_key: "{{.Env.CHOCOLATEY_API_KEY }}"
