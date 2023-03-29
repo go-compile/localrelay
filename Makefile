@@ -18,7 +18,7 @@ install-deps:
 	go install github.com/goreleaser/goreleaser@latest
 
 docker:
-	docker build . --tag localrelay --build-arg VERSION=${VERSION} COMMIT=${COMMIT} BRANCH=${BRANCH}
+	docker build . --tag localrelay --build-arg VERSION=${VERSION} --build-arg COMMIT=${COMMIT} --build-arg BRANCH=${BRANCH}
 
 docker-push:
 	docker buildx build --platform linux/amd64,linux/arm/v7,linux/arm64 . --tag gocompile/localrelay:latest --build-arg VERSION=${VERSION} --push
