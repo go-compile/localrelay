@@ -1,43 +1,149 @@
 ---
 kind: pipeline
+type: docker
 name: go-1-18
 
 steps:
-- name: test
-  image: golang:1.18
-  commands:
-  - go test ./...
-  - go build -v ./cmd/localrelay
+  - name: test
+    image: golang:1.18
+    commands:
+      - go test ./...
+      - go build -v ./cmd/localrelay
 
+  - name: goreleaser-validate
+    image: goreleaser/goreleaser
+    commands:
+      - goreleaser check
+
+  - name: run gitleaks
+    image: plugins/gitleaks
+    settings:
+      path: .
+      
+  - name: build-failed-notification
+    image: curlimages/curl:8.00.1
+    environment:
+      notify:
+        from_secret: notification_webhook
+    when:
+      status:
+        - failure
+    commands:
+      - "curl -v $notify -F 'title=Build Failed: ${DRONE_REPO}' -F $'message=[Build Failed] ${DRONE_REPO}\n[COMMIT] ${DRONE_COMMIT}\n[BRANCH] ${DRONE_BRANCH}\n'"
 ---
 kind: pipeline
+type: docker
 name: go-1-19
 
 steps:
-- name: test
-  image: golang:1.19
-  commands:
-  - go test ./...
-  - go build -v ./cmd/localrelay
+  - name: test
+    image: golang:1.19
+    commands:
+      - go test ./...
+      - go build -v ./cmd/localrelay
+
+  - name: build-failed-notification
+    image: curlimages/curl:8.00.1
+    environment:
+      notify:
+        from_secret: notification_webhook
+    when:
+      status:
+        - failure
+    commands:
+      - "curl -v $notify -F 'title=Build Failed: ${DRONE_REPO}' -F $'message=[Build Failed] ${DRONE_REPO}\n[COMMIT] ${DRONE_COMMIT}\n[BRANCH] ${DRONE_BRANCH}\n'"
 
 ---
 kind: pipeline
+type: docker
 name: go-1-17
 
 steps:
-- name: test
-  image: golang:1.17
-  commands:
-  - go test ./...
-  - go build -v ./cmd/localrelay
+  - name: test
+    image: golang:1.17
+    commands:
+      - go test ./...
+      - go build -v ./cmd/localrelay
+
+  - name: build-failed-notification
+    image: curlimages/curl:8.00.1
+    environment:
+      notify:
+        from_secret: notification_webhook
+    when:
+      status:
+        - failure
+    commands:
+      - "curl -v $notify -F 'title=Build Failed: ${DRONE_REPO}' -F $'message=[Build Failed] ${DRONE_REPO}\n[COMMIT] ${DRONE_COMMIT}\n[BRANCH] ${DRONE_BRANCH}\n'"
 
 ---
 kind: pipeline
+type: docker
 name: osv-dependency-scan
 
 steps:
-- name: osv-vuln-dep-scanner
-  image: golang
-  commands:
-  - go install github.com/google/osv-scanner/cmd/osv-scanner@v1
-  - osv-scanner -r ./
+  - name: osv-vuln-dep-scanner
+    image: golang
+    commands:
+      - go install github.com/google/osv-scanner/cmd/osv-scanner@v1
+      - osv-scanner -r ./
+  - name: build-failed-notification
+    image: curlimages/curl:8.00.1
+    environment:
+      notify:
+        from_secret: notification_webhook
+    when:
+      status:
+        - failure
+    commands:
+      - "curl -v $notify -F 'title=Vulnerability In ${DRONE_REPO}' -F $'message=[Build Failed] ${DRONE_REPO}\n[COMMIT] ${DRONE_COMMIT}\n[BRANCH] ${DRONE_BRANCH}'"
+
+---
+kind: pipeline
+type: docker
+name: automatic-build
+
+depends_on:
+  - "osv-dependency-scan"
+  - "go-1-17"
+  - "go-1-18"
+  - "go-1-19"
+
+steps:
+  - name: release
+    image: goreleaser/goreleaser
+    environment:
+      GITEA_TOKEN:
+        from_secret: gitea_token
+    commands:
+      - goreleaser release --skip-sign
+    when:
+      event:
+        - tag
+      status:
+        - success
+
+  - name: release-failed-notification
+    image: curlimages/curl:8.00.1
+    environment:
+      notify:
+        from_secret: notification_webhook
+    when:
+      event: 
+        - tag
+      status:
+        - failure
+    commands:
+      - "curl -v $notify -F 'title=Release Failed ${DRONE_REPO}' -F $'message=[Release Failed] ${DRONE_REPO}\n[COMMIT] ${DRONE_COMMIT}\n[BRANCH] ${DRONE_BRANCH}'"
+  - name: release-success-notification
+    image: curlimages/curl:8.00.1
+    environment:
+      notify:
+        from_secret: notification_webhook
+    when:
+      event: 
+        - tag
+      status:
+        - success
+    commands:
+      - "curl -v $notify -F 'title=Successfully Released ${DRONE_REPO}' -F $'message=Released ${DRONE_REPO} [${DRONE_BRANCH}]'"

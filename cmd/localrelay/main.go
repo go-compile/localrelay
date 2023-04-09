@@ -6,13 +6,14 @@ import (
 	"strings"
 	"time"
 
-	"github.com/go-compile/localrelay"
 	"github.com/kardianos/service"
 )
 
-const (
+var (
 	// VERSION uses semantic versioning
-	VERSION = localrelay.VERSION
+	VERSION = "(Unknown Version)"
+	COMMIT  = "0000000"
+	BRANCH  = "(Unknown Branch)"
 )
 
 var (
@@ -110,6 +111,7 @@ func main() {
 			return
 			// start-service-daemon will run as the service daemon
 		case "start-service-daemon":
+			log.Printf("[Version] %s (%s.%s)\n", VERSION, BRANCH, COMMIT)
 			daemonStarted = time.Now()
 			if err := s.Run(); err != nil {
 				log.Fatalf("[Error] Failed to run service: %s\n", err)

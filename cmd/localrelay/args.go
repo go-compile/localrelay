@@ -270,7 +270,7 @@ func help() {
 }
 
 func version() {
-	fmt.Printf("LocalRelay CLI - %s\n", VERSION)
+	fmt.Printf("LocalRelay CLI - %s (%s.%s)\n", VERSION, BRANCH, COMMIT)
 	fmt.Println()
 	fmt.Println(" A reverse proxying program to allow services e.g. Nextcloud, Bitwarden etc to\n" +
 		" be accessed over Tor (SOCKS5) even when the client app do not support\n" +

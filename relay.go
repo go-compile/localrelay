@@ -78,6 +78,7 @@ const (
 	ProxyUDP
 
 	// VERSION uses semantic versioning
+	// this version number is for the library not the CLI
 	VERSION = "v1.3.4"
 )
 

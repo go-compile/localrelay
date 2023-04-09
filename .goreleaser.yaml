@@ -1,0 +1,157 @@
+# This is an example .goreleaser.yml file with some sensible defaults.
+# Make sure to check the documentation at https://goreleaser.com
+before:
+  hooks:
+    # You may remove this if you don't use go modules.
+    # - go mod tidy
+    # you may remove this if you don't need go generate
+    - go generate ./...
+builds:
+  - main: ./cmd/localrelay
+    id: "cli"
+    binary: "localrelay"
+    ldflags:
+      - "-s -w"
+      - "-X main.VERSION={{.Version}}"
+      - "-X main.COMMIT={{.ShortCommit}}"
+      - "-X main.BRANCH={{.Branch}}"
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - windows
+      - darwin
+      - openbsd
+      - freebsd
+      - netbsd
+      - solaris
+    ignore:
+      - goos: windows
+        goarch: arm64
+      - goos: windows
+        goarch: arm
+
+archives:
+  - format: tar.gz
+    # this name template makes the OS and Arch compatible with the results of uname.
+    name_template: >-
+      {{ .ProjectName }}_
+      {{- title .Os }}_
+      {{- if eq .Arch "amd64" }}x86_64
+      {{- else if eq .Arch "386" }}i386
+      {{- else }}{{ .Arch }}{{ end }}
+      {{- if .Arm }}v{{ .Arm }}{{ end }}
+    # use zip for windows archives
+    format_overrides:
+      - goos: windows
+        format: zip
+checksum:
+  name_template: "checksums.txt"
+snapshot:
+  name_template: "{{ incpatch .Version }}-next"
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+      - "^ci:"
+gitea_urls:
+  api: "{{ .Env.GITEA_API }}"
+  download: "{{ .Env.GITEA_DOWNLOAD }}"
+  # set to true if you use a self-signed certificate
+  skip_tls_verify: false
+release:
+  gitea:
+    owner: go-compile
+    name: localrelay
+  disable: false
+# The lines beneath this are called `modelines`. See `:help modeline`
+# Feel free to remove those if you don't want/use them.
+# yaml-language-server: $schema=https://goreleaser.com/static/schema.json
+# vim: set ts=2 sw=2 tw=0 fo=cnqoj
+
+nfpms:
+  # note that this is an array of nfpm configs
+  - # ID of the nfpm config, must be unique.
+    # Defaults to "default".
+    id: nfpms-build
+
+    # You can change the file name of the package.
+    #
+    # Default:`{{ .PackageName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}{{ with .Arm }}v{{ . }}{{ end }}{{ with .Mips }}_{{ . }}{{ end }}{{ if not (eq .Amd64 "v1") }}{{ .Amd64 }}{{ end }}`
+    file_name_template: "{{ .ConventionalFileName }}"
+
+    # Your app's vendor.
+    # Default is empty.
+    vendor: Go-Compile
+
+    # Template to your app's homepage.
+    # Default is empty.
+    homepage: https://github.com/go-compile/localrelay
+
+    # Template to your app's description.
+    # Default is empty.
+    description: Reverse proxy routing system allowing you to use fail overs, connect to onion hidden services.
+    # Your app's license.
+    # Default is empty.
+    license: GPL-3.0
+
+    maintainer: Go-Compile
+
+    # Formats to be generated.
+    formats:
+      - deb
+      - rpm
+      - termux.deb # Since GoReleaser v1.11.
+      - archlinux # Since GoReleaser v1.13.
+
+    # Template to the path that the binaries should be installed.
+    # Defaults to `/usr/bin`.
+    bindir: /usr/bin
+
+    # Section.
+    section: default
+
+    # Custom configuration applied only to the RPM packager.
+    rpm:
+      # The package group. This option is deprecated by most distros
+      # but required by old distros like CentOS 5 / EL 5 and earlier.
+      group: Unspecified
+
+      # Compression algorithm (gzip (default), lzma or xz).
+      compression: lzma
+
+signs:
+  - artifacts: checksum
+    output: true
+
+scoop:
+  url_template: "https://github.com/go-compile/localrelay/releases/download/{{.Tag}}/{{.ArtifactName }}"
+
+  bucket:
+    owner: go-compile
+    name: "main"
+
+  homepage: "https://github.com/go-compile/localrelay"
+  description: "Reverse proxy routing system allowing you to use fail overs, connect to onion hidden services."
+  license: GPL-3.0
+  skip_upload: true
+
+chocolateys:
+  - authors: "Go Compile"
+    title: "Localrelay"
+    project_source_url: "https://github.com/go-compile/localrelay"
+    project_url: "https://github.com/go-compile/localrelay"
+    url_template: "https://github.com/go-compile/localrelay/releases/download/{{.Tag}}/{{.ArtifactName }}"
+    license_url: "https://github.com/go-compile/localrelay/blob/master/LICENSE"
+    tags: "reverse proxy tor socks5 failover http https tcp"
+    summary: "Localrelay is a light-weight reverse proxy"
+    package_source_url: "https://github.com/go-compile/localrelay"
+    require_license_acceptance: false
+    icon_url: "https://raw.githubusercontent.com/go-compile/localrelay/master/icon.png"
+    description: "{{ .ProjectName }} is a reverse proxy routing system, allowing you to use fail overs and connect to onion hidden services."
+    release_notes: "https://github.com/go-compile/localrelay/releases/tag/v{{.Version}}"
+    api_key: "{{.Env.CHOCOLATEY_API_KEY }}"
+    source_repo: "https://push.chocolatey.org/"
+    skip_publish: false
