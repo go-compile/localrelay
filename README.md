@@ -169,6 +169,11 @@ sudo mv localrelay /usr/bin
 
 ### Windows:
 
+#### Install with [Chocolatey](https://chocolatey.org/)
+```
+choco install localrelay
+```
+
 Steps for Windows 10. The _Environment Variables Settings_ app will be slightly different if you're on Windows 8 or 7.
 
 1. Download the binary file. (ends in .exe)
