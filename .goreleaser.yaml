@@ -126,18 +126,6 @@ signs:
   - artifacts: checksum
     output: true
 
-scoop:
-  url_template: "https://github.com/go-compile/localrelay/releases/download/{{.Tag}}/{{.ArtifactName }}"
-
-  bucket:
-    owner: go-compile
-    name: "main"
-
-  homepage: "https://github.com/go-compile/localrelay"
-  description: "Reverse proxy routing system allowing you to use fail overs, connect to onion hidden services."
-  license: GPL-3.0
-  skip_upload: true
-
 chocolateys:
   - authors: "Go Compile"
     title: "Localrelay"
