@@ -10,3 +10,4 @@ packages/
 dist/
 *.msi
 *.wixpdb
+scripts/wix/localrelay.wxs
