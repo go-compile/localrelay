@@ -20,6 +20,13 @@
 				<Component Id="ProductComponent">
 					<File Id="localrelay.exe" KeyPath="yes"
 						Source="dist\cli_windows_amd64_v1\localrelay.exe"></File>
+					<ServiceInstall Id="ServiceComponent" Name="localrelayd"
+						DisplayName="localrelayd" Type="ownProcess" Start="auto"
+						ErrorControl="normal"
+						Description="Localrelay daemon relay runner"
+						Arguments="start-service-daemon"></ServiceInstall>
+					<ServiceControl Id="ServiceControl" Name="localrelayd" Remove="uninstall"
+						Stop="both" Wait="yes"></ServiceControl>
 				</Component>
 				<Component Id="MiscComponent">
 					<File Id="LICENSE"
