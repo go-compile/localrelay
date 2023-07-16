@@ -8,3 +8,6 @@ cmd/localrelay/localrelay
 /localrelay
 packages/
 dist/
+*.msi
+*.wixpdb
+scripts/wix/localrelay.wxs

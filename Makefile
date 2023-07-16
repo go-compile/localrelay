@@ -4,6 +4,12 @@ BRANCH=$(shell git rev-parse --abbrev-ref HEAD)
 
 build:
 	goreleaser release --snapshot --clean --skip-sign --skip-publish
+	make wix
+
+wix:
+	cp ./scripts/wix/localrelay.template.wxs ./scripts/wix/localrelay.wxs
+	sed -i -E 's/LR_VERSION/${VERSION}/g' ./scripts/wix/localrelay.wxs
+	wix build ./scripts/wix/localrelay.wxs
 
 publish:
 	goreleaser release --clean
@@ -27,3 +33,4 @@ docker-push:
 clean:
 	rm -rf ./dist/
 	go clean
+	rm ./scripts/wix/localrelay.wxs

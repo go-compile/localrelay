@@ -45,8 +45,12 @@ archives:
     format_overrides:
       - goos: windows
         format: zip
+    files:
+      - LICENSE
+
 checksum:
   name_template: "checksums.txt"
+
 snapshot:
   name_template: "{{ incpatch .Version }}-next"
 changelog:
@@ -142,4 +146,3 @@ chocolateys:
     release_notes: "https://github.com/go-compile/localrelay/releases/tag/v{{.Version}}"
     api_key: "{{.Env.CHOCOLATEY_API_KEY }}"
     source_repo: "https://push.chocolatey.org/"
-    skip_publish: false
