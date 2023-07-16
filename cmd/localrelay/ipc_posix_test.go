@@ -17,7 +17,7 @@ func TestIPCPosix(t *testing.T) {
 		}
 	}()
 
-	time.Sleep(time.Millisecond * 50)
+	time.Sleep(time.Second)
 
 	_, err := serviceStatus()
 	if err != nil {
