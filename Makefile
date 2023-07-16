@@ -4,6 +4,7 @@ BRANCH=$(shell git rev-parse --abbrev-ref HEAD)
 
 build:
 	goreleaser release --snapshot --clean --skip-sign --skip-publish
+	cd ./scripts/ && wix build localrelay.wxs
 
 publish:
 	goreleaser release --clean
