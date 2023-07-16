@@ -1,7 +1,7 @@
 ﻿<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
 	<Package Language="1033" Manufacturer="Go Compile" Name="Localrelay"
 		UpgradeCode="17bdaca3-9d5f-4daf-9b56-d59f00b09a3a" Version="1.3.6">
-		<Icon Id="LocalrelayIco" SourceFile="../cmd/localrelay/logo.ico" />
+		<Icon Id="LocalrelayIco" SourceFile="cmd/localrelay/logo.ico" />
 		<Property Id="ARPPRODUCTICON" Value="LocalrelayIco" />
 		<MajorUpgrade
 			DowngradeErrorMessage="A later version of [ProductName] is already installed. Setup will now exit." />
@@ -19,11 +19,11 @@
 			<Directory Id="INSTALLFOLDER" Name="Localrelay">
 				<Component Id="ProductComponent">
 					<File Id="localrelay.exe" KeyPath="yes"
-						Source="..\dist\cli_windows_amd64_v1\localrelay.exe"></File>
+						Source="dist\cli_windows_amd64_v1\localrelay.exe"></File>
 				</Component>
 				<Component Id="MiscComponent">
 					<File Id="LICENSE"
-						Source="..\LICENSE"></File>
+						Source="LICENSE"></File>
 				</Component>
 				<Component Id="ModifyPathEnv" Guid="85d992f0-3380-447b-b175-1b3b99195628"
 					KeyPath="yes">
