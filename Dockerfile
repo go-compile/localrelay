@@ -31,6 +31,9 @@ FROM scratch
 COPY --from=builder /app /usr/bin
 COPY --from=builder /app/empty /var/run
 
+# fix TLS unable to verify CA errors
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
+
 WORKDIR /app
 
 CMD ["/usr/bin/localrelay", "start-service-daemon"]
