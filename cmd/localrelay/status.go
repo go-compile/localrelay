@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"os"
 	"sort"
 	"strconv"
 	"time"
@@ -12,32 +13,30 @@ import (
 )
 
 func relayStatus() error {
+	// make terminal raw to allow the use of colour on windows terminals
+	current, _ := console.ConsoleFromFile(os.Stdout)
+	// NOTE: Docker healthchecks will panic "provided file is not a console"
+
+	if current != nil {
+		defer current.Reset()
+	}
+
+	if current != nil {
+		if err := current.SetRaw(); err != nil {
+			log.Println(err)
+		}
+	}
 
 	// we don't set terminal to raw here because print statements don't use
 	// carriage returns
 	s, err := serviceStatus()
 	if err != nil {
 
-		// make terminal raw to allow the use of colour on windows terminals
-		current := console.Current()
-
-		if err := current.SetRaw(); err != nil {
-			log.Fatal(err)
-		}
-
 		fmt.Printf("Daemon:    \x1b[31m [OFFLINE] \x1b[0m\r\n")
 		fmt.Println(err)
-		current.Reset()
 
-		return nil
-	}
-
-	// make terminal raw to allow the use of colour on windows terminals
-	current := console.Current()
-	defer current.Reset()
-
-	if err := current.SetRaw(); err != nil {
-		log.Fatal(err)
+		// exit with error
+		os.Exit(1)
 	}
 
 	fmt.Printf("\r\nDaemon:      \x1b[102m\x1b[30m [RUNNING] \x1b[0m\r\n")
