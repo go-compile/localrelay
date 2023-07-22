@@ -28,6 +28,7 @@ func IPCConnect() (*http.Client, net.Conn, error) {
 		Transport: &http.Transport{Dial: func(network, addr string) (net.Conn, error) {
 			return conn, nil
 		}},
+		Timeout: time.Second * 15,
 	}
 
 	return httpClient, conn, nil
