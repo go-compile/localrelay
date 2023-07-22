@@ -9,7 +9,7 @@ import (
 	"github.com/containerd/console"
 )
 
-func displayOpenConns(opt *options) error {
+func displayOpenConns(opt *options, onlyIPS bool) error {
 	// make terminal raw to allow the use of colour on windows terminals
 	current, _ := console.ConsoleFromFile(os.Stdout)
 	// NOTE: Docker healthchecks will panic "provided file is not a console"
@@ -53,17 +53,22 @@ func displayOpenConns(opt *options) error {
 	for _, conn := range conns {
 		if len(filteredRelays) != 0 {
 			if arrayContains(filteredRelays, conn.RelayName) {
-				printConn(conn)
+				printConn(conn, onlyIPS)
 			}
 		} else {
-			printConn(conn)
+			printConn(conn, onlyIPS)
 		}
 	}
 
 	return nil
 }
 
-func printConn(conn connection) {
+func printConn(conn connection, onlyIPS bool) {
+	if onlyIPS {
+		fmt.Printf("%s\r\n", conn.RemoteAddr)
+		return
+	}
+
 	fmt.Printf("%s -> %s (%s) (%s)\r\n", conn.RemoteAddr, conn.ForwardedAddr, conn.RelayName, formatDuration(time.Since(time.Unix(conn.Opened, 0))))
 }
 
