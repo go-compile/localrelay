@@ -80,7 +80,7 @@ func stopRelay(relayName string) error {
 	case 200:
 		fmt.Printf("Relay %q has been stopped.\n", relayName)
 	case 500:
-		fmt.Println("Failed to stop relay.\n")
+		fmt.Printf("Failed to stop relay.\n")
 	case 404:
 		fmt.Printf("Relay not found.\n")
 	default:
