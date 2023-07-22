@@ -36,6 +36,9 @@ func assignIPCRoutes(r *router.Router) {
 	r.POST("/run", ipcRouteRun)
 	r.GET("/status", ipcRouteStatus)
 	r.GET("/connections", ipcRouteConns)
+	r.GET("/drop", ipcRouteDropAll)
+	// r.GET("/drop/ip/{}", ipcRouteDropIP)
+	// r.GET("/drop/relay/{}", ipcRouteDropRelay)
 }
 
 func ipcHeadersMiddleware(handler fasthttp.RequestHandler) fasthttp.RequestHandler {
@@ -194,4 +197,14 @@ func ipcRouteConns(ctx *fasthttp.RequestCtx) {
 
 	ctx.SetStatusCode(200)
 	json.NewEncoder(ctx).Encode(relayConns)
+}
+
+func ipcRouteDropAll(ctx *fasthttp.RequestCtx) {
+	relays := runningRelaysCopy()
+	// iterate through all relays and close every connection
+	for _, r := range relays {
+		for _, conn := range r.GetConns() {
+			go conn.Conn.Close()
+		}
+	}
 }

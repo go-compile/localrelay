@@ -2,44 +2,13 @@ package main
 
 import (
 	"bytes"
-	"encoding/binary"
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/url"
 	"strconv"
 
 	"github.com/pkg/errors"
 )
-
-// commandDataIPC will send a command with a data section
-func commandDataIPC(w io.Writer, id uint8, data []byte) error {
-	// calculate packet length
-	payloadLen := make([]byte, 2)
-	binary.BigEndian.PutUint16(payloadLen, uint16(len(data)+3))
-
-	if _, err := w.Write(payloadLen); err != nil {
-		return err
-	}
-
-	if _, err := w.Write([]byte{id}); err != nil {
-		return err
-	}
-
-	// write buf len
-	lenBuf := make([]byte, 2)
-	binary.BigEndian.PutUint16(lenBuf, uint16(len(data)))
-
-	if _, err := w.Write(lenBuf); err != nil {
-		return err
-	}
-
-	if _, err := w.Write([]byte(data)); err != nil {
-		return err
-	}
-
-	return nil
-}
 
 // serviceRun takes paths to relay config files and then connects via IPC to
 // instruct the service to run these relays
@@ -111,7 +80,7 @@ func stopRelay(relayName string) error {
 	case 200:
 		fmt.Printf("Relay %q has been stopped.\n", relayName)
 	case 500:
-		fmt.Println("Failed to stop relay.")
+		fmt.Println("Failed to stop relay.\n")
 	case 404:
 		fmt.Printf("Relay not found.\n")
 	default:
@@ -147,22 +116,24 @@ func activeConnections() ([]connection, error) {
 }
 
 func dropAll() error {
-	// conn, err := IPCConnect()
-	// if err != nil {
-	// 	return errors.Wrap(err, "connecting to IPC")
-	// }
+	client, conn, err := IPCConnect()
+	if err != nil {
+		return err
+	}
 
-	// defer conn.Close()
+	defer conn.Close()
 
-	// _, err = conn.Write([]byte{0, 3, daemonDropAll, 0, 0})
-	// if err != nil {
-	// 	return err
-	// }
+	resp, err := client.Get("http://lr/drop")
+	if err != nil {
+		return err
+	}
 
-	// _, err = readCommand(conn)
-	// if err != nil {
-	// 	return errors.Wrap(err, "reading from ipc conn")
-	// }
+	switch resp.StatusCode {
+	case 200:
+		fmt.Printf("All connections have been dropped.\r")
+	default:
+		fmt.Printf("Failed to drop connections. Status code: %d.\n", resp.StatusCode)
+	}
 
 	return nil
 }
