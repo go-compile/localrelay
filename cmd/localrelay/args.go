@@ -241,6 +241,7 @@ func help() {
 	fmt.Println("  localrelay start")
 	fmt.Println("  localrelay status")
 	fmt.Println("  localrelay monitor")
+	fmt.Println("  localrelay connections")
 	fmt.Println("  localrelay stop")
 	fmt.Println("  localrelay stop <relay>")
 	fmt.Println("  localrelay restart")

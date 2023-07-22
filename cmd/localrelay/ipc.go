@@ -27,6 +27,7 @@ const (
 	daemonRun uint8 = iota
 	daemonStatus
 	daemonStop
+	daemonConns
 
 	maxErrors = 40
 )
@@ -211,6 +212,36 @@ func ipcLoop(conn io.ReadWriteCloser) error {
 
 			Metrics: relayMetrics,
 		})
+
+		lenbuf := make([]byte, 2)
+		binary.BigEndian.PutUint16(lenbuf, uint16(respBuf.Len()))
+
+		conn.Write(lenbuf)
+		conn.Write(respBuf.Bytes())
+	case daemonConns:
+		respBuf := bytes.NewBuffer(nil)
+
+		relayConns := make([]connection, 0, 200)
+
+		relays := runningRelaysCopy()
+		for _, r := range relays {
+			for _, conn := range r.GetConns() {
+
+				relayConns = append(relayConns, connection{
+					LocalAddr:  conn.Conn.LocalAddr().String(),
+					RemoteAddr: conn.Conn.RemoteAddr().String(),
+					Network:    conn.Conn.LocalAddr().Network(),
+
+					RelayName:     r.Name,
+					RelayHost:     r.Host,
+					ForwardedAddr: conn.RemoteAddr,
+
+					Opened: conn.Opened.Unix(),
+				})
+			}
+		}
+
+		json.NewEncoder(respBuf).Encode(relayConns)
 
 		lenbuf := make([]byte, 2)
 		binary.BigEndian.PutUint16(lenbuf, uint16(respBuf.Len()))

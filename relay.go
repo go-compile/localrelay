@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/pkg/errors"
 	"golang.org/x/net/proxy"
@@ -61,7 +62,14 @@ type Relay struct {
 	protocolSwitching map[int]string
 
 	// connPool contains a list of ACTIVE connections
-	connPool []net.Conn
+	connPool []*PooledConn
+}
+
+// PooledConn allows meta data to be attached to a connection
+type PooledConn struct {
+	Conn       net.Conn
+	RemoteAddr string
+	Opened     time.Time
 }
 
 const (
@@ -294,7 +302,7 @@ func (r *Relay) storeConn(conn net.Conn) {
 	r.m.Lock()
 	defer r.m.Unlock()
 
-	r.connPool = append(r.connPool, conn)
+	r.connPool = append(r.connPool, &PooledConn{conn, "", time.Now()})
 }
 
 // popConn removes the provided connection from the conn pool
@@ -303,10 +311,32 @@ func (r *Relay) popConn(conn net.Conn) {
 	defer r.m.Unlock()
 
 	for i := 0; i < len(r.connPool); i++ {
-		if r.connPool[i] == conn {
+		if r.connPool[i].Conn == conn {
 			// remove conn
 			r.connPool = append(r.connPool[:i], r.connPool[i+1:]...)
 			return
 		}
 	}
+}
+
+// setConnRemote will update the conn pool with the remote
+func (r *Relay) setConnRemote(conn net.Conn, remote net.Addr) {
+	r.m.Lock()
+	defer r.m.Unlock()
+
+	for i := 0; i < len(r.connPool); i++ {
+		if r.connPool[i].Conn == conn {
+			// remove conn
+			r.connPool[i].RemoteAddr = remote.String()
+			return
+		}
+	}
+}
+
+// GetConns returns all the active connections to this relay
+func (r *Relay) GetConns() []*PooledConn {
+	r.m.Lock()
+	defer r.m.Unlock()
+
+	return r.connPool
 }

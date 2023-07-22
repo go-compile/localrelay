@@ -83,6 +83,7 @@ func handleConn(r *Relay, conn net.Conn, network string) {
 			r.Metrics.dial(1, 0, start)
 
 			r.logger.Info.Printf("CONNECTED TO %s\n", r.ForwardAddr)
+			r.setConnRemote(conn, c.RemoteAddr())
 
 			err = streamConns(conn, c, r.Metrics)
 			if err != nil {
@@ -120,6 +121,8 @@ func handleConn(r *Relay, conn net.Conn, network string) {
 	r.Metrics.dial(1, 0, start)
 
 	r.logger.Info.Printf("CONNECTED TO %s\n", r.ForwardAddr)
+	r.setConnRemote(conn, c.RemoteAddr())
+
 	err = streamConns(conn, c, r.Metrics)
 	if err != nil {
 		r.logger.Info.Printf("ERROR FROM %q ON %q: ERR=%s\n", conn.RemoteAddr(), conn.LocalAddr(), err)

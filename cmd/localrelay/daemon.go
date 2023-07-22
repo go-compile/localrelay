@@ -35,3 +35,19 @@ type metrics struct {
 	In, Out, Active, DialAvg  int
 	TotalConns, TotalRequests uint64
 }
+
+type connection struct {
+	ID int64
+
+	LocalAddr  string
+	RemoteAddr string
+	Network    string
+
+	RelayName string
+	RelayHost string
+
+	ForwardedAddr string
+
+	// Opened is a unix timestamp
+	Opened int64
+}

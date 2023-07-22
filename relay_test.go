@@ -63,7 +63,7 @@ func TestConnPool(t *testing.T) {
 					relay.popConn(conn)
 
 					for _, c := range relay.connPool {
-						if c == conn {
+						if c.Conn == conn {
 							t.Fatal("correct conn was not removed")
 						}
 					}

@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"os"
 	"strings"
 	"time"
 
@@ -131,6 +132,13 @@ func main() {
 			}
 
 			fmt.Println("Daemon has been started")
+			return
+		case "conns", "connections":
+			if err := displayOpenConns(); err != nil {
+				fmt.Println(err)
+				os.Exit(1)
+			}
+
 			return
 		case "status":
 			if err := relayStatus(); err != nil {

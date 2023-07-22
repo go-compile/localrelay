@@ -159,3 +159,29 @@ func stopRelay(relayName string) error {
 
 	return nil
 }
+
+func activeConnections() ([]connection, error) {
+	conn, err := IPCConnect()
+	if err != nil {
+		return nil, err
+	}
+
+	defer conn.Close()
+
+	_, err = conn.Write([]byte{0, 3, daemonConns, 0, 0})
+	if err != nil {
+		return nil, err
+	}
+
+	payload, err := readCommand(conn)
+	if err != nil {
+		return nil, err
+	}
+
+	var pool []connection
+	if err := json.Unmarshal(payload, &pool); err != nil {
+		return nil, err
+	}
+
+	return pool, nil
+}
