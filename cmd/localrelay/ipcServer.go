@@ -39,6 +39,7 @@ func assignIPCRoutes(r *router.Router) {
 	r.GET("/drop", ipcRouteDropAll)
 	// r.GET("/drop/ip/{}", ipcRouteDropIP)
 	// r.GET("/drop/relay/{}", ipcRouteDropRelay)
+	// r.GET("/drop/addr/{}", ipcRouteDropAddr)
 }
 
 func ipcHeadersMiddleware(handler fasthttp.RequestHandler) fasthttp.RequestHandler {
