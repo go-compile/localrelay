@@ -134,7 +134,7 @@ func main() {
 			fmt.Println("Daemon has been started")
 			return
 		case "conns", "connections":
-			if err := displayOpenConns(); err != nil {
+			if err := displayOpenConns(opt); err != nil {
 				fmt.Println(err)
 				os.Exit(1)
 			}
