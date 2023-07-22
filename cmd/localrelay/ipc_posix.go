@@ -13,8 +13,24 @@ var (
 	ipcPathPrefix = "/var/run/"
 )
 
-func IPCConnect() (io.ReadWriteCloser, error) {
-	return net.DialTimeout("unix", ipcPathPrefix+ipcSocket, ipcTimeout)
+func IPCConnect() (*http.Client, net.Conn, error) {
+	conn, err := net.DialTimeout("unix", ipcPathPrefix+ipcSocket, ipcTimeout)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	// make a http client which always uses the socket.
+	// When making a HTTP request provide any host, it does not need to exist.
+	//
+	// Example:
+	//  http://lr/status
+	httpClient := &http.Client{
+		Transport: &http.Transport{Dial: func(network, addr string) (net.Conn, error) {
+			return conn, nil
+		}},
+	}
+
+	return httpClient, conn, nil
 }
 
 func IPCListen() error {
