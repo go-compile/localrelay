@@ -170,6 +170,11 @@ func main() {
 				fmt.Println(err)
 			}
 			return
+		case "droprelay":
+			if err := dropConnsRelay(opt); err != nil {
+				fmt.Println(err)
+			}
+			return
 		default:
 			fmt.Printf("Unrecognised command %q\n", opt.commands[i])
 			return

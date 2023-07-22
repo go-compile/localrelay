@@ -246,6 +246,7 @@ func help() {
 	fmt.Println("  localrelay ips")
 	fmt.Println("  localrelay drop")
 	fmt.Println("  localrelay dropip <ip>")
+	fmt.Println("  localrelay droprelay <relay>")
 	fmt.Println("  localrelay stop")
 	fmt.Println("  localrelay stop <relay>")
 	fmt.Println("  localrelay restart")

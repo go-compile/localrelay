@@ -122,3 +122,26 @@ func dropConnsIP(opt *options) error {
 
 	return dropIP(opt.commands[1])
 }
+
+func dropConnsRelay(opt *options) error {
+	// make terminal raw to allow the use of colour on windows terminals
+	current, _ := console.ConsoleFromFile(os.Stdout)
+	// NOTE: Docker healthchecks will panic "provided file is not a console"
+
+	if current != nil {
+		defer current.Reset()
+	}
+
+	if current != nil {
+		if err := current.SetRaw(); err != nil {
+			log.Println(err)
+		}
+	}
+
+	if len(opt.commands) < 2 {
+		fmt.Println("Provide a relay name.")
+		return nil
+	}
+
+	return dropRelay(opt.commands[1])
+}
