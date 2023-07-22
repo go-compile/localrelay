@@ -8,6 +8,8 @@ import (
 	"io"
 	"net/url"
 	"strconv"
+
+	"github.com/pkg/errors"
 )
 
 // commandDataIPC will send a command with a data section
@@ -68,31 +70,28 @@ func serviceRun(relays []string) error {
 }
 
 func serviceStatus() (*status, error) {
-	// conn, err := IPCConnect()
-	// if err != nil {
-	// 	return nil, err
-	// }
+	client, conn, err := IPCConnect()
+	if err != nil {
+		return nil, err
+	}
 
-	// defer conn.Close()
+	defer conn.Close()
 
-	// _, err = conn.Write([]byte{0, 3, daemonStatus, 0, 0})
-	// if err != nil {
-	// 	return nil, err
-	// }
+	resp, err := client.Get("http://lr/status")
+	if err != nil {
+		return nil, err
+	}
 
-	// payload, err := readCommand(conn)
-	// if err != nil {
-	// 	return nil, err
-	// }
+	if resp.StatusCode != 200 {
+		return nil, errors.New("failed to fetch status")
+	}
 
-	// var s status
-	// if err := json.Unmarshal(payload, &s); err != nil {
-	// 	return nil, err
-	// }
+	var status status
+	if err := json.NewDecoder(resp.Body).Decode(&status); err != nil {
+		return nil, err
+	}
 
-	// return &s, nil
-
-	return nil, nil
+	return &status, nil
 }
 
 func stopRelay(relayName string) error {

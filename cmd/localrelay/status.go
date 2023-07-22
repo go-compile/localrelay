@@ -31,7 +31,6 @@ func relayStatus() error {
 	// carriage returns
 	s, err := serviceStatus()
 	if err != nil {
-
 		fmt.Printf("Daemon:    \x1b[31m [OFFLINE] \x1b[0m\r\n")
 		fmt.Println(err)
 
