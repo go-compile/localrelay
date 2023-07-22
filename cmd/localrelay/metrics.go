@@ -76,7 +76,9 @@ func relayMetrics(opt *options) error {
 					return
 				}
 
-				if bytes.Equal(buf[:n], []byte{3}) || bytes.Equal(buf[:n], []byte{8}) {
+				// break on keys "q", "ESC", "CTRL + C" etc
+				if bytes.Equal(buf[:n], []byte{3}) || bytes.Equal(buf[:n], []byte{8}) ||
+					bytes.Equal(buf[:n], []byte{113}) || bytes.Equal(buf[:n], []byte{27}) {
 					close(sig)
 					break
 				}
