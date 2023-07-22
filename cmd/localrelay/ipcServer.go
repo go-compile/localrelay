@@ -35,6 +35,7 @@ func assignIPCRoutes(r *router.Router) {
 	r.GET("/stop/{relay}", ipcRouteStop)
 	r.POST("/run", ipcRouteRun)
 	r.GET("/status", ipcRouteStatus)
+	r.GET("/connections", ipcRouteConns)
 }
 
 func ipcHeadersMiddleware(handler fasthttp.RequestHandler) fasthttp.RequestHandler {
@@ -168,4 +169,29 @@ func ipcRouteStatus(ctx *fasthttp.RequestCtx) {
 
 		Metrics: relayMetrics,
 	})
+}
+
+func ipcRouteConns(ctx *fasthttp.RequestCtx) {
+	relayConns := make([]connection, 0, 200)
+
+	relays := runningRelaysCopy()
+	for _, r := range relays {
+		for _, conn := range r.GetConns() {
+
+			relayConns = append(relayConns, connection{
+				LocalAddr:  conn.Conn.LocalAddr().String(),
+				RemoteAddr: conn.Conn.RemoteAddr().String(),
+				Network:    conn.Conn.LocalAddr().Network(),
+
+				RelayName:     r.Name,
+				RelayHost:     r.Host,
+				ForwardedAddr: conn.RemoteAddr,
+
+				Opened: conn.Opened.Unix(),
+			})
+		}
+	}
+
+	ctx.SetStatusCode(200)
+	json.NewEncoder(ctx).Encode(relayConns)
 }

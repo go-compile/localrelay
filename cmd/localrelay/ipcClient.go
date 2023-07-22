@@ -122,31 +122,28 @@ func stopRelay(relayName string) error {
 }
 
 func activeConnections() ([]connection, error) {
-	// conn, err := IPCConnect()
-	// if err != nil {
-	// 	return nil, err
-	// }
+	client, conn, err := IPCConnect()
+	if err != nil {
+		return nil, err
+	}
 
-	// defer conn.Close()
+	defer conn.Close()
 
-	// _, err = conn.Write([]byte{0, 3, daemonConns, 0, 0})
-	// if err != nil {
-	// 	return nil, err
-	// }
+	resp, err := client.Get("http://lr/connections")
+	if err != nil {
+		return nil, err
+	}
 
-	// payload, err := readCommand(conn)
-	// if err != nil {
-	// 	return nil, err
-	// }
+	if resp.StatusCode != 200 {
+		return nil, errors.New("failed to fetch connections")
+	}
 
-	// var pool []connection
-	// if err := json.Unmarshal(payload, &pool); err != nil {
-	// 	return nil, err
-	// }
+	var pool []connection
+	if err := json.NewDecoder(resp.Body).Decode(&pool); err != nil {
+		return nil, err
+	}
 
-	// return pool, nil
-
-	return nil, nil
+	return pool, nil
 }
 
 func dropAll() error {
