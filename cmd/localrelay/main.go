@@ -161,7 +161,12 @@ func main() {
 
 			return
 		case "drop":
-			if err := dropAll(); err != nil {
+			if err := dropConns(opt); err != nil {
+				fmt.Println(err)
+			}
+			return
+		case "dropip":
+			if err := dropConnsIP(opt); err != nil {
 				fmt.Println(err)
 			}
 			return

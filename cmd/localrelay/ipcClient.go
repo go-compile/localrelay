@@ -130,7 +130,30 @@ func dropAll() error {
 
 	switch resp.StatusCode {
 	case 200:
-		fmt.Printf("All connections have been dropped.\r")
+		fmt.Printf("All connections have been dropped.\r\n")
+	default:
+		fmt.Printf("Failed to drop connections. Status code: %d.\r\n", resp.StatusCode)
+	}
+
+	return nil
+}
+
+func dropIP(ip string) error {
+	client, conn, err := IPCConnect()
+	if err != nil {
+		return err
+	}
+
+	defer conn.Close()
+
+	resp, err := client.Get("http://lr/drop/ip/" + url.PathEscape(ip))
+	if err != nil {
+		return err
+	}
+
+	switch resp.StatusCode {
+	case 200:
+		fmt.Printf("All connections from %q have been dropped.\r\n", ip)
 	default:
 		fmt.Printf("Failed to drop connections. Status code: %d.\n", resp.StatusCode)
 	}

@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"net"
 	"os"
 	"strconv"
 	"strings"
@@ -37,7 +38,7 @@ func assignIPCRoutes(r *router.Router) {
 	r.GET("/status", ipcRouteStatus)
 	r.GET("/connections", ipcRouteConns)
 	r.GET("/drop", ipcRouteDropAll)
-	// r.GET("/drop/ip/{}", ipcRouteDropIP)
+	r.GET("/drop/ip/{ip}", ipcRouteDropIP)
 	// r.GET("/drop/relay/{}", ipcRouteDropRelay)
 	// r.GET("/drop/addr/{}", ipcRouteDropAddr)
 }
@@ -206,6 +207,26 @@ func ipcRouteDropAll(ctx *fasthttp.RequestCtx) {
 	for _, r := range relays {
 		for _, conn := range r.GetConns() {
 			go conn.Conn.Close()
+		}
+	}
+}
+
+func ipcRouteDropIP(ctx *fasthttp.RequestCtx) {
+	ip := ctx.UserValue("ip").(string)
+
+	relays := runningRelaysCopy()
+	// iterate through all relays and close every connection
+	for _, r := range relays {
+		for _, conn := range r.GetConns() {
+			host, _, err := net.SplitHostPort(conn.Conn.RemoteAddr().String())
+			if err != nil {
+				// ignore error
+				continue
+			}
+
+			if host == ip {
+				go conn.Conn.Close()
+			}
 		}
 	}
 }
