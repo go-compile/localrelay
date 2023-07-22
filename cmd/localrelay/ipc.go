@@ -28,6 +28,10 @@ const (
 	daemonStatus
 	daemonStop
 	daemonConns
+	daemonDropAll   //TODO
+	daemonDropRelay //TODO
+	daemonDropIP    //TODO
+	daemonDropAddr  //TODO
 
 	maxErrors = 40
 )
@@ -248,6 +252,18 @@ func ipcLoop(conn io.ReadWriteCloser) error {
 
 		conn.Write(lenbuf)
 		conn.Write(respBuf.Bytes())
+
+	case daemonDropAll:
+		relays := runningRelaysCopy()
+		// iterate through all relays and close every connection
+		for _, r := range relays {
+			for _, conn := range r.GetConns() {
+				go conn.Conn.Close()
+			}
+		}
+
+		// return success
+		conn.Write([]byte{0, 0})
 	default:
 		// send unsuccessful response
 		msg := "Unknown command"

@@ -185,3 +185,24 @@ func activeConnections() ([]connection, error) {
 
 	return pool, nil
 }
+
+func dropAll() error {
+	conn, err := IPCConnect()
+	if err != nil {
+		return errors.Wrap(err, "connecting to IPC")
+	}
+
+	defer conn.Close()
+
+	_, err = conn.Write([]byte{0, 3, daemonDropAll, 0, 0})
+	if err != nil {
+		return err
+	}
+
+	_, err = readCommand(conn)
+	if err != nil {
+		return errors.Wrap(err, "reading from ipc conn")
+	}
+
+	return nil
+}

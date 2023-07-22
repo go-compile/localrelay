@@ -37,8 +37,6 @@ type metrics struct {
 }
 
 type connection struct {
-	ID int64
-
 	LocalAddr  string
 	RemoteAddr string
 	Network    string

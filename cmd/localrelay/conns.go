@@ -81,3 +81,25 @@ func arrayContains(arr []string, element string) bool {
 
 	return false
 }
+
+func dropConns(opt *options) error {
+	// make terminal raw to allow the use of colour on windows terminals
+	current, _ := console.ConsoleFromFile(os.Stdout)
+	// NOTE: Docker healthchecks will panic "provided file is not a console"
+
+	if current != nil {
+		defer current.Reset()
+	}
+
+	if current != nil {
+		if err := current.SetRaw(); err != nil {
+			log.Println(err)
+		}
+	}
+
+	if err := dropAll(); err != nil {
+		return err
+	}
+
+	return nil
+}

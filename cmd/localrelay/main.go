@@ -160,6 +160,9 @@ func main() {
 			}
 
 			return
+		case "drop":
+			dropAll()
+			return
 		default:
 			fmt.Printf("Unrecognised command %q\n", opt.commands[i])
 			return
