@@ -2,14 +2,21 @@ package main
 
 import (
 	"encoding/json"
+	"os"
+	"strconv"
 	"strings"
 	"time"
 
 	"github.com/fasthttp/router"
 	"github.com/go-compile/localrelay"
+	"github.com/naoina/toml"
 
 	"github.com/valyala/fasthttp"
 )
+
+type msgResponse struct {
+	Message string `json:"message"`
+}
 
 func newIPCServer() *fasthttp.Server {
 	r := router.New()
@@ -72,10 +79,65 @@ func ipcRouteStop(ctx *fasthttp.RequestCtx) {
 
 func ipcRouteRun(ctx *fasthttp.RequestCtx) {
 	var files []string
-	if err := json.NewDecoder(ctx.Response.BodyStream()).Decode(&files); err != nil {
+
+	if err := json.Unmarshal(ctx.Request.Body(), &files); err != nil {
 		ctx.SetStatusCode(400)
 		ctx.Write([]byte(`{"message":"Invalid json body."}`))
 		return
 	}
 
+	// TODO: support run multiple files
+	if len(files) != 1 {
+		ctx.SetStatusCode(400)
+		ctx.Write([]byte(`{"message":"Endpoint currently requires at maximum and minimum one relay."}`))
+		return
+	}
+
+	relayFile := files[0]
+
+	exists, err := pathExists(relayFile)
+	if err != nil {
+		ctx.SetStatusCode(500)
+		ctx.Write([]byte(`{"message":"Relay path could not be verified."}`))
+		return
+	}
+
+	if !exists {
+		ctx.SetStatusCode(404)
+		ctx.Write([]byte(`{"message":"Relay file does not exist."}`))
+		return
+	}
+
+	f, err := os.Open(relayFile)
+	if err != nil {
+		ctx.SetStatusCode(500)
+		ctx.Write([]byte(`{"message":"Failed to open relay config."}`))
+		return
+	}
+
+	var relay Relay
+	if err := toml.NewDecoder(f).Decode(&relay); err != nil {
+		f.Close()
+		ctx.SetStatusCode(500)
+		ctx.Write([]byte(`{"message":"Failed to decode relay config."}`))
+		return
+	}
+
+	f.Close()
+
+	if isRunning(relay.Name) {
+		ctx.SetStatusCode(500)
+		ctx.Write([]byte(`{"message":"Relay is already running."}`))
+		return
+	}
+
+	if err := launchRelays([]Relay{relay}, false); err != nil {
+		ctx.SetStatusCode(500)
+		ctx.Write([]byte(`{"message":` + strconv.Quote("Error launching relay. "+err.Error()) + `}`))
+		return
+	}
+
+	ctx.SetStatusCode(200)
+	ctx.Write([]byte(`{"message":"Relay successfully launched."}`))
+	return
 }

@@ -100,7 +100,7 @@ func runRelays(opt *options, i int, cmd []string) error {
 
 			fmt.Println("[Info] Service has been started.")
 
-			// wait for proccess to launch
+			// wait for process to launch
 			time.Sleep(time.Millisecond * 50)
 		}
 
