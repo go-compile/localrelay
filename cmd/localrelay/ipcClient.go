@@ -1,13 +1,10 @@
 package main
 
 import (
-	"bytes"
 	"encoding/binary"
-	"encoding/json"
 	"fmt"
 	"io"
-
-	"github.com/pkg/errors"
+	"net/url"
 )
 
 // commandDataIPC will send a command with a data section
@@ -42,167 +39,165 @@ func commandDataIPC(w io.Writer, id uint8, data []byte) error {
 // serviceRun takes paths to relay config files and then connects via IPC to
 // instruct the service to run these relays
 func serviceRun(relays []string) error {
-	conn, err := IPCConnect()
-	if err != nil {
-		return errors.Wrap(err, "connecting to IPC")
-	}
+	// conn, err := IPCConnect()
+	// if err != nil {
+	// 	return errors.Wrap(err, "connecting to IPC")
+	// }
 
-	defer conn.Close()
+	// defer conn.Close()
 
-	for _, relay := range relays {
-		buf := bytes.NewBuffer(nil)
-		buf.Write([]byte{daemonRun})
+	// for _, relay := range relays {
+	// 	buf := bytes.NewBuffer(nil)
+	// 	buf.Write([]byte{daemonRun})
 
-		lenBuf := make([]byte, 2)
-		binary.BigEndian.PutUint16(lenBuf, uint16(len(relay)))
+	// 	lenBuf := make([]byte, 2)
+	// 	binary.BigEndian.PutUint16(lenBuf, uint16(len(relay)))
 
-		buf.Write(lenBuf)
-		buf.Write([]byte(relay))
+	// 	buf.Write(lenBuf)
+	// 	buf.Write([]byte(relay))
 
-		payloadLen := make([]byte, 2)
-		binary.BigEndian.PutUint16(payloadLen, uint16(buf.Len()))
+	// 	payloadLen := make([]byte, 2)
+	// 	binary.BigEndian.PutUint16(payloadLen, uint16(buf.Len()))
 
-		conn.Write(payloadLen)
-		conn.Write(buf.Bytes())
+	// 	conn.Write(payloadLen)
+	// 	conn.Write(buf.Bytes())
 
-		response := make([]byte, 1)
-		_, err := conn.Read(response)
-		if err != nil {
-			return errors.Wrap(err, "reading from ipc conn")
-		}
+	// 	response := make([]byte, 1)
+	// 	_, err := conn.Read(response)
+	// 	if err != nil {
+	// 		return errors.Wrap(err, "reading from ipc conn")
+	// 	}
 
-		switch response[0] {
-		case 0:
-			fmt.Printf("[Error] Relay %q could not be started.\n", relay)
+	// 	switch response[0] {
+	// 	case 0:
+	// 		fmt.Printf("[Error] Relay %q could not be started.\n", relay)
 
-			errlenBuf := make([]byte, 2)
-			if _, err := conn.Read(errlenBuf); err != nil {
-				return err
-			}
+	// 		errlenBuf := make([]byte, 2)
+	// 		if _, err := conn.Read(errlenBuf); err != nil {
+	// 			return err
+	// 		}
 
-			fmt.Println("1")
-			msg := make([]byte, binary.BigEndian.Uint16(errlenBuf))
-			if _, err := conn.Read(msg); err != nil {
-				return err
-			}
+	// 		fmt.Println("1")
+	// 		msg := make([]byte, binary.BigEndian.Uint16(errlenBuf))
+	// 		if _, err := conn.Read(msg); err != nil {
+	// 			return err
+	// 		}
 
-			fmt.Println(string(msg))
-		case 1:
-			fmt.Printf("[Info] Relay %q has been started.\n", relay)
-		case 2:
-			fmt.Printf("[Info] Relay %q is already running.\n", relay)
-		case 3:
-			fmt.Printf("[Info] Relay %q does not exist.\n", relay)
-		case 4:
-			fmt.Printf("[Info] Relay %q errored when creating.\n", relay)
-		}
-	}
+	// 		fmt.Println(string(msg))
+	// 	case 1:
+	// 		fmt.Printf("[Info] Relay %q has been started.\n", relay)
+	// 	case 2:
+	// 		fmt.Printf("[Info] Relay %q is already running.\n", relay)
+	// 	case 3:
+	// 		fmt.Printf("[Info] Relay %q does not exist.\n", relay)
+	// 	case 4:
+	// 		fmt.Printf("[Info] Relay %q errored when creating.\n", relay)
+	// 	}
+	// }
 
 	return nil
 }
 
 func serviceStatus() (*status, error) {
-	conn, err := IPCConnect()
-	if err != nil {
-		return nil, err
-	}
+	// conn, err := IPCConnect()
+	// if err != nil {
+	// 	return nil, err
+	// }
 
-	defer conn.Close()
+	// defer conn.Close()
 
-	_, err = conn.Write([]byte{0, 3, daemonStatus, 0, 0})
-	if err != nil {
-		return nil, err
-	}
+	// _, err = conn.Write([]byte{0, 3, daemonStatus, 0, 0})
+	// if err != nil {
+	// 	return nil, err
+	// }
 
-	payload, err := readCommand(conn)
-	if err != nil {
-		return nil, err
-	}
+	// payload, err := readCommand(conn)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
-	var s status
-	if err := json.Unmarshal(payload, &s); err != nil {
-		return nil, err
-	}
+	// var s status
+	// if err := json.Unmarshal(payload, &s); err != nil {
+	// 	return nil, err
+	// }
 
-	return &s, nil
+	// return &s, nil
+
+	return nil, nil
 }
 
 func stopRelay(relayName string) error {
-	conn, err := IPCConnect()
+	client, conn, err := IPCConnect()
 	if err != nil {
 		return err
 	}
 
 	defer conn.Close()
 
-	if err := commandDataIPC(conn, daemonStop, []byte(relayName)); err != nil {
-		return nil
-	}
-
-	response := make([]byte, 1)
-	if _, err := conn.Read(response); err != nil {
+	resp, err := client.Get("http://lr/stop/" + url.PathEscape(relayName))
+	if err != nil {
 		return err
 	}
 
-	switch response[0] {
-	case 0:
-		fmt.Println("Failed to stop relay.")
-	case 1:
+	switch resp.StatusCode {
+	case 200:
 		fmt.Printf("Relay %q has been stopped.\n", relayName)
-	case 3:
-		fmt.Printf("Relay %q is not running.\n", relayName)
-	case 4:
-		fmt.Printf("Remote daemon failed to parse command.\n")
+	case 500:
+		fmt.Println("Failed to stop relay.")
+	case 404:
+		fmt.Printf("Relay not found.\n")
 	default:
-		fmt.Printf("Unknown response %d.\n", response[0])
+		fmt.Printf("Unknown response %d.\n", resp.StatusCode)
 	}
 
 	return nil
 }
 
 func activeConnections() ([]connection, error) {
-	conn, err := IPCConnect()
-	if err != nil {
-		return nil, err
-	}
+	// conn, err := IPCConnect()
+	// if err != nil {
+	// 	return nil, err
+	// }
 
-	defer conn.Close()
+	// defer conn.Close()
 
-	_, err = conn.Write([]byte{0, 3, daemonConns, 0, 0})
-	if err != nil {
-		return nil, err
-	}
+	// _, err = conn.Write([]byte{0, 3, daemonConns, 0, 0})
+	// if err != nil {
+	// 	return nil, err
+	// }
 
-	payload, err := readCommand(conn)
-	if err != nil {
-		return nil, err
-	}
+	// payload, err := readCommand(conn)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
-	var pool []connection
-	if err := json.Unmarshal(payload, &pool); err != nil {
-		return nil, err
-	}
+	// var pool []connection
+	// if err := json.Unmarshal(payload, &pool); err != nil {
+	// 	return nil, err
+	// }
 
-	return pool, nil
+	// return pool, nil
+
+	return nil, nil
 }
 
 func dropAll() error {
-	conn, err := IPCConnect()
-	if err != nil {
-		return errors.Wrap(err, "connecting to IPC")
-	}
+	// conn, err := IPCConnect()
+	// if err != nil {
+	// 	return errors.Wrap(err, "connecting to IPC")
+	// }
 
-	defer conn.Close()
+	// defer conn.Close()
 
-	_, err = conn.Write([]byte{0, 3, daemonDropAll, 0, 0})
-	if err != nil {
-		return err
-	}
+	// _, err = conn.Write([]byte{0, 3, daemonDropAll, 0, 0})
+	// if err != nil {
+	// 	return err
+	// }
 
-	_, err = readCommand(conn)
-	if err != nil {
-		return errors.Wrap(err, "reading from ipc conn")
-	}
+	// _, err = readCommand(conn)
+	// if err != nil {
+	// 	return errors.Wrap(err, "reading from ipc conn")
+	// }
 
 	return nil
 }

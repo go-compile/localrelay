@@ -5,7 +5,6 @@ import (
 	"encoding/binary"
 	"encoding/json"
 	"io"
-	"log"
 	"net"
 	"os"
 	"strings"
@@ -13,6 +12,7 @@ import (
 	"github.com/go-compile/localrelay"
 	"github.com/naoina/toml"
 	"github.com/pkg/errors"
+	"github.com/valyala/fasthttp"
 )
 
 type daemon struct{}
@@ -28,7 +28,7 @@ const (
 	daemonStatus
 	daemonStop
 	daemonConns
-	daemonDropAll   //TODO
+	daemonDropAll
 	daemonDropRelay //TODO
 	daemonDropIP    //TODO
 	daemonDropAddr  //TODO
@@ -84,28 +84,10 @@ func parseCommand(payload []byte) (uint8, []byte, error) {
 }
 
 // handleConn takes a conn and handles each command
-func handleConn(conn io.ReadWriteCloser, l io.Closer) {
+func handleConn(conn net.Conn, srv *fasthttp.Server, l io.Closer) {
 	defer conn.Close()
 
-	// if client causes more than x errors drop conn
-	for i := 0; i < maxErrors; {
-		// run in loop and handle errors here
-		if err := ipcLoop(conn); err != nil {
-			i++ //increase error counter
-
-			// connection has closed
-			if err == io.EOF {
-				return
-			}
-
-			log.Printf("[Error] IPC: %s\n", err)
-
-			// if connection closed quit
-			if err == net.ErrClosed || err == io.EOF {
-				break
-			}
-		}
-	}
+	srv.ServeConn(conn)
 }
 
 func ipcLoop(conn io.ReadWriteCloser) error {

@@ -1,8 +1,8 @@
 package main
 
 import (
-	"io"
 	"net"
+	"net/http"
 
 	"gopkg.in/natefinch/npipe.v2"
 )
@@ -19,6 +19,8 @@ func IPCListen() error {
 
 	defer l.Close()
 
+	srv := newIPCServer()
+
 	for {
 		conn, err := l.Accept()
 		if err != nil {
@@ -29,16 +31,27 @@ func IPCListen() error {
 			continue
 		}
 
-		go handleConn(conn, l)
+		go handleConn(conn, srv, l)
 	}
 }
 
 // IPCConnect will use name pipes to communicate to the daemon
-func IPCConnect() (io.ReadWriteCloser, error) {
+func IPCConnect() (*http.Client, net.Conn, error) {
 	conn, err := npipe.DialTimeout(`\\.\pipe\`+serviceName, ipcTimeout)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	return conn, nil
+	// make a http client which always uses the socket.
+	// When making a HTTP request provide any host, it does not need to exist.
+	//
+	// Example:
+	//  http://lr/status
+	httpClient := &http.Client{
+		Transport: &http.Transport{Dial: func(network, addr string) (net.Conn, error) {
+			return conn, nil
+		}},
+	}
+
+	return httpClient, conn, nil
 }
