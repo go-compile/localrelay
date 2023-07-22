@@ -4,8 +4,8 @@
 package main
 
 import (
-	"io"
 	"net"
+	"net/http"
 )
 
 var (
@@ -43,6 +43,8 @@ func IPCListen() error {
 
 	defer l.Close()
 
+	srv := newIPCServer()
+
 	for {
 		conn, err := l.Accept()
 		if err != nil {
@@ -53,6 +55,6 @@ func IPCListen() error {
 			continue
 		}
 
-		go handleConn(conn, l)
+		go handleConn(conn, srv, l)
 	}
 }
