@@ -35,8 +35,14 @@ func relayFailOverTCP(r *Relay, l net.Listener) error {
 }
 
 func handleFailOver(r *Relay, conn net.Conn, network string) {
+	r.storeConn(conn)
+
 	defer func() {
 		conn.Close()
+
+		// remove conn from connPool
+		r.popConn(conn)
+
 		r.Metrics.connections(-1)
 	}()
 

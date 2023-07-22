@@ -45,8 +45,14 @@ func relayTCP(r *Relay, l net.Listener) error {
 }
 
 func handleConn(r *Relay, conn net.Conn, network string) {
+	r.storeConn(conn)
+
 	defer func() {
 		conn.Close()
+
+		// remove conn from connPool
+		r.popConn(conn)
+
 		r.Metrics.connections(-1)
 	}()
 

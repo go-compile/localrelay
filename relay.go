@@ -59,6 +59,9 @@ type Relay struct {
 	m       sync.Mutex
 
 	protocolSwitching map[int]string
+
+	// connPool contains a list of ACTIVE connections
+	connPool []net.Conn
 }
 
 const (
@@ -79,7 +82,7 @@ const (
 
 	// VERSION uses semantic versioning
 	// this version number is for the library not the CLI
-	VERSION = "v1.3.4"
+	VERSION = "v1.4.0"
 )
 
 var (
@@ -282,5 +285,28 @@ func (r *Relay) Serve(l net.Listener) error {
 		return relayFailOverTCP(r, l)
 	default:
 		return ErrUnknownProxyType
+	}
+}
+
+// storeConn places the provided net.Conn into the connPoll.
+// To remove this conn from the pool, provide it to popConn()
+func (r *Relay) storeConn(conn net.Conn) {
+	r.m.Lock()
+	defer r.m.Unlock()
+
+	r.connPool = append(r.connPool, conn)
+}
+
+// popConn removes the provided connection from the conn pool
+func (r *Relay) popConn(conn net.Conn) {
+	r.m.Lock()
+	defer r.m.Unlock()
+
+	for i := 0; i < len(r.connPool); i++ {
+		if r.connPool[i] == conn {
+			// remove conn
+			r.connPool = append(r.connPool[:i], r.connPool[i+1:]...)
+			return
+		}
 	}
 }
