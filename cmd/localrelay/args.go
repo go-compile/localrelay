@@ -36,6 +36,8 @@ type options struct {
 	DisableAutoStart bool
 	store            bool
 
+	ipcPipe string
+
 	interval time.Duration
 }
 
@@ -112,6 +114,13 @@ func parseArgs() (*options, error) {
 			opt.key = value
 		case "disable_autostart", "disable_auto_start", "nostart", "noauto":
 			opt.DisableAutoStart = true
+		case "ipc-stream-io-pipe":
+			value, err := getAnswer(args, arg, &i)
+			if err != nil {
+				return nil, err
+			}
+
+			opt.ipcPipe = value
 		case "detach", "bg":
 			opt.detach = true
 		case "store":

@@ -49,12 +49,12 @@ func relayMetrics(opt *options) error {
 	if len(opt.commands) > 1 {
 		for _, relayName := range opt.commands[1:] {
 			if !validateName(relayName) {
-				fmt.Println("[WARN] Invalid relay name.")
+				Printf("[WARN] Invalid relay name.")
 				return nil
 			}
 
 			if _, ok := status.Metrics[strings.ToLower(relayName)]; !ok {
-				fmt.Printf("Relay %q is not running.\n", relayName)
+				Printf("Relay %q is not running.\n", relayName)
 				return nil
 			}
 
@@ -151,12 +151,12 @@ func relayMetrics(opt *options) error {
 				}
 			}
 
-			fmt.Printf("\r\n\x1b[2K  [Running Relays: %d] [In/Out: %s/%s]\r\n", running, formatBytes(totalInOut[0]), formatBytes(totalInOut[1]))
-			fmt.Printf("\x1b[%dA", (count*2)+2)
+			Printf("\r\n\x1b[2K  [Running Relays: %d] [In/Out: %s/%s]\r\n", running, formatBytes(totalInOut[0]), formatBytes(totalInOut[1]))
+			Printf("\x1b[%dA", (count*2)+2)
 		}
 	}
 }
 
 func printMetrics(name string, m metrics) {
-	fmt.Printf("\x1b[2K \x1b[90m%s\x1b[0m\r\n\x1b[2K  [In/Out:%s/%s] [DialAvg:%dms] [Active:%d] [Total:%d]\r\n", name, formatBytes(m.In), formatBytes(m.Out), m.DialAvg, m.Active, m.TotalConns+m.TotalRequests)
+	Printf("\x1b[2K \x1b[90m%s\x1b[0m\r\n\x1b[2K  [In/Out:%s/%s] [DialAvg:%dms] [Active:%d] [Total:%d]\r\n", name, formatBytes(m.In), formatBytes(m.Out), m.DialAvg, m.Active, m.TotalConns+m.TotalRequests)
 }

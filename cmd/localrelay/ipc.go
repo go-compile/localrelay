@@ -4,6 +4,7 @@ import (
 	"io"
 	"net"
 
+	"github.com/pkg/errors"
 	"github.com/valyala/fasthttp"
 )
 
@@ -16,7 +17,8 @@ const (
 )
 
 var (
-	ipcListener io.Closer
+	ipcListener   io.Closer
+	ErrIPCTimeout = errors.New("timed out waiting for IPC to connect")
 )
 
 // handleConn takes a conn and handles each command

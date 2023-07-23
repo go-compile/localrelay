@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
 
 	"github.com/kardianos/service"
 )
@@ -107,4 +108,42 @@ func configSystemDir() string {
 
 func relaysDir() string {
 	return filepath.Join(configSystemDir(), configDirSuffix)
+}
+
+// securityCheckBinary checks for common issues yet is not comprehensive
+func securityCheckBinary() (bool, string, error) {
+	exe, err := os.Executable()
+	if err != nil {
+		return false, "", err
+	}
+
+	if runtime.GOOS != "windows" {
+		// validate file location
+		if !(strings.HasPrefix(exe, "/usr/bin/") ||
+			strings.HasPrefix(exe, "/usr/sbin/") ||
+			strings.HasPrefix(exe, "/usr/local/bin") ||
+			strings.HasPrefix(exe, "/bin/") ||
+			strings.HasPrefix(exe, "/sbin/")) {
+			return false, "Binary is outside of an appropriate bin directory.", nil
+		}
+	}
+
+	fileStat, err := os.Stat(exe)
+	if err != nil {
+		return false, "Could not sta binary.", err
+	}
+
+	owner, err := fileOwnership(fileStat)
+	if err != nil {
+		return false, "Could not attain file ownership information.", err
+	}
+
+	// if file owned by root
+	if owner != "0" && runtime.GOOS != "windows" {
+		return false, "Binary is not solely owned by root/administrator.", err
+	}
+
+	// TODO: check if non-owners have write access
+
+	return true, "", nil
 }

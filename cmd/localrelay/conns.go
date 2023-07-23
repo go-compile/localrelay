@@ -65,11 +65,11 @@ func displayOpenConns(opt *options, onlyIPS bool) error {
 
 func printConn(conn connection, onlyIPS bool) {
 	if onlyIPS {
-		fmt.Printf("%s\r\n", conn.RemoteAddr)
+		Printf("%s\r\n", conn.RemoteAddr)
 		return
 	}
 
-	fmt.Printf("%s -> %s (%s) (%s)\r\n", conn.RemoteAddr, conn.ForwardedAddr, conn.RelayName, formatDuration(time.Since(time.Unix(conn.Opened, 0))))
+	Printf("%s -> %s (%s) (%s)\r\n", conn.RemoteAddr, conn.ForwardedAddr, conn.RelayName, formatDuration(time.Since(time.Unix(conn.Opened, 0))))
 }
 
 func arrayContains(arr []string, element string) bool {

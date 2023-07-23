@@ -3,8 +3,10 @@ package main
 import (
 	"net"
 	"net/http"
+	"os"
 	"time"
 
+	"golang.org/x/sys/windows"
 	"gopkg.in/natefinch/npipe.v2"
 )
 
@@ -56,4 +58,16 @@ func IPCConnect() (*http.Client, net.Conn, error) {
 	}
 
 	return httpClient, conn, nil
+}
+
+func fileOwnership(stat os.FileInfo) (string, error) {
+	// TODO: get owner of file on windows
+	return "", nil
+}
+
+func runningAsRoot() bool {
+	token := windows.GetCurrentProcessToken()
+	defer token.Close()
+
+	return token.IsElevated()
 }

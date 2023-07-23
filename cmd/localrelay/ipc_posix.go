@@ -60,3 +60,19 @@ func IPCListen() error {
 		go handleConn(conn, srv, l)
 	}
 }
+
+func fileOwnership(stat os.FileInfo) (string, error) {
+	s := stat.Sys().(*syscall.Stat_t)
+	uid := s.Uid
+	gid := s.Gid
+
+	if uid != gid {
+		return uid + "," + gid, nil
+	}
+
+	return uid
+}
+
+func runningAsRoot() bool {
+	return os.Geteuid() == 1
+}

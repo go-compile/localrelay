@@ -4,10 +4,12 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"runtime"
 	"strings"
 	"time"
 
 	"github.com/kardianos/service"
+	"github.com/pkg/errors"
 )
 
 var (
@@ -47,6 +49,17 @@ func main() {
 		return
 	}
 
+	// if process was forked forward stdout
+	if len(opt.ipcPipe) != 0 {
+		conn, err := forwardIO(opt)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+
+		defer conn.Close()
+	}
+
 	if len(opt.commands) == 0 {
 		help()
 		return
@@ -75,7 +88,6 @@ func main() {
 			return
 			// stop will shutdown the daemon service
 		case "stop":
-
 			if len(opt.commands) == 1 {
 				if err := s.Stop(); err != nil {
 					log.Fatalf("[Error] Failed to stop service: %s\n", err)
@@ -93,8 +105,24 @@ func main() {
 
 		// install will register the daemon service
 		case "install":
+			secure, msg, err := securityCheckBinary()
+			if err != nil {
+				log.Fatal(errors.Wrap(err, "checking binary security"))
+			}
+
+			if !secure {
+				fmt.Printf("WARNING!\n Security issues detected. Installation Blocked!\n"+
+					"Please follow localrelay's service installation guide to avoid inadvertently"+
+					"exposing your system to security vulnerabilities. It is likely your binary has"+
+					"insecure permissions.\n\nAudit Results:\n%s\n", msg)
+				return
+			}
+
+			if !privCommand(true) {
+				return
+			}
+
 			if err := s.Install(); err != nil {
-				fmt.Println("[Warn] Administrator privileges are required to install.")
 				log.Fatalf("[Error] Failed to install service: %s\n", err)
 			}
 
@@ -102,8 +130,11 @@ func main() {
 
 			return
 		case "uninstall":
+			if !privCommand(true) {
+				return
+			}
+
 			if err := s.Uninstall(); err != nil {
-				fmt.Println("[Warn] Administrator privileges are required to uninstall.")
 				log.Fatalf("[Error] Failed to uninstall service: %s\n", err)
 			}
 
@@ -134,6 +165,10 @@ func main() {
 			fmt.Println("Daemon has been started")
 			return
 		case "conns", "connections":
+			if !privCommand(true) {
+				return
+			}
+
 			if err := displayOpenConns(opt, false); err != nil {
 				fmt.Println(err)
 				os.Exit(1)
@@ -141,13 +176,21 @@ func main() {
 
 			return
 		case "ips":
+			if !privCommand(true) {
+				return
+			}
+
 			if err := displayOpenConns(opt, true); err != nil {
-				fmt.Println(err)
+				Println(err)
 				os.Exit(1)
 			}
 
 			return
 		case "status":
+			if !privCommand(true) {
+				return
+			}
+
 			if err := relayStatus(); err != nil {
 				fmt.Println(err)
 			}
@@ -155,22 +198,38 @@ func main() {
 			return
 			// TODO: add logs. Connect via IPC and show live view
 		case "metrics", "monitor":
+			if !privCommand(false) {
+				return
+			}
+
 			if err := relayMetrics(opt); err != nil {
 				fmt.Println(err)
 			}
 
 			return
 		case "drop":
+			if !privCommand(true) {
+				return
+			}
+
 			if err := dropConns(opt); err != nil {
 				fmt.Println(err)
 			}
 			return
 		case "dropip":
+			if !privCommand(true) {
+				return
+			}
+
 			if err := dropConnsIP(opt); err != nil {
 				fmt.Println(err)
 			}
 			return
 		case "droprelay":
+			if !privCommand(true) {
+				return
+			}
+
 			if err := dropConnsRelay(opt); err != nil {
 				fmt.Println(err)
 			}
@@ -180,4 +239,25 @@ func main() {
 			return
 		}
 	}
+}
+
+// privCommand will handle permission elevation.
+// If bool is false exit program without errors.
+// If bool true the user has permission.
+func privCommand(autoFork bool) bool {
+	if !runningAsRoot() {
+		if runtime.GOOS == "windows" && autoFork {
+			// UAC prompt
+			if err := fork(); err != nil {
+				Println(err)
+				return false
+			}
+		} else {
+			fmt.Println("Elevated privileges required.")
+		}
+
+		return false
+	}
+
+	return true
 }
