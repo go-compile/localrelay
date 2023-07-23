@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -21,27 +20,27 @@ var (
 
 func newRelay(opt *options, i int, cmd []string) error {
 	if len(opt.commands)-1 <= i {
-		fmt.Println("[WARN] Relay name was not provided.")
+		Println("[WARN] Relay name was not provided.")
 		return nil
 	}
 
 	if err := createConfigDir(); err != nil {
-		fmt.Printf("[WARN] Failed to create config dir: %s\n", err)
+		Printf("[WARN] Failed to create config dir: %s\n", err)
 	}
 
 	name := cmd[i+1]
 	if !validateName(name) {
-		fmt.Println("[WARN] Invalid relay name.")
+		Println("[WARN] Invalid relay name.")
 		return nil
 	}
 
 	if opt.host == "" {
-		fmt.Println("[WARN] Host was not set.")
+		Println("[WARN] Host was not set.")
 		return nil
 	}
 
 	if opt.destination == "" {
-		fmt.Println("[WARN] Destination was not set.")
+		Println("[WARN] Destination was not set.")
 		return nil
 	}
 
@@ -49,7 +48,7 @@ func newRelay(opt *options, i int, cmd []string) error {
 	case "", "socks5":
 		// validate socks5 or empty is ok
 	default:
-		fmt.Println("[WARN] Unsupported proxy type.")
+		Println("[WARN] Unsupported proxy type.")
 		return nil
 	}
 
@@ -93,7 +92,7 @@ func newRelay(opt *options, i int, cmd []string) error {
 				return err
 			}
 
-			fmt.Printf("[Info] Relay config written to %s\n", filename)
+			Printf("[Info] Relay config written to %s\n", filename)
 
 			return nil
 		}
@@ -108,7 +107,7 @@ func newRelay(opt *options, i int, cmd []string) error {
 		return err
 	}
 
-	fmt.Println("File already exits, do you want to overwrite it?")
+	Println("File already exits, do you want to overwrite it?")
 	prompt.SetPrompt("Overwrite (y/n): ")
 	overwrite, err := prompt.ReadlineWithDefault("n")
 	if err != nil {
@@ -121,7 +120,7 @@ func newRelay(opt *options, i int, cmd []string) error {
 	}
 
 	if !ow {
-		fmt.Println("[Info] Aborting, file was not overwritten")
+		Println("[Info] Aborting, file was not overwritten")
 		return nil
 	}
 
@@ -133,7 +132,7 @@ func newRelay(opt *options, i int, cmd []string) error {
 		return err
 	}
 
-	fmt.Printf("[Info] Relay config written to %s\n", filename)
+	Printf("[Info] Relay config written to %s\n", filename)
 
 	return nil
 }

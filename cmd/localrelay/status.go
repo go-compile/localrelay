@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"sort"
@@ -31,17 +30,17 @@ func relayStatus() error {
 	// carriage returns
 	s, err := serviceStatus()
 	if err != nil {
-		fmt.Printf("Daemon:    \x1b[31m [OFFLINE] \x1b[0m\r\n")
-		fmt.Println(err)
+		Printf("Daemon:    \x1b[31m [OFFLINE] \x1b[0m\r\n")
+		Println(err)
 
 		// exit with error
 		os.Exit(1)
 	}
 
-	fmt.Printf("\r\nDaemon:      \x1b[102m\x1b[30m [RUNNING] \x1b[0m\r\n")
-	fmt.Printf("PID:         [%d]\r\n", s.Pid)
-	fmt.Printf("Version:     [%s]\r\n", s.Version)
-	fmt.Printf("Relays:      [%d]\r\n", len(s.Relays))
+	Printf("\r\nDaemon:      \x1b[102m\x1b[30m [RUNNING] \x1b[0m\r\n")
+	Printf("PID:         [%d]\r\n", s.Pid)
+	Printf("Version:     [%s]\r\n", s.Version)
+	Printf("Relays:      [%d]\r\n", len(s.Relays))
 
 	totalConns := 0
 	totalRequests := 0
@@ -57,11 +56,11 @@ func relayStatus() error {
 		active += int(m.Active)
 	}
 
-	fmt.Println("\r")
-	fmt.Printf("Total Conns: [%d] Total Requests: [%d]\r\n", totalConns, totalRequests)
-	fmt.Printf("Active:      [%d]\r\n", active)
-	fmt.Printf("In/Out:      [%s/%s]\r\n", formatBytes(in), formatBytes(out))
-	fmt.Printf("Uptime:      [%s]\r\n", formatDuration(time.Since(time.Unix(s.Started, 0))))
+	Println("\r")
+	Printf("Total Conns: [%d] Total Requests: [%d]\r\n", totalConns, totalRequests)
+	Printf("Active:      [%d]\r\n", active)
+	Printf("In/Out:      [%s/%s]\r\n", formatBytes(in), formatBytes(out))
+	Printf("Uptime:      [%s]\r\n", formatDuration(time.Since(time.Unix(s.Started, 0))))
 
 	// sort alphabetically
 	sort.SliceStable(s.Relays, func(i, j int) bool {
@@ -86,7 +85,7 @@ func relayStatus() error {
 			badges += "\x1b[92m [PROXY] \x1b[0m"
 		}
 
-		fmt.Printf("  \x1b[90m%.2d\x1b[0m: %s %s\r\n      %s -> %s\r\n", i+1, s.Relays[i].Name, badges, s.Relays[i].Host, s.Relays[i].ForwardAddr)
+		Printf("  \x1b[90m%.2d\x1b[0m: %s %s\r\n      %s -> %s\r\n", i+1, s.Relays[i].Name, badges, s.Relays[i].Host, s.Relays[i].ForwardAddr)
 	}
 
 	return nil

@@ -98,7 +98,7 @@ func checkForUpdates() error {
 			}
 			fm.Unlock()
 
-			fmt.Printf("\r Latest version: %s", frames[i%len(frames)])
+			Printf("\r Latest version: %s", frames[i%len(frames)])
 			time.Sleep(time.Millisecond * 60)
 		}
 	}()
@@ -123,12 +123,12 @@ func checkForUpdates() error {
 	}
 
 	if release.Prerelease {
-		fmt.Printf("  ├ Latest version: %s (Pre Release)\n", release.Name)
+		Printf("  ├ Latest version: %s (Pre Release)\n", release.Name)
 	} else {
-		fmt.Printf("  ├ Latest version: %s\n", release.Name)
+		Printf("  ├ Latest version: %s\n", release.Name)
 	}
 
-	fmt.Printf("  └ Published: %s\n", release.PublishedAt.Format("January 2 2006"))
+	Printf("  └ Published: %s\n", release.PublishedAt.Format("January 2 2006"))
 
 	return nil
 }

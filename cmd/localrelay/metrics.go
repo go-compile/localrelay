@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"fmt"
 	"log"
 	"os"
 	"os/signal"
@@ -97,9 +96,9 @@ func relayMetrics(opt *options) error {
 		case <-sig:
 			// make a guess how far to move the cursor
 			if len(relays) != 0 {
-				fmt.Printf("\x1b[%dB", (len(relays)*2)+2)
+				Printf("\x1b[%dB", (len(relays)*2)+2)
 			} else {
-				fmt.Printf("\x1b[%dB", (len(status.Metrics)*2)+2)
+				Printf("\x1b[%dB", (len(status.Metrics)*2)+2)
 			}
 
 			return nil
@@ -112,7 +111,7 @@ func relayMetrics(opt *options) error {
 
 			// if relay has gone offline clear bottom of screen
 			if x := len(status.Metrics); x < running {
-				fmt.Printf("\x1b[0J")
+				Printf("\x1b[0J")
 			}
 
 			running = len(status.Metrics)

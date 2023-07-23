@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"runtime"
@@ -24,6 +23,9 @@ var (
 )
 
 func main() {
+	// set default output, may be changed if ipc stream is enabled
+	stdout = os.Stdout
+
 	serviceConfig := &service.Config{
 		Name:        serviceName,
 		DisplayName: serviceName,
@@ -45,7 +47,7 @@ func main() {
 	}
 
 	if err != nil {
-		fmt.Println(err)
+		Println(err)
 		return
 	}
 
@@ -53,7 +55,7 @@ func main() {
 	if len(opt.ipcPipe) != 0 {
 		conn, err := forwardIO(opt)
 		if err != nil {
-			fmt.Println(err)
+			Println(err)
 			return
 		}
 
@@ -76,13 +78,13 @@ func main() {
 			return
 		case "new":
 			if err := newRelay(opt, i, opt.commands); err != nil {
-				fmt.Println(err)
+				Println(err)
 			}
 
 			return
 		case "run":
 			if err := runRelays(opt, i, opt.commands); err != nil {
-				fmt.Println(err)
+				Println(err)
 			}
 
 			return
@@ -93,7 +95,7 @@ func main() {
 					log.Fatalf("[Error] Failed to stop service: %s\n", err)
 				}
 
-				fmt.Println("Daemon has been shutdown")
+				Println("Daemon has been shutdown")
 				return
 			}
 
@@ -111,7 +113,7 @@ func main() {
 			}
 
 			if !secure {
-				fmt.Printf("WARNING!\n Security issues detected. Installation Blocked!\n"+
+				Printf("WARNING!\n Security issues detected. Installation Blocked!\n"+
 					"Please follow localrelay's service installation guide to avoid inadvertently"+
 					"exposing your system to security vulnerabilities. It is likely your binary has"+
 					"insecure permissions.\n\nAudit Results:\n%s\n", msg)
@@ -126,7 +128,7 @@ func main() {
 				log.Fatalf("[Error] Failed to install service: %s\n", err)
 			}
 
-			fmt.Println("Daemon service has been installed.")
+			Println("Daemon service has been installed.")
 
 			return
 		case "uninstall":
@@ -138,7 +140,7 @@ func main() {
 				log.Fatalf("[Error] Failed to uninstall service: %s\n", err)
 			}
 
-			fmt.Println("Daemon service has been uninstalled.")
+			Println("Daemon service has been uninstalled.")
 
 			return
 			// start-service-daemon will run as the service daemon
@@ -156,13 +158,13 @@ func main() {
 				log.Fatalf("[Error] Failed to restart service: %s\n", err)
 			}
 
-			fmt.Println("Daemon has been restarted")
+			Println("Daemon has been restarted")
 		case "start":
 			if err := s.Start(); err != nil {
 				log.Fatalf("[Error] Failed to start service: %s\n", err)
 			}
 
-			fmt.Println("Daemon has been started")
+			Println("Daemon has been started")
 			return
 		case "conns", "connections":
 			if !privCommand(true) {
@@ -170,7 +172,7 @@ func main() {
 			}
 
 			if err := displayOpenConns(opt, false); err != nil {
-				fmt.Println(err)
+				Println(err)
 				os.Exit(1)
 			}
 
@@ -192,7 +194,7 @@ func main() {
 			}
 
 			if err := relayStatus(); err != nil {
-				fmt.Println(err)
+				Println(err)
 			}
 
 			return
@@ -203,7 +205,7 @@ func main() {
 			}
 
 			if err := relayMetrics(opt); err != nil {
-				fmt.Println(err)
+				Println(err)
 			}
 
 			return
@@ -213,7 +215,7 @@ func main() {
 			}
 
 			if err := dropConns(opt); err != nil {
-				fmt.Println(err)
+				Println(err)
 			}
 			return
 		case "dropip":
@@ -222,7 +224,7 @@ func main() {
 			}
 
 			if err := dropConnsIP(opt); err != nil {
-				fmt.Println(err)
+				Println(err)
 			}
 			return
 		case "droprelay":
@@ -231,11 +233,11 @@ func main() {
 			}
 
 			if err := dropConnsRelay(opt); err != nil {
-				fmt.Println(err)
+				Println(err)
 			}
 			return
 		default:
-			fmt.Printf("Unrecognised command %q\n", opt.commands[i])
+			Printf("Unrecognised command %q\n", opt.commands[i])
 			return
 		}
 	}
@@ -253,7 +255,7 @@ func privCommand(autoFork bool) bool {
 				return false
 			}
 		} else {
-			fmt.Println("Elevated privileges required.")
+			Println("Elevated privileges required.")
 		}
 
 		return false

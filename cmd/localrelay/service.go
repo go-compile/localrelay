@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"path/filepath"
@@ -12,7 +11,7 @@ import (
 )
 
 func (p daemon) Start(s service.Service) error {
-	fmt.Println(s.String() + " started")
+	Println(s.String() + " started")
 	go p.run()
 	return nil
 }
@@ -31,7 +30,7 @@ func (p daemon) Stop(s service.Service) error {
 
 	ipcListener.Close()
 
-	fmt.Println(s.String() + " stopped")
+	Println(s.String() + " stopped")
 	return nil
 }
 

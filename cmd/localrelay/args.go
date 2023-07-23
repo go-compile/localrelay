@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"net/url"
 	"os"
 	"strconv"
@@ -136,7 +135,7 @@ func parseArgs() (*options, error) {
 				return nil, err
 			}
 
-			fmt.Printf("Timeout set to: %dms\n", dur.Milliseconds())
+			Printf("Timeout set to: %dms\n", dur.Milliseconds())
 			localrelay.Timeout = dur
 		case "destination", "d", "dst", "rhost":
 			value, err := getAnswer(args, arg, &i)
@@ -201,11 +200,11 @@ func parseArgs() (*options, error) {
 		case "help", "h", "?":
 			help()
 			if len(os.Args) >= 3 {
-				fmt.Println("\n\n[Warn] It looks like you accidentally used -h instead of -host")
+				Println("\n\n[Warn] It looks like you accidentally used -h instead of -host")
 			}
 			return nil, nil
 		default:
-			fmt.Printf("Unknown argument %q\n", arg)
+			Printf("Unknown argument %q\n", arg)
 			return nil, nil
 		}
 
@@ -237,62 +236,62 @@ func getAnswer(args []string, arg []string, i *int) (string, error) {
 }
 
 func help() {
-	fmt.Printf("LocalRelay CLI - %s\n", VERSION)
-	fmt.Println()
-	fmt.Println("Usage:")
-	fmt.Println("  localrelay new <relay_name> -host 127.0.0.1:8080 -destination example.com:80")
-	fmt.Println("    -output=<file_location> -tcp -http -https -proxy socks5://127.0.0.1:9050")
-	fmt.Println()
-	fmt.Println("  localrelay run <relay_config>")
-	fmt.Println("  localrelay run <relay_config> -detach")
-	fmt.Println("  localrelay run <relay_config> <relay_config2>...")
-	fmt.Println()
-	fmt.Println("  localrelay start")
-	fmt.Println("  localrelay status")
-	fmt.Println("  localrelay monitor")
-	fmt.Println("  localrelay connections")
-	fmt.Println("  localrelay connections <relay>")
-	fmt.Println("  localrelay ips")
-	fmt.Println("  localrelay drop")
-	fmt.Println("  localrelay dropip <ip>")
-	fmt.Println("  localrelay droprelay <relay>")
-	fmt.Println("  localrelay stop")
-	fmt.Println("  localrelay stop <relay>")
-	fmt.Println("  localrelay restart")
-	fmt.Println("  localrelay install")
-	fmt.Println("  localrelay uninstall")
-	fmt.Println()
-	fmt.Println("Arguments:")
-	fmt.Printf("  %-28s %s\n", "-host, -lhost", "Set listen host")
-	fmt.Printf("  %-28s %s\n", "-destination, -dst, -rhost", "Set forward address")
-	fmt.Printf("  %-28s %s\n", "-tcp", "Set relay to TCP relay")
-	fmt.Printf("  %-28s %s\n", "-udp", "Set relay to UDP relay")
-	fmt.Printf("  %-28s %s\n", "-http", "Set relay to HTTP relay")
-	fmt.Printf("  %-28s %s\n", "-https", "Set relay to HTTPS relay")
-	fmt.Printf("  %-28s %s\n", "-failover", "Set relay to TCP failover relay")
-	fmt.Printf("  %-28s %s\n", "-proxy", "Set socks5 proxy via URL")
-	fmt.Printf("  %-28s %s\n", "-output, -o", "Set output file path")
-	fmt.Printf("  %-28s %s\n", "-proxy_ignore", "Destination indexes to ignore proxy settings")
-	fmt.Printf("  %-28s %s\n", "-version", "View version page")
-	fmt.Printf("  %-28s %s\n", "-timeout", "Set dial timeout for non proxied relays")
-	fmt.Printf("  %-28s %s\n", "-detach", "Run relay service in background")
-	fmt.Printf("  %-28s %s\n", "-log", "Specify the file to write logs to")
-	fmt.Printf("  %-28s %s\n", "-cert", "Set TLS certificate file")
-	fmt.Printf("  %-28s %s\n", "-key", "Set TLS key file")
-	fmt.Printf("  %-28s %s\n", "-noauto", "Set relay to not autostart with daemon")
-	fmt.Printf("  %-28s %s\n", "-store", "Output relay configs to config dir")
-	fmt.Printf("  %-28s %s\n", "-interval", "Metrics refresh interval")
+	Printf("LocalRelay CLI - %s\n", VERSION)
+	Println()
+	Println("Usage:")
+	Println("  localrelay new <relay_name> -host 127.0.0.1:8080 -destination example.com:80")
+	Println("    -output=<file_location> -tcp -http -https -proxy socks5://127.0.0.1:9050")
+	Println()
+	Println("  localrelay run <relay_config>")
+	Println("  localrelay run <relay_config> -detach")
+	Println("  localrelay run <relay_config> <relay_config2>...")
+	Println()
+	Println("  localrelay start")
+	Println("  localrelay status")
+	Println("  localrelay monitor")
+	Println("  localrelay connections")
+	Println("  localrelay connections <relay>")
+	Println("  localrelay ips")
+	Println("  localrelay drop")
+	Println("  localrelay dropip <ip>")
+	Println("  localrelay droprelay <relay>")
+	Println("  localrelay stop")
+	Println("  localrelay stop <relay>")
+	Println("  localrelay restart")
+	Println("  localrelay install")
+	Println("  localrelay uninstall")
+	Println()
+	Println("Arguments:")
+	Printf("  %-28s %s\n", "-host, -lhost", "Set listen host")
+	Printf("  %-28s %s\n", "-destination, -dst, -rhost", "Set forward address")
+	Printf("  %-28s %s\n", "-tcp", "Set relay to TCP relay")
+	Printf("  %-28s %s\n", "-udp", "Set relay to UDP relay")
+	Printf("  %-28s %s\n", "-http", "Set relay to HTTP relay")
+	Printf("  %-28s %s\n", "-https", "Set relay to HTTPS relay")
+	Printf("  %-28s %s\n", "-failover", "Set relay to TCP failover relay")
+	Printf("  %-28s %s\n", "-proxy", "Set socks5 proxy via URL")
+	Printf("  %-28s %s\n", "-output, -o", "Set output file path")
+	Printf("  %-28s %s\n", "-proxy_ignore", "Destination indexes to ignore proxy settings")
+	Printf("  %-28s %s\n", "-version", "View version page")
+	Printf("  %-28s %s\n", "-timeout", "Set dial timeout for non proxied relays")
+	Printf("  %-28s %s\n", "-detach", "Run relay service in background")
+	Printf("  %-28s %s\n", "-log", "Specify the file to write logs to")
+	Printf("  %-28s %s\n", "-cert", "Set TLS certificate file")
+	Printf("  %-28s %s\n", "-key", "Set TLS key file")
+	Printf("  %-28s %s\n", "-noauto", "Set relay to not autostart with daemon")
+	Printf("  %-28s %s\n", "-store", "Output relay configs to config dir")
+	Printf("  %-28s %s\n", "-interval", "Metrics refresh interval")
 }
 
 func version() {
-	fmt.Printf("LocalRelay CLI - %s (%s.%s)\n", VERSION, BRANCH, COMMIT)
-	fmt.Println()
-	fmt.Println(" A reverse proxying program to allow services e.g. Nextcloud, Bitwarden etc to\n" +
+	Printf("LocalRelay CLI - %s (%s.%s)\n", VERSION, BRANCH, COMMIT)
+	Println()
+	Println(" A reverse proxying program to allow services e.g. Nextcloud, Bitwarden etc to\n" +
 		" be accessed over Tor (SOCKS5) even when the client app do not support\n" +
 		" SOCKS proxies.")
-	fmt.Println()
-	fmt.Println()
-	fmt.Println(" github.com/go-compile/localrelay")
+	Println()
+	Println()
+	Println(" github.com/go-compile/localrelay")
 
 	checkForUpdates()
 }

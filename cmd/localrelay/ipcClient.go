@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"net/url"
 	"strconv"
 
@@ -32,7 +31,7 @@ func serviceRun(relays []string) error {
 			return err
 		}
 
-		fmt.Println(response.Message)
+		Println(response.Message)
 	}
 
 	return nil
@@ -78,13 +77,13 @@ func stopRelay(relayName string) error {
 
 	switch resp.StatusCode {
 	case 200:
-		fmt.Printf("Relay %q has been stopped.\n", relayName)
+		Printf("Relay %q has been stopped.\n", relayName)
 	case 500:
-		fmt.Printf("Failed to stop relay.\n")
+		Printf("Failed to stop relay.\n")
 	case 404:
-		fmt.Printf("Relay not found.\n")
+		Printf("Relay not found.\n")
 	default:
-		fmt.Printf("Unknown response %d.\n", resp.StatusCode)
+		Printf("Unknown response %d.\n", resp.StatusCode)
 	}
 
 	return nil
@@ -130,9 +129,9 @@ func dropAll() error {
 
 	switch resp.StatusCode {
 	case 200:
-		fmt.Printf("All connections have been dropped.\r\n")
+		Printf("All connections have been dropped.\r\n")
 	default:
-		fmt.Printf("Failed to drop connections. Status code: %d.\r\n", resp.StatusCode)
+		Printf("Failed to drop connections. Status code: %d.\r\n", resp.StatusCode)
 	}
 
 	return nil
@@ -153,9 +152,9 @@ func dropIP(ip string) error {
 
 	switch resp.StatusCode {
 	case 200:
-		fmt.Printf("All connections from %q have been dropped.\r\n", ip)
+		Printf("All connections from %q have been dropped.\r\n", ip)
 	default:
-		fmt.Printf("Failed to drop connections. Status code: %d.\n", resp.StatusCode)
+		Printf("Failed to drop connections. Status code: %d.\n", resp.StatusCode)
 	}
 
 	return nil
@@ -176,9 +175,9 @@ func dropRelay(relay string) error {
 
 	switch resp.StatusCode {
 	case 200:
-		fmt.Printf("All connections from %q have been dropped.\r\n", relay)
+		Printf("All connections from %q have been dropped.\r\n", relay)
 	default:
-		fmt.Printf("Failed to drop connections. Status code: %d.\n", resp.StatusCode)
+		Printf("Failed to drop connections. Status code: %d.\n", resp.StatusCode)
 	}
 
 	return nil

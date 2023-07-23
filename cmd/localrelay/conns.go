@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"time"
@@ -29,8 +28,8 @@ func displayOpenConns(opt *options, onlyIPS bool) error {
 	conns, err := activeConnections()
 	if err != nil {
 
-		fmt.Printf("Daemon:    \x1b[31m [OFFLINE] \x1b[0m\r\n")
-		fmt.Println(err)
+		Printf("Daemon:    \x1b[31m [OFFLINE] \x1b[0m\r\n")
+		Println(err)
 
 		// exit with error
 		os.Exit(1)
@@ -42,7 +41,7 @@ func displayOpenConns(opt *options, onlyIPS bool) error {
 	if len(opt.commands) > 1 {
 		for _, relayName := range opt.commands[1:] {
 			if !validateName(relayName) {
-				fmt.Println("[WARN] Invalid relay name.")
+				Println("[WARN] Invalid relay name.")
 				return nil
 			}
 
@@ -116,7 +115,7 @@ func dropConnsIP(opt *options) error {
 	}
 
 	if len(opt.commands) < 2 {
-		fmt.Println("Provide an ip address.")
+		Println("Provide an ip address.")
 		return nil
 	}
 
@@ -139,7 +138,7 @@ func dropConnsRelay(opt *options) error {
 	}
 
 	if len(opt.commands) < 2 {
-		fmt.Println("Provide a relay name.")
+		Println("Provide a relay name.")
 		return nil
 	}
 

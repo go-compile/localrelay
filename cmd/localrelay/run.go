@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -76,16 +75,16 @@ func runRelays(opt *options, i int, cmd []string) error {
 	}
 
 	if len(relays) == 0 {
-		fmt.Println("[WARN] No relay configs provided.")
+		Println("[WARN] No relay configs provided.")
 		return nil
 	}
 
-	fmt.Printf("Loaded: %d relays\n", len(relays))
+	Printf("Loaded: %d relays\n", len(relays))
 
 	// if detach is enable fork process and start daemon
 	if opt.detach {
 		if !runningAsRoot() {
-			fmt.Println("Elevated privileges required to run in background.")
+			Println("Elevated privileges required to run in background.")
 			return nil
 		}
 
@@ -95,13 +94,13 @@ func runRelays(opt *options, i int, cmd []string) error {
 		}
 
 		if running != service.StatusRunning {
-			fmt.Println("[Info] Service not running.")
+			Println("[Info] Service not running.")
 
 			if err := daemonService.Start(); err != nil {
 				log.Fatalf("[Error] Failed to start service: %s\n", err)
 			}
 
-			fmt.Println("[Info] Service has been started.")
+			Println("[Info] Service has been started.")
 
 			// wait for process to launch
 			time.Sleep(time.Millisecond * 50)
@@ -125,16 +124,16 @@ func launchRelays(relays []Relay, wait bool) error {
 			return ErrInvalidRelayName
 		}
 
-		fmt.Printf("[Info] [Relay:%d] Starting %q on %q\n", i+1, r.Name, r.Host)
+		Printf("[Info] [Relay:%d] Starting %q on %q\n", i+1, r.Name, r.Host)
 
 		if r.Proxy.Host != "" && strings.ToLower(r.Proxy.Protocol) != "socks5" {
-			fmt.Printf("[Warn] Proxy type %q not supported.\n", r.Proxy.Protocol)
+			Printf("[Warn] Proxy type %q not supported.\n", r.Proxy.Protocol)
 			return nil
 		}
 
 		w := os.Stdout
 		if r.Logging != "stdout" {
-			fmt.Printf("[Info] [Relay:%s] Log output writing to: %q\n", r.Name, r.Logging)
+			Printf("[Info] [Relay:%s] Log output writing to: %q\n", r.Name, r.Logging)
 
 			f, err := os.OpenFile(r.Logging, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
 			if err != nil {
@@ -252,7 +251,7 @@ func launchRelays(relays []Relay, wait bool) error {
 
 	if wait {
 		wg.Wait()
-		fmt.Println("[Info] All relays closed.")
+		Println("[Info] All relays closed.")
 	}
 
 	return nil
