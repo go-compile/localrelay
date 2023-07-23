@@ -7,7 +7,9 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"syscall"
 	"time"
+	"strconv"
 )
 
 var (
@@ -68,10 +70,10 @@ func fileOwnership(stat os.FileInfo) (string, error) {
 	gid := s.Gid
 
 	if uid != gid {
-		return uid + "," + gid, nil
+		return strconv.Itoa(int(uid)) + "," + strconv.Itoa(int(gid)), nil
 	}
 
-	return uid
+	return strconv.Itoa(int(uid)), nil
 }
 
 func runningAsRoot() bool {
