@@ -3,6 +3,7 @@ package main
 import (
 	"net/url"
 	"os"
+	"runtime"
 	"strconv"
 	"strings"
 	"time"
@@ -284,7 +285,7 @@ func help() {
 }
 
 func version() {
-	Printf("LocalRelay CLI - %s (%s.%s)\n", VERSION, BRANCH, COMMIT)
+	Printf("LocalRelay CLI - %s (%s.%s) [%s]\n", VERSION, BRANCH, COMMIT, runtime.Version())
 	Println()
 	Println(" A reverse proxying program to allow services e.g. Nextcloud, Bitwarden etc to\n" +
 		" be accessed over Tor (SOCKS5) even when the client app do not support\n" +
