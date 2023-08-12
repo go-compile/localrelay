@@ -11,7 +11,8 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/tam7t/hpkp v0.0.0-20160821193359-2b70b4024ed5
 	github.com/valyala/fasthttp v1.48.0
-	golang.org/x/net v0.12.0
+	golang.org/x/net v0.14.0
+	golang.org/x/sys v0.11.0
 	gopkg.in/natefinch/npipe.v2 v2.0.0-20160621034901-c1b8fa8bdcce
 )
 
@@ -22,5 +23,4 @@ require (
 	github.com/naoina/go-stringutil v0.1.0 // indirect
 	github.com/savsgio/gotils v0.0.0-20230208104028-c358bd845dee // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
-	golang.org/x/sys v0.10.0 // indirect
 )
