@@ -105,6 +105,8 @@ func checkForUpdates() error {
 
 	r, err := http.Get("https://api.github.com/repos/go-compile/localrelay/releases/latest")
 	if err != nil {
+		fmt.Print("\r")
+		Printf("  └ Latest version: %s\n", "unknown")
 		return err
 	}
 
