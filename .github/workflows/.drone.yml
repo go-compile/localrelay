@@ -86,7 +86,7 @@ steps:
     image: ghcr.io/google/osv-scanner:latest
     commands:
       - /osv-scanner -r ./
-      
+
   - name: build-failed-notification
     image: curlimages/curl:8.00.1
     environment:
@@ -97,53 +97,3 @@ steps:
         - failure
     commands:
       - "curl -v $notify -F 'title=Vulnerability In ${DRONE_REPO}' -F $'message=[Build Failed] ${DRONE_REPO}\n[COMMIT] ${DRONE_COMMIT}\n[BRANCH] ${DRONE_BRANCH}'"
-
----
-kind: pipeline
-type: docker
-name: automatic-build
-
-depends_on:
-  - "osv-dependency-scan"
-  - "go-1-17"
-  - "go-1-18"
-  - "go-1-19"
-
-steps:
-  - name: release
-    image: goreleaser/goreleaser
-    environment:
-      GITEA_TOKEN:
-        from_secret: gitea_token
-    commands:
-      - goreleaser release --skip-sign
-    when:
-      event:
-        - tag
-      status:
-        - success
-
-  - name: release-failed-notification
-    image: curlimages/curl:8.00.1
-    environment:
-      notify:
-        from_secret: notification_webhook
-    when:
-      event: 
-        - tag
-      status:
-        - failure
-    commands:
-      - "curl -v $notify -F 'title=Release Failed ${DRONE_REPO}' -F $'message=[Release Failed] ${DRONE_REPO}\n[COMMIT] ${DRONE_COMMIT}\n[BRANCH] ${DRONE_BRANCH}'"
-  - name: release-success-notification
-    image: curlimages/curl:8.00.1
-    environment:
-      notify:
-        from_secret: notification_webhook
-    when:
-      event: 
-        - tag
-      status:
-        - success
-    commands:
-      - "curl -v $notify -F 'title=Successfully Released ${DRONE_REPO}' -F $'message=Released ${DRONE_REPO} [${DRONE_BRANCH}]'"
