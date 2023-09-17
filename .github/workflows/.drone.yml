@@ -83,10 +83,10 @@ name: osv-dependency-scan
 
 steps:
   - name: osv-vuln-dep-scanner
-    image: golang
+    image: ghcr.io/google/osv-scanner:latest
     commands:
-      - go install github.com/google/osv-scanner/cmd/osv-scanner@v1
-      - osv-scanner -r ./
+      - /osv-scanner -r ./
+      
   - name: build-failed-notification
     image: curlimages/curl:8.00.1
     environment:
