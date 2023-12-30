@@ -3,8 +3,10 @@ COMMIT=$(shell git rev-parse --short HEAD)
 BRANCH=$(shell git rev-parse --abbrev-ref HEAD)
 
 build:
-	goreleaser release --snapshot --clean --skip-sign --skip-publish
-	make wix
+	goreleaser release --snapshot --clean --skip=publish,sign
+
+release:
+	goreleaser release --clean --skip=publish
 
 wix:
 	cp ./scripts/wix/localrelay.template.wxs ./scripts/wix/localrelay.wxs

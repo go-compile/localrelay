@@ -7,7 +7,8 @@ before:
     # you may remove this if you don't need go generate
     - go generate ./...
 builds:
-  - main: ./cmd/localrelay
+  - 
+    main: ./cmd/localrelay
     id: "cli"
     binary: "localrelay"
     ldflags:
@@ -30,6 +31,9 @@ builds:
         goarch: arm64
       - goos: windows
         goarch: arm
+    hooks:
+      post:
+        - cmd: bash -c 'if [ "{{.Os}}" == "windows" ] && [ "{{.Arch}}" == "amd64" ]; then make wix; mv ./scripts/wix/localrelay.msi ./dist; fi'
 
 archives:
   - format: tar.gz
@@ -50,6 +54,9 @@ archives:
 
 checksum:
   name_template: "checksums.txt"
+  extra_files:
+    - glob: ./dist/*.msi
+    - name_template: localrelay.msi
 
 snapshot:
   name_template: "{{ incpatch .Version }}-next"
@@ -129,6 +136,7 @@ nfpms:
 signs:
   - artifacts: checksum
     output: true
+    id: "628B769BFD007F8233FDAD1853F4922E9D5497B8"
 
 chocolateys:
   - authors: "Go Compile"
