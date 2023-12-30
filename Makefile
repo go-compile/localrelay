@@ -34,3 +34,4 @@ clean:
 	rm -rf ./dist/
 	go clean
 	rm ./scripts/wix/localrelay.wxs
+	rm ./scripts/wix/localrelay.msi
