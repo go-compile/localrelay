@@ -90,6 +90,10 @@ func main() {
 			return
 			// stop will shutdown the daemon service
 		case "stop":
+			if !privCommand(true) {
+				return
+			}
+
 			if len(opt.commands) == 1 {
 				if err := s.Stop(); err != nil {
 					log.Fatalf("[Error] Failed to stop service: %s\n", err)
@@ -154,12 +158,20 @@ func main() {
 			return
 			// restart will rerun the service but will not restore previously ran relays
 		case "restart":
+			if !privCommand(true) {
+				return
+			}
+
 			if err := s.Restart(); err != nil {
 				log.Fatalf("[Error] Failed to restart service: %s\n", err)
 			}
 
 			Println("Daemon has been restarted")
 		case "start":
+			if !privCommand(true) {
+				return
+			}
+
 			if err := s.Start(); err != nil {
 				log.Fatalf("[Error] Failed to start service: %s\n", err)
 			}
