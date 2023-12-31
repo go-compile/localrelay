@@ -61,8 +61,6 @@ type Relay struct {
 	running bool
 	m       sync.Mutex
 
-	protocolSwitching map[int]string
-
 	// connPool contains a list of ACTIVE connections
 	connPool []*PooledConn
 }
@@ -114,9 +112,6 @@ func New(name string, logger io.Writer, listener TargetLink, destination ...Targ
 		httpClient: http.DefaultClient,
 
 		logger: NewLogger(logger, name),
-
-		// TODO: remove if redundent
-		// protocolSwitching: make(map[int]string, strings.Count(destination, ",")),
 	}
 }
 
@@ -138,21 +133,12 @@ func (r *Relay) setRunning(toggle bool) {
 // SetHTTP is used to set the relay as a type HTTP relay
 // addr will auto be set in the server object if left blank
 func (r *Relay) SetHTTP(server *http.Server) error {
-	return errors.New("not implemented") //TODO: remove once setHTTP fixed
-
 	// Auto set addr if left blank
 	if server.Addr == "" {
 		server.Addr = r.Listener.Addr()
 	} else if server.Addr != r.Listener.Addr() {
 		return ErrAddrNotMatch
 	}
-
-	// if there is a trailing slash strip it
-	// if len(r.ForwardAddr) > 1 && r.ForwardAddr[len(r.ForwardAddr)-1] == '/' {
-	// 	r.ForwardAddr = r.ForwardAddr[:len(r.ForwardAddr)-1]
-	// }
-
-	// FIXME: ^ how does this interact with the new destination refactor?
 
 	r.httpServer = server
 
