@@ -1,8 +1,15 @@
 package localrelay
 
 import (
+	"errors"
 	"net/url"
 	"strings"
+
+	"golang.org/x/net/proxy"
+)
+
+var (
+	ErrProxyDefine = errors.New("proxy is not defined")
 )
 
 type TargetLink string
@@ -53,4 +60,26 @@ func (t *TargetLink) Protocol() string {
 	return strings.ToLower(u.Scheme)
 }
 
-// TODO: TargetLink.Proxy
+// Proxy parses the TargetLink and uses the relay to lookup proxy dialers.
+// The returned array is in the same order as written.
+func (t *TargetLink) Proxy(r *Relay) ([]proxy.Dialer, error) {
+	u, _ := url.Parse(string(*t))
+
+	// get ?proxy=<value> from TargetLink and split into comma seperated array
+	proxieNames := strings.Split(u.Query().Get("proxy"), ",")
+	if len(proxieNames) == 0 {
+		return nil, nil
+	}
+
+	proxies := make([]proxy.Dialer, len(proxieNames))
+	for i := 0; i < len(proxies); i++ {
+		proxy, found := r.proxies[proxieNames[i]]
+		if !found {
+			return proxies, ErrProxyDefine
+		}
+
+		proxies[i] = proxy
+	}
+
+	return proxies, nil
+}
