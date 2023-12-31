@@ -1,40 +1,32 @@
 package main
 
-import "github.com/go-compile/localrelay"
+import "github.com/go-compile/localrelay/v2"
 
 // Relay is a config for a relay server
 type Relay struct {
-	Name        string
-	Host        string
-	Destination string
-	// Kind is ProxyType; TCP, HTTP, HTTPS
-	Kind localrelay.ProxyType
+	Name     string
+	Listener localrelay.TargetLink
+	// DisableAutoStart will stop the daemon from auto starting this relay
+	AutoRestart bool
 	// Logging; stdout, ./filename.log
 	Logging string
 
-	// Certificate for TLS
+	Destinations []localrelay.TargetLink
+
+	Tls     TLS
+	Proxies *Proxy
+}
+
+// TLS is used when configuring https proxies
+type TLS struct {
 	Certificate string
-	Key         string
-
-	Proxy *Proxy
-	// ProxyIgnore is a list of destination indexes where
-	// the proxy settings should be ignored.
-	ProxyIgnore []int
-
-	// DisableAutoStart will stop the daemon from auto starting this relay
-	DisableAutoStart bool
-
-	// ProtocolSwitch allows the outbound protocol to be switched
-	// this only works for TCP and UDP.
-	// NOTE: If a proxy is enabled protocol switching is disabled
-	ProtocolSwitch []string
+	Private     string
 }
 
 // Proxy is used for relay forwarding
 type Proxy struct {
 	Protocol string
-	Host     string
-
+	Address  string
 	Username string
 	Password string
 }
