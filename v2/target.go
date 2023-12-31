@@ -62,24 +62,24 @@ func (t *TargetLink) Protocol() string {
 
 // Proxy parses the TargetLink and uses the relay to lookup proxy dialers.
 // The returned array is in the same order as written.
-func (t *TargetLink) Proxy(r *Relay) ([]proxy.Dialer, error) {
+func (t *TargetLink) Proxy(r *Relay) ([]proxy.Dialer, []string, error) {
 	u, _ := url.Parse(string(*t))
 
 	// get ?proxy=<value> from TargetLink and split into comma seperated array
 	proxieNames := strings.Split(u.Query().Get("proxy"), ",")
 	if len(proxieNames) == 0 {
-		return nil, nil
+		return nil, proxieNames, nil
 	}
 
 	proxies := make([]proxy.Dialer, len(proxieNames))
 	for i := 0; i < len(proxies); i++ {
 		proxy, found := r.proxies[proxieNames[i]]
 		if !found {
-			return proxies, ErrProxyDefine
+			return proxies, proxieNames, ErrProxyDefine
 		}
 
 		proxies[i] = proxy
 	}
 
-	return proxies, nil
+	return proxies, proxieNames, nil
 }

@@ -39,7 +39,7 @@ type Relay struct {
 
 	// ProxyEnabled is set to true when a proxy has been set for this relay
 	ProxyEnabled bool
-	proxies      []*proxy.Dialer
+	proxies      map[string]proxy.Dialer
 	// remoteProxyIgnore is a list of indexes in the ForwardAddr array
 	// to which the proxy settings should be ignored
 	remoteProxyIgnore []int
@@ -193,8 +193,8 @@ func (r *Relay) SetTLS(certificateFile, keyFile string) {
 // SetProxy sets the proxy dialer to be used
 // proxy.SOCKS5() can be used to setup a socks5 proxy
 // or a list of proxies
-func (r *Relay) SetProxy(dialer ...*proxy.Dialer) {
-	r.proxies = dialer
+func (r *Relay) SetProxy(proxies map[string]proxy.Dialer) {
+	r.proxies = proxies
 	r.ProxyEnabled = true
 }
 
