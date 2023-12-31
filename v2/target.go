@@ -8,13 +8,13 @@ type TargetLink string
 // Example: 127.0.0.1:443
 func (t *TargetLink) Addr() string {
 	u, _ := url.Parse(string(*t))
-	return u.Host + ":" + u.Port()
+	return u.Host
 }
 
 // Host returns the host/ip of the target
 func (t *TargetLink) Host() string {
 	u, _ := url.Parse(string(*t))
-	return u.Host
+	return u.Hostname()
 }
 
 // Port returns the port number of the target
