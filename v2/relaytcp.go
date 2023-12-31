@@ -70,10 +70,10 @@ func handleConn(r *Relay, conn net.Conn, network string) {
 
 		// if no proxy is set
 		if proxies == nil {
-			r.logger.Info.Printf("DAILING REMOTE [%d]\n", destination)
+			r.logger.Info.Printf("DAILING REMOTE [%s]\n", destination)
 
 			if err := dial(r, conn, destination.Addr(), i+1, destination.Protocol(), start); err != nil {
-				r.logger.Info.Printf("FAILED DAILING REMOTE [%d]\n", destination)
+				r.logger.Info.Printf("FAILED DAILING REMOTE [%s]\n", destination)
 				// errored dialing, continue to try next destination
 				continue
 			}
