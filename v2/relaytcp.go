@@ -97,6 +97,9 @@ func handleConn(r *Relay, conn net.Conn, network string) {
 				continue
 			}
 
+			// TODO: test validate
+			r.setConnRemote(c, c.RemoteAddr())
+
 			r.Metrics.dial(1, 0, start)
 
 			r.logger.Info.Printf("CONNECTED TO %s\n", destination)

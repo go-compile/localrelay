@@ -40,9 +40,6 @@ type Relay struct {
 	// ProxyEnabled is set to true when a proxy has been set for this relay
 	ProxyEnabled bool
 	proxies      map[string]proxy.Dialer
-	// remoteProxyIgnore is a list of indexes in the ForwardAddr array
-	// to which the proxy settings should be ignored
-	remoteProxyIgnore []int
 
 	logger *Logger
 
@@ -136,18 +133,6 @@ func (r *Relay) setRunning(toggle bool) {
 	defer r.m.Unlock()
 
 	r.running = toggle
-}
-
-// ignoreProxySettings returns true if the proxy should be disabled
-// for this remote index
-func (r *Relay) ignoreProxySettings(remoteIndex int) bool {
-	for _, v := range r.remoteProxyIgnore {
-		if v == remoteIndex {
-			return true
-		}
-	}
-
-	return false
 }
 
 // SetHTTP is used to set the relay as a type HTTP relay
