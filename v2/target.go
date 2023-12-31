@@ -28,7 +28,7 @@ func (t *TargetLink) ProxyType() ProxyType {
 // Example: 127.0.0.1:443
 func (t *TargetLink) Addr() string {
 	u, _ := url.Parse(string(*t))
-	return u.Host
+	return u.Hostname() + ":" + t.Port()
 }
 
 // Host returns the host/ip of the target
