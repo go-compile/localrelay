@@ -14,7 +14,7 @@ func (t *TargetLink) String() string {
 
 // ProxyType returns the protocol as a ProxyType
 func (t *TargetLink) ProxyType() ProxyType {
-	return ProxyType(strings.ToLower(t.Protocol()))
+	return ProxyType(t.Protocol())
 }
 
 // Addr returns the address within the target link.
@@ -33,13 +33,24 @@ func (t *TargetLink) Host() string {
 // Port returns the port number of the target
 func (t *TargetLink) Port() string {
 	u, _ := url.Parse(string(*t))
-	return u.Port()
+
+	if len(u.Port()) > 0 {
+		return u.Port()
+	}
+	switch t.Protocol() {
+	case "https":
+		return "443"
+	case "http":
+		return "80"
+	default:
+		return ""
+	}
 }
 
 // Protocol returns the protocol of the target
 func (t *TargetLink) Protocol() string {
 	u, _ := url.Parse(string(*t))
-	return u.Scheme
+	return strings.ToLower(u.Scheme)
 }
 
 // TODO: TargetLink.Proxy
