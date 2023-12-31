@@ -1,8 +1,21 @@
 package localrelay
 
-import "net/url"
+import (
+	"net/url"
+	"strings"
+)
 
 type TargetLink string
+
+func (t *TargetLink) String() string {
+	u, _ := url.Parse(string(*t))
+	return u.Host
+}
+
+// ProxyType returns the protocol as a ProxyType
+func (t *TargetLink) ProxyType() ProxyType {
+	return ProxyType(strings.ToLower(t.Protocol()))
+}
 
 // Addr returns the address within the target link.
 // Example: 127.0.0.1:443
