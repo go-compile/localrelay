@@ -9,20 +9,20 @@ import (
 func TestTargetParseTCP(t *testing.T) {
 	target := localrelay.TargetLink("tcp://127.0.0.1:443")
 
-	if target.Addr() != "127.0.0.1:443" {
-		t.Error("unexpected target address")
+	if x := target.Addr(); x != "127.0.0.1:443" {
+		t.Errorf("unexpected target address: %s", x)
 	}
 
-	if target.Host() != "127.0.0.1" {
-		t.Error("unexpected target host")
+	if x := target.Host(); x != "127.0.0.1" {
+		t.Errorf("unexpected target host: %s", x)
 	}
 
-	if target.Port() != "443" {
-		t.Error("unexpected target port")
+	if x := target.Port(); x != "443" {
+		t.Errorf("unexpected target port: %s", x)
 	}
 
-	if target.Protocol() != "tcp" {
-		t.Error("unexpected target protocol")
+	if x := target.Protocol(); x != "tcp" {
+		t.Errorf("unexpected target protocol: %s", x)
 	}
 }
 
