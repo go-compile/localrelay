@@ -53,9 +53,9 @@ func newRelay(opt *options, i int, cmd []string) error {
 		return nil
 	}
 
-	listener := localrelay.TargetLink(string(opt.proxyType) + "//" + opt.host)
+	listener := localrelay.TargetLink(string(opt.proxyType) + "://" + opt.host)
 
-	destination := localrelay.TargetLink(string(opt.proxyType) + "//" + opt.destination)
+	destination := localrelay.TargetLink(string(opt.proxyType) + "://" + opt.destination)
 	if opt.proxy.IsSet() {
 		destination += "/?proxy=proxy-a"
 	}

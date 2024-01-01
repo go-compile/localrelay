@@ -167,7 +167,6 @@ func launchRelays(relays []Relay, wait bool) error {
 
 		relay.SetProxy(proxMap)
 
-		// TODO: set destinations
 		// TODO: setup http proxy settings
 
 		switch r.Listener.ProxyType() {
@@ -238,7 +237,8 @@ func launchRelays(relays []Relay, wait bool) error {
 				removeLogDescriptor(r.Name)
 				wg.Done()
 			}(relay)
-
+		default:
+			return errors.New("unknown listener type")
 		}
 	}
 

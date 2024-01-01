@@ -83,3 +83,8 @@ func (t *TargetLink) Proxy(r *Relay) ([]proxy.Dialer, []string, error) {
 
 	return proxies, proxieNames, nil
 }
+
+// Print returns the targetlink string
+func (t *TargetLink) Print() string {
+	return string(*t)
+}
