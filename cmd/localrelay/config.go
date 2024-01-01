@@ -14,7 +14,7 @@ type Relay struct {
 	Destinations []localrelay.TargetLink
 
 	Tls     TLS
-	Proxies *Proxy
+	Proxies map[string]Proxy
 }
 
 // TLS is used when configuring https proxies
@@ -29,4 +29,9 @@ type Proxy struct {
 	Address  string
 	Username string
 	Password string
+}
+
+// IsSet returns true if a proxy has been set
+func (p *Proxy) IsSet() bool {
+	return p.Address != ""
 }

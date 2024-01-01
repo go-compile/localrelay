@@ -80,7 +80,7 @@ func launchAutoStartRelays() error {
 
 		relays = append(relays, *relay)
 
-		if relay.DisableAutoStart {
+		if !relay.AutoRestart {
 			log.Printf("[Ignoring Relay] %q\n", relay.Name)
 			continue
 		}

@@ -185,7 +185,7 @@ func parseArgs() (*options, error) {
 			pw, _ := prox.User.Password()
 
 			opt.proxy.Protocol = prox.Scheme
-			opt.proxy.Host = prox.Host
+			opt.proxy.Address = prox.Host
 			opt.proxy.Username = prox.User.Username()
 			opt.proxy.Password = pw
 		case "tcp":

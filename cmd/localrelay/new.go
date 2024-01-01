@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/chzyer/readline"
+	"github.com/go-compile/localrelay/v2"
 	"github.com/naoina/toml"
 	"github.com/pkg/errors"
 )
@@ -52,18 +53,24 @@ func newRelay(opt *options, i int, cmd []string) error {
 		return nil
 	}
 
-	relay := Relay{
-		Name:        name,
-		Host:        opt.host,
-		Destination: opt.destination,
-		Kind:        opt.proxyType,
-		Logging:     opt.logs,
-		ProxyIgnore: opt.proxyIgnore,
-		Certificate: opt.certificate,
-		Key:         opt.key,
+	listener := localrelay.TargetLink(string(opt.proxyType) + "//" + opt.host)
+	if opt.proxy.IsSet() {
+		listener += "/?proxy=proxy-a"
+	}
 
-		Proxy:            &opt.proxy,
-		DisableAutoStart: opt.DisableAutoStart,
+	relay := Relay{
+		Name:         name,
+		Listener:     listener,
+		Destinations: []localrelay.TargetLink{localrelay.TargetLink(opt.destination)},
+		Logging:      opt.logs,
+
+		Tls: TLS{
+			Certificate: opt.certificate,
+			Private:     opt.key,
+		},
+
+		Proxies:     map[string]Proxy{"proxy-a": opt.proxy},
+		AutoRestart: !opt.DisableAutoStart,
 	}
 
 	filename := name + ".toml"

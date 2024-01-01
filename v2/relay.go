@@ -110,6 +110,7 @@ func New(name string, logger io.Writer, listener TargetLink, destination ...Targ
 		},
 
 		httpClient: http.DefaultClient,
+		proxies:    make(map[string]proxy.Dialer),
 
 		logger: NewLogger(logger, name),
 	}

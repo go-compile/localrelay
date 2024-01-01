@@ -4,14 +4,13 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
 	"sync"
 	"time"
 
-	"github.com/go-compile/localrelay"
+	"github.com/go-compile/localrelay/v2"
 	"github.com/kardianos/service"
 	"github.com/naoina/toml"
 	"github.com/pkg/errors"
@@ -124,12 +123,7 @@ func launchRelays(relays []Relay, wait bool) error {
 			return ErrInvalidRelayName
 		}
 
-		Printf("[Info] [Relay:%d] Starting %q on %q\n", i+1, r.Name, r.Host)
-
-		if r.Proxy.Host != "" && strings.ToLower(r.Proxy.Protocol) != "socks5" {
-			Printf("[Warn] Proxy type %q not supported.\n", r.Proxy.Protocol)
-			return nil
-		}
+		Printf("[Info] [Relay:%d] Starting %q on %q\n", i+1, r.Name, r.Listener)
 
 		w := os.Stdout
 		if r.Logging != "stdout" {
@@ -144,43 +138,40 @@ func launchRelays(relays []Relay, wait bool) error {
 			w = f
 		}
 
-		relay := localrelay.New(r.Name, r.Host, r.Destination, w)
-		for index, proto := range r.ProtocolSwitch {
-			if len(proto) == 0 {
-				continue
+		relay := localrelay.New(r.Name, w, r.Listener, r.Destinations...)
+
+		// ===== set proxies
+		proxMap := make(map[string]proxy.Dialer)
+		for proxyName, proxyConf := range r.Proxies {
+			if strings.ToLower(proxyConf.Protocol) != "socks5" {
+				return errors.New("Socks5 is the only supported proxy type")
 			}
 
-			relay.SetProtocolSwitch(index, proto)
+			auth := &proxy.Auth{
+				User:     proxyConf.Username,
+				Password: proxyConf.Password,
+			}
+
+			// If auth not set make it nil
+			if proxyConf.Username == "" && proxyConf.Username == "" {
+				auth = nil
+			}
+
+			prox, err := proxy.SOCKS5("tcp", proxyConf.Address, auth, nil)
+			if err != nil {
+				return err
+			}
+
+			proxMap[proxyName] = prox
 		}
 
-		switch r.Kind {
-		case localrelay.ProxyTCP, localrelay.ProxyFailOverTCP, localrelay.ProxyUDP:
-			// If proxy enabled
-			if r.Proxy.Host != "" && strings.ToLower(r.Proxy.Protocol) == "socks5" {
+		relay.SetProxy(proxMap)
 
-				auth := &proxy.Auth{
-					User:     r.Proxy.Username,
-					Password: r.Proxy.Password,
-				}
+		// TODO: set destinations
+		// TODO: setup http proxy settings
 
-				// If auth not set make it nil
-				if r.Proxy.Username == "" {
-					auth = nil
-				}
-
-				prox, err := proxy.SOCKS5("tcp", r.Proxy.Host, auth, nil)
-				if err != nil {
-					panic(err)
-				}
-
-				relay.SetProxy(&prox)
-			}
-
-			if r.Kind == localrelay.ProxyFailOverTCP {
-				relay.SetFailOverTCP()
-				relay.DisableProxy(r.ProxyIgnore...)
-			}
-
+		switch r.Listener.ProxyType() {
+		case localrelay.ProxyTCP, localrelay.ProxyUDP:
 			addRelay(relay)
 			wg.Add(1)
 			go func(relay *localrelay.Relay) {
@@ -194,7 +185,7 @@ func launchRelays(relays []Relay, wait bool) error {
 			}(relay)
 		case localrelay.ProxyHTTP, localrelay.ProxyHTTPS:
 			// Convert the relay from the default: TCP to a HTTP server
-			err := relay.SetHTTP(http.Server{
+			err := relay.SetHTTP(&http.Server{
 				// Middle ware can be set here
 				Handler: localrelay.HandleHTTP(relay),
 
@@ -207,32 +198,34 @@ func launchRelays(relays []Relay, wait bool) error {
 				panic(err)
 			}
 
-			if relay.ProxyType == localrelay.ProxyHTTPS {
+			if relay.Listener.ProxyType() == localrelay.ProxyHTTPS {
 				// Set TLS certificates & make relay HTTPS
-				relay.SetTLS(r.Certificate, r.Key)
+				relay.SetTLS(r.Tls.Certificate, r.Tls.Private)
 			}
+
+			// TODO: implement proxies for HTTP(S) proxies
 
 			// If proxy enabled
-			if r.Proxy.Host != "" && strings.ToLower(r.Proxy.Protocol) == "socks5" {
+			// if r.Proxy.Host != "" && strings.ToLower(r.Proxy.Protocol) == "socks5" {
 
-				userinfo := url.UserPassword(r.Proxy.Username, r.Proxy.Password)
-				prox, err := url.Parse(r.Proxy.Protocol + "://" + r.Proxy.Host)
-				if err != nil {
-					panic(err)
-				}
+			// 	userinfo := url.UserPassword(r.Proxy.Username, r.Proxy.Password)
+			// 	prox, err := url.Parse(r.Proxy.Protocol + "://" + r.Proxy.Host)
+			// 	if err != nil {
+			// 		panic(err)
+			// 	}
 
-				if len(r.Proxy.Username) != 0 {
-					prox.User = userinfo
-				}
+			// 	if len(r.Proxy.Username) != 0 {
+			// 		prox.User = userinfo
+			// 	}
 
-				relay.SetClient(&http.Client{
-					Transport: &http.Transport{
-						Proxy: http.ProxyURL(prox),
-					},
+			// 	relay.SetClient(&http.Client{
+			// 		Transport: &http.Transport{
+			// 			Proxy: http.ProxyURL(prox),
+			// 		},
 
-					Timeout: time.Second * 120,
-				})
-			}
+			// 		Timeout: time.Second * 120,
+			// 	})
+			// }
 
 			addRelay(relay)
 			wg.Add(1)
