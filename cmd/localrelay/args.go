@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/go-compile/localrelay"
+	"github.com/go-compile/localrelay/v2"
 	"github.com/pkg/errors"
 )
 
@@ -53,8 +53,9 @@ func parseArgs() (*options, error) {
 	args := os.Args[1:]
 
 	opt := &options{
-		logs:     "stdout",
-		interval: time.Second,
+		logs:      "stdout",
+		interval:  time.Second,
+		proxyType: localrelay.ProxyTCP,
 	}
 
 	for i := 0; i < len(args); i++ {
@@ -196,8 +197,6 @@ func parseArgs() (*options, error) {
 			opt.proxyType = localrelay.ProxyHTTP
 		case "https":
 			opt.proxyType = localrelay.ProxyHTTPS
-		case "failover", "failovertcp", "failover-tcp", "tcp-failover":
-			opt.proxyType = localrelay.ProxyFailOverTCP
 		case "help", "h", "?":
 			help()
 			if len(os.Args) >= 3 {

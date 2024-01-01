@@ -153,7 +153,7 @@ func launchRelays(relays []Relay, wait bool) error {
 			}
 
 			// If auth not set make it nil
-			if proxyConf.Username == "" && proxyConf.Username == "" {
+			if proxyConf.Username == "" && proxyConf.Password == "" {
 				auth = nil
 			}
 

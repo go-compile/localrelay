@@ -54,14 +54,16 @@ func newRelay(opt *options, i int, cmd []string) error {
 	}
 
 	listener := localrelay.TargetLink(string(opt.proxyType) + "//" + opt.host)
+
+	destination := localrelay.TargetLink(string(opt.proxyType) + "//" + opt.destination)
 	if opt.proxy.IsSet() {
-		listener += "/?proxy=proxy-a"
+		destination += "/?proxy=proxy-a"
 	}
 
 	relay := Relay{
 		Name:         name,
 		Listener:     listener,
-		Destinations: []localrelay.TargetLink{localrelay.TargetLink(opt.destination)},
+		Destinations: []localrelay.TargetLink{destination},
 		Logging:      opt.logs,
 
 		Tls: TLS{
@@ -69,8 +71,12 @@ func newRelay(opt *options, i int, cmd []string) error {
 			Private:     opt.key,
 		},
 
-		Proxies:     map[string]Proxy{"proxy-a": opt.proxy},
+		Proxies:     make(map[string]Proxy),
 		AutoRestart: !opt.DisableAutoStart,
+	}
+
+	if opt.proxy.IsSet() {
+		relay.Proxies["proxy-a"] = opt.proxy
 	}
 
 	filename := name + ".toml"
