@@ -67,7 +67,7 @@ func (t *TargetLink) Proxy(r *Relay) ([]proxy.Dialer, []string, error) {
 
 	// get ?proxy=<value> from TargetLink and split into comma seperated array
 	proxieNames := strings.Split(u.Query().Get("proxy"), ",")
-	if len(proxieNames) == 0 {
+	if len(proxieNames) == 0 || len(proxieNames[0]) == 0 {
 		return nil, proxieNames, nil
 	}
 
