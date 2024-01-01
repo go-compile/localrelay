@@ -165,7 +165,9 @@ func launchRelays(relays []Relay, wait bool) error {
 			proxMap[proxyName] = prox
 		}
 
-		relay.SetProxy(proxMap)
+		if len(proxMap) > 1 {
+			relay.SetProxy(proxMap)
+		}
 
 		// TODO: setup http proxy settings
 
