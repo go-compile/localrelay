@@ -3,7 +3,7 @@ package main
 import (
 	"time"
 
-	"github.com/go-compile/localrelay"
+	"github.com/go-compile/localrelay/v2"
 	"github.com/pkg/errors"
 )
 

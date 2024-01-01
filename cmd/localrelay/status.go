@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/containerd/console"
-	"github.com/go-compile/localrelay"
+	"github.com/go-compile/localrelay/v2"
 )
 
 func relayStatus() error {
@@ -70,11 +70,9 @@ func relayStatus() error {
 	for i := range s.Relays {
 		badges := ""
 
-		switch s.Relays[i].ProxyType {
+		switch s.Relays[i].Listener.ProxyType() {
 		case localrelay.ProxyTCP:
 			badges += "\x1b[90m [TCP] \x1b[0m"
-		case localrelay.ProxyFailOverTCP:
-			badges += "\x1b[90m [FAIL-OVER] \x1b[0m"
 		case localrelay.ProxyHTTP:
 			badges += "\x1b[90m [HTTP] \x1b[0m"
 		case localrelay.ProxyHTTPS:
@@ -85,7 +83,7 @@ func relayStatus() error {
 			badges += "\x1b[92m [PROXY] \x1b[0m"
 		}
 
-		Printf("  \x1b[90m%.2d\x1b[0m: %s %s\r\n      %s -> %s\r\n", i+1, s.Relays[i].Name, badges, s.Relays[i].Host, s.Relays[i].ForwardAddr)
+		Printf("  \x1b[90m%.2d\x1b[0m: %s %s\r\n      %s -> %s\r\n", i+1, s.Relays[i].Name, badges, s.Relays[i].Listener, s.Relays[i].Destination)
 	}
 
 	return nil

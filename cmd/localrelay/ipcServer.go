@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/fasthttp/router"
-	"github.com/go-compile/localrelay"
+	"github.com/go-compile/localrelay/v2"
 	"github.com/naoina/toml"
 
 	"github.com/valyala/fasthttp"
@@ -188,7 +188,7 @@ func ipcRouteConns(ctx *fasthttp.RequestCtx) {
 				Network:    conn.Conn.LocalAddr().Network(),
 
 				RelayName:     r.Name,
-				RelayHost:     r.Host,
+				RelayHost:     string(r.Listener),
 				ForwardedAddr: conn.RemoteAddr,
 
 				Opened: conn.Opened.Unix(),
