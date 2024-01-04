@@ -106,3 +106,20 @@ func (c *Client) DropIP(ip string) error {
 
 	return nil
 }
+
+func (c *Client) DropAll() error {
+	resp, err := c.hc.Get("http://lr/drop")
+	if err != nil {
+		return err
+	}
+
+	if resp.StatusCode != 200 {
+		return ErrNotOk
+	}
+
+	if resp.StatusCode != 200 {
+		return ErrNotOk
+	}
+
+	return nil
+}
