@@ -89,3 +89,20 @@ func (c *Client) DropRelay(relay string) error {
 
 	return nil
 }
+
+func (c *Client) DropIP(ip string) error {
+	resp, err := c.hc.Get("http://lr/drop/ip/" + url.PathEscape(ip))
+	if err != nil {
+		return err
+	}
+
+	if resp.StatusCode != 200 {
+		return ErrNotOk
+	}
+
+	if resp.StatusCode != 200 {
+		return ErrNotOk
+	}
+
+	return nil
+}
