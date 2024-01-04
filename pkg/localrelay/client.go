@@ -5,6 +5,7 @@ import (
 	"errors"
 	"net"
 	"net/http"
+	"net/url"
 
 	"github.com/go-compile/localrelay/internal/ipc"
 )
@@ -70,4 +71,21 @@ func (c *Client) GetConnections() ([]Connection, error) {
 	}
 
 	return pool, nil
+}
+
+func (c *Client) DropRelay(relay string) error {
+	resp, err := c.hc.Get("http://lr/drop/relay/" + url.PathEscape(relay))
+	if err != nil {
+		return err
+	}
+
+	if resp.StatusCode != 200 {
+		return ErrNotOk
+	}
+
+	if resp.StatusCode != 200 {
+		return ErrNotOk
+	}
+
+	return nil
 }
