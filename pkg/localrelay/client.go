@@ -1,10 +1,16 @@
 package localrelay
 
 import (
+	"encoding/json"
+	"errors"
 	"net"
 	"net/http"
 
 	"github.com/go-compile/localrelay/internal/ipc"
+)
+
+var (
+	ErrNotOk = errors.New("status code not ok")
 )
 
 type Client struct {
@@ -28,4 +34,22 @@ func Connect() (*Client, error) {
 // Close disconnects from the IPC socket
 func (c *Client) Close() error {
 	return c.conn.Close()
+}
+
+func (c *Client) GetStatus() (*Status, error) {
+	resp, err := c.hc.Get("http://lr/status")
+	if err != nil {
+		return nil, err
+	}
+
+	if resp.StatusCode != 200 {
+		return nil, ErrNotOk
+	}
+
+	var status Status
+	if err := json.NewDecoder(resp.Body).Decode(&status); err != nil {
+		return nil, err
+	}
+
+	return &status, nil
 }
