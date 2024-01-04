@@ -1,11 +1,13 @@
 package localrelay
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"net"
 	"net/http"
 	"net/url"
+	"strconv"
 
 	"github.com/go-compile/localrelay/internal/ipc"
 )
@@ -19,6 +21,10 @@ var (
 type Client struct {
 	conn net.Conn
 	hc   *http.Client
+}
+
+type msgResponse struct {
+	Message string `json:"message"`
 }
 
 // Connect establishes a connection to the IPC socket
@@ -130,4 +136,30 @@ func (c *Client) StopRelay(relay string) error {
 	default:
 		return errors.New("unknown respose code")
 	}
+}
+
+func (c *Client) StartRelay(relays ...string) (responses []string, err error) {
+	for _, relay := range relays {
+		// make post request to run relay. Use strconv instead of json encoding for performance
+		resp, err := c.hc.Post("http://lr/run", "application/json", bytes.NewBuffer([]byte("["+strconv.Quote(relay)+"]")))
+		if err != nil {
+			return responses, err
+		}
+
+		var response msgResponse
+		if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
+			return responses, err
+		}
+
+		responses = append(responses, response.Message)
+
+		switch resp.StatusCode {
+		case 404:
+			return responses, ErrNotFound
+		case 500:
+			return responses, ErrFailure
+		}
+	}
+
+	return responses, nil
 }
