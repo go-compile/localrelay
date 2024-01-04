@@ -11,7 +11,9 @@ import (
 )
 
 var (
-	ErrNotOk = errors.New("status code not ok")
+	ErrNotOk    = errors.New("status code not ok")
+	ErrFailure  = errors.New("localrelay failed executing the requested action")
+	ErrNotFound = errors.New("relay not found")
 )
 
 type Client struct {
@@ -83,10 +85,6 @@ func (c *Client) DropRelay(relay string) error {
 		return ErrNotOk
 	}
 
-	if resp.StatusCode != 200 {
-		return ErrNotOk
-	}
-
 	return nil
 }
 
@@ -94,10 +92,6 @@ func (c *Client) DropIP(ip string) error {
 	resp, err := c.hc.Get("http://lr/drop/ip/" + url.PathEscape(ip))
 	if err != nil {
 		return err
-	}
-
-	if resp.StatusCode != 200 {
-		return ErrNotOk
 	}
 
 	if resp.StatusCode != 200 {
@@ -117,9 +111,23 @@ func (c *Client) DropAll() error {
 		return ErrNotOk
 	}
 
-	if resp.StatusCode != 200 {
-		return ErrNotOk
+	return nil
+}
+
+func (c *Client) StopRelay(relay string) error {
+	resp, err := c.hc.Get("http://lr/stop/relay/" + url.PathEscape(relay))
+	if err != nil {
+		return err
 	}
 
-	return nil
+	switch resp.StatusCode {
+	case 200:
+		return nil
+	case 500:
+		return ErrFailure
+	case 404:
+		return ErrNotFound
+	default:
+		return errors.New("unknown respose code")
+	}
 }
