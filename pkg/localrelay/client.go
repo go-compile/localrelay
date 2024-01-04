@@ -53,3 +53,21 @@ func (c *Client) GetStatus() (*Status, error) {
 
 	return &status, nil
 }
+
+func (c *Client) GetConnections() ([]Connection, error) {
+	resp, err := c.hc.Get("http://lr/connections")
+	if err != nil {
+		return nil, err
+	}
+
+	if resp.StatusCode != 200 {
+		return nil, ErrNotOk
+	}
+
+	var pool []Connection
+	if err := json.NewDecoder(resp.Body).Decode(&pool); err != nil {
+		return nil, err
+	}
+
+	return pool, nil
+}
