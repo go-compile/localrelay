@@ -7,6 +7,5 @@ import "net"
 
 // NewListener for windows uses name pipes to communicate
 func NewListener() (net.Listener, error) {
-
 	return net.Listen("unix", ipcPathPrefix+ipcSocket)
 }
