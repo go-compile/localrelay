@@ -1,69 +1,53 @@
 package main
 
 import (
-	"bytes"
 	"encoding/json"
 	"net/url"
-	"strconv"
 
+	"github.com/go-compile/localrelay/internal/ipc"
+	"github.com/go-compile/localrelay/pkg/api"
 	"github.com/pkg/errors"
 )
 
 // serviceRun takes paths to relay config files and then connects via IPC to
 // instruct the service to run these relays
 func serviceRun(relays []string) error {
-	client, conn, err := IPCConnect()
+	c, err := api.Connect()
 	if err != nil {
 		return err
 	}
 
-	defer conn.Close()
+	defer c.Close()
 
 	for _, relay := range relays {
-		// make post request to run relay. Use strconv instead of json encoding for performance
-		resp, err := client.Post("http://lr/run", "application/json", bytes.NewBuffer([]byte("["+strconv.Quote(relay)+"]")))
+		r, err := c.StartRelay(relay)
+
+		for _, v := range r {
+			Println(v)
+		}
+
 		if err != nil {
 			return err
 		}
-
-		var response msgResponse
-		if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
-			return err
-		}
-
-		Println(response.Message)
 	}
 
 	return nil
 }
 
-func serviceStatus() (*status, error) {
-	client, conn, err := IPCConnect()
+func serviceStatus() (*api.Status, error) {
+	c, err := api.Connect()
 	if err != nil {
 		return nil, err
 	}
 
-	defer conn.Close()
+	defer c.Close()
 
-	resp, err := client.Get("http://lr/status")
-	if err != nil {
-		return nil, err
-	}
-
-	if resp.StatusCode != 200 {
-		return nil, errors.New("failed to fetch status")
-	}
-
-	var status status
-	if err := json.NewDecoder(resp.Body).Decode(&status); err != nil {
-		return nil, err
-	}
-
-	return &status, nil
+	status, err := c.GetStatus()
+	return status, err
 }
 
 func stopRelay(relayName string) error {
-	client, conn, err := IPCConnect()
+	client, conn, err := ipc.Connect()
 	if err != nil {
 		return err
 	}
@@ -89,7 +73,7 @@ func stopRelay(relayName string) error {
 	return nil
 }
 
-func activeConnections() ([]connection, error) {
+func activeConnections() ([]api.Connection, error) {
 	client, conn, err := IPCConnect()
 	if err != nil {
 		return nil, err

@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/containerd/console"
+	"github.com/go-compile/localrelay/pkg/api"
 	"github.com/pkg/errors"
 )
 
@@ -21,7 +22,7 @@ var (
 
 type namedMetrics struct {
 	name string
-	metrics
+	api.Metrics
 }
 
 func relayMetrics(opt *options) error {
@@ -136,7 +137,7 @@ func relayMetrics(opt *options) error {
 				count = len(metrics)
 
 				for _, m := range metrics {
-					printMetrics(m.name, m.metrics)
+					printMetrics(m.name, m.Metrics)
 				}
 			} else {
 				// sort will be based on order of input args
@@ -156,6 +157,6 @@ func relayMetrics(opt *options) error {
 	}
 }
 
-func printMetrics(name string, m metrics) {
+func printMetrics(name string, m api.Metrics) {
 	Printf("\x1b[2K \x1b[90m%s\x1b[0m\r\n\x1b[2K  [In/Out:%s/%s] [DialAvg:%dms] [Active:%d] [Total:%d]\r\n", name, formatBytes(m.In), formatBytes(m.Out), m.DialAvg, m.Active, m.TotalConns+m.TotalRequests)
 }

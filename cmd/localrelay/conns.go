@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/containerd/console"
+	"github.com/go-compile/localrelay/pkg/api"
 )
 
 func displayOpenConns(opt *options, onlyIPS bool) error {
@@ -62,7 +63,7 @@ func displayOpenConns(opt *options, onlyIPS bool) error {
 	return nil
 }
 
-func printConn(conn connection, onlyIPS bool) {
+func printConn(conn api.Connection, onlyIPS bool) {
 	if onlyIPS {
 		Printf("%s\r\n", conn.RemoteAddr)
 		return

@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/fasthttp/router"
+	"github.com/go-compile/localrelay/pkg/api"
 	"github.com/go-compile/localrelay/v2"
 	"github.com/naoina/toml"
 
@@ -149,12 +150,12 @@ func ipcRouteRun(ctx *fasthttp.RequestCtx) {
 }
 
 func ipcRouteStatus(ctx *fasthttp.RequestCtx) {
-	relayMetrics := make(map[string]metrics)
+	relayMetrics := make(map[string]api.Metrics)
 
 	relays := runningRelaysCopy()
 	for _, r := range relays {
 		active, total := r.Metrics.Connections()
-		relayMetrics[r.Name] = metrics{
+		relayMetrics[r.Name] = api.Metrics{
 			In:            r.Metrics.Download(),
 			Out:           r.Metrics.Upload(),
 			Active:        active,
@@ -165,7 +166,7 @@ func ipcRouteStatus(ctx *fasthttp.RequestCtx) {
 	}
 
 	ctx.SetStatusCode(200)
-	json.NewEncoder(ctx).Encode(&status{
+	json.NewEncoder(ctx).Encode(&api.Status{
 		Relays:  relays,
 		Pid:     os.Getpid(),
 		Version: VERSION,
@@ -176,13 +177,13 @@ func ipcRouteStatus(ctx *fasthttp.RequestCtx) {
 }
 
 func ipcRouteConns(ctx *fasthttp.RequestCtx) {
-	relayConns := make([]connection, 0, 200)
+	relayConns := make([]api.Connection, 0, 200)
 
 	relays := runningRelaysCopy()
 	for _, r := range relays {
 		for _, conn := range r.GetConns() {
 
-			relayConns = append(relayConns, connection{
+			relayConns = append(relayConns, api.Connection{
 				LocalAddr:  conn.Conn.LocalAddr().String(),
 				RemoteAddr: conn.Conn.RemoteAddr().String(),
 				Network:    conn.Conn.LocalAddr().Network(),
