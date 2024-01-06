@@ -99,14 +99,24 @@ var (
 	// ErrAddrNotMatch is returned when a server object has a addr which is not nil
 	// and does not equal the relay's address
 	ErrAddrNotMatch = errors.New("addr does not match the relays host address")
-
+	// ErrNoDestination is returned when the user did not provide a destination
 	ErrNoDestination = errors.New("at least one destination must be set")
+	// ErrManyDestinations is returned if attempting to use more than one destination
+	// on a http(s) relay.
+	ErrManyDestinations = errors.New("too many destinations for this relay type")
 )
 
 // New creates a new TCP relay
 func New(name string, logger io.Writer, listener TargetLink, destination ...TargetLink) (*Relay, error) {
 	if len(destination) == 0 {
 		return nil, ErrNoDestination
+	}
+
+	// if a http(s) proxy enforce one destination only policy
+	if t := destination[0].ProxyType(); t == ProxyHTTP || t == ProxyHTTPS {
+		if len(destination) > 1 {
+			return nil, ErrManyDestinations
+		}
 	}
 
 	return &Relay{
