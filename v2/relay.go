@@ -99,10 +99,15 @@ var (
 	// ErrAddrNotMatch is returned when a server object has a addr which is not nil
 	// and does not equal the relay's address
 	ErrAddrNotMatch = errors.New("addr does not match the relays host address")
+
+	ErrNoDestination = errors.New("at least one destination must be set")
 )
 
 // New creates a new TCP relay
-func New(name string, logger io.Writer, listener TargetLink, destination ...TargetLink) *Relay {
+func New(name string, logger io.Writer, listener TargetLink, destination ...TargetLink) (*Relay, error) {
+	if len(destination) == 0 {
+		return nil, ErrNoDestination
+	}
 
 	return &Relay{
 		Name:        name,
@@ -118,7 +123,7 @@ func New(name string, logger io.Writer, listener TargetLink, destination ...Targ
 		proxies:    make(map[string]ProxyURL),
 
 		logger: NewLogger(logger, name),
-	}
+	}, nil
 }
 
 // Running returns true if relay is running

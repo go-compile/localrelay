@@ -11,7 +11,10 @@ import (
 func TestConnPoolBasic(t *testing.T) {
 	conns := []net.Conn{}
 	connAmount := 50
-	relay := New("test-relay", io.Discard, "127.0.0.1:23832", "127.0.0.1:23838")
+	relay, err := New("test-relay", io.Discard, "127.0.0.1:23832", "127.0.0.1:23838")
+	if err != nil {
+		t.Error(err)
+	}
 
 	for i := 0; i < connAmount; i++ {
 		conn := &net.TCPConn{}
@@ -39,7 +42,10 @@ func TestConnPool(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	relay := New("test-relay", io.Discard, "127.0.0.1:23838", "127.0.0.1:23838")
+	relay, err := New("test-relay", io.Discard, "127.0.0.1:23838", "127.0.0.1:23838")
+	if err != nil {
+		t.Error(err)
+	}
 
 	wg := sync.WaitGroup{}
 

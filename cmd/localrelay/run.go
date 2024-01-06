@@ -138,7 +138,10 @@ func launchRelays(relays []Relay, wait bool) error {
 			w = f
 		}
 
-		relay := localrelay.New(r.Name, w, r.Listener, r.Destinations...)
+		relay, err := localrelay.New(r.Name, w, r.Listener, r.Destinations...)
+		if err != nil {
+			return err
+		}
 
 		// ===== set proxies
 		proxMap := make(map[string]localrelay.ProxyURL)
