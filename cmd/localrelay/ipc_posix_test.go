@@ -6,17 +6,20 @@ package main
 import (
 	"testing"
 	"time"
+
+	"github.com/go-compile/localrelay/internal/ipc"
 )
 
 func TestIPCPosix(t *testing.T) {
 
 	ipcPathPrefix = "./"
 	go func() {
-		if err := IPCListen(); err != nil {
+		l, err := ipc.NewListener()
+		l.Close()
+		if err != nil {
 			t.Fatal(err)
 		}
 	}()
-
 	time.Sleep(time.Second)
 
 	_, err := serviceStatus()

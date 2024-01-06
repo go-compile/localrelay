@@ -10,34 +10,6 @@ import (
 	"gopkg.in/natefinch/npipe.v2"
 )
 
-// IPCListen for windows uses name pipes to communicate
-func IPCListen() error {
-
-	l, err := npipe.Listen(`\\.\pipe\` + serviceName)
-	if err != nil {
-		return err
-	}
-
-	ipcListener = l
-
-	defer l.Close()
-
-	srv := newIPCServer()
-
-	for {
-		conn, err := l.Accept()
-		if err != nil {
-			if err == net.ErrClosed {
-				return err
-			}
-
-			continue
-		}
-
-		go handleConn(conn, srv, l)
-	}
-}
-
 // IPCConnect will use name pipes to communicate to the daemon
 func IPCConnect() (*http.Client, net.Conn, error) {
 	conn, err := npipe.DialTimeout(`\\.\pipe\`+serviceName, ipcTimeout)

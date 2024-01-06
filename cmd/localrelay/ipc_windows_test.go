@@ -3,13 +3,17 @@ package main
 import (
 	"testing"
 	"time"
+
+	"github.com/go-compile/localrelay/internal/ipc"
 )
 
 func TestIPCWindows(t *testing.T) {
 	go func() {
-		if err := IPCListen(); err != nil {
-			// if IPC listen fails make sure your host system isn't
-			// already running localrelay. Run localrelay stop
+		// if IPC listen fails make sure your host system isn't
+		// already running localrelay. Run localrelay stop
+		l, err := ipc.NewListener()
+		l.Close()
+		if err != nil {
 			t.Fatal(err)
 		}
 	}()

@@ -7,6 +7,7 @@ import (
 	"runtime"
 	"strings"
 
+	"github.com/go-compile/localrelay/internal/ipc"
 	"github.com/kardianos/service"
 )
 
@@ -35,18 +36,23 @@ func (p daemon) Stop(s service.Service) error {
 }
 
 func (p daemon) run() {
-
 	// TODO: listen to signals for reload from systemctl
 
 	if err := launchAutoStartRelays(); err != nil {
 		log.Fatal(err)
 	}
 
-	// listen to commands over IPC
-	if err := IPCListen(); err != nil {
+	l, err := ipc.NewListener()
+	if err != nil {
 		log.Fatal(err)
 	}
 
+	ipcListener = l
+
+	err = ipc.ListenServe(l, newIPCServer())
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func launchAutoStartRelays() error {

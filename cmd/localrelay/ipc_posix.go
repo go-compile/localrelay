@@ -7,9 +7,9 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"strconv"
 	"syscall"
 	"time"
-	"strconv"
 )
 
 var (
@@ -36,32 +36,6 @@ func IPCConnect() (*http.Client, net.Conn, error) {
 	}
 
 	return httpClient, conn, nil
-}
-
-func IPCListen() error {
-
-	l, err := net.Listen("unix", ipcPathPrefix+ipcSocket)
-	if err != nil {
-		return err
-	}
-	ipcListener = l
-
-	defer l.Close()
-
-	srv := newIPCServer()
-
-	for {
-		conn, err := l.Accept()
-		if err != nil {
-			if err == net.ErrClosed {
-				return err
-			}
-
-			continue
-		}
-
-		go handleConn(conn, srv, l)
-	}
 }
 
 func fileOwnership(stat os.FileInfo) (string, error) {
