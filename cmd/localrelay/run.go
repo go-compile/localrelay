@@ -165,7 +165,7 @@ func launchRelays(relays []Relay, wait bool) error {
 			proxMap[proxyName] = prox
 		}
 
-		if len(proxMap) > 1 {
+		if len(proxMap) > 0 {
 			relay.SetProxy(proxMap)
 		}
 

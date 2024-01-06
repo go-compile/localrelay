@@ -177,7 +177,6 @@ func (r *Relay) Close() error {
 
 // ListenServe will start a listener and handle the incoming requests
 func (r *Relay) ListenServe() error {
-
 	defer func() {
 		r.logger.Info.Printf("STOPPING: %q on %q\n", r.Name, r.Listener)
 		r.setRunning(false)
