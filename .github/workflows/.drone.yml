@@ -85,7 +85,7 @@ steps:
   - name: osv-vuln-dep-scanner
     image: ghcr.io/google/osv-scanner:latest
     commands:
-      - /osv-scanner -r ./
+      - /osv-scanner --config=./.github/osv.toml -r ./
 
   - name: build-failed-notification
     image: curlimages/curl:8.00.1
