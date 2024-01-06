@@ -1,4 +1,4 @@
-package localrelay
+package api
 
 import (
 	"bytes"
