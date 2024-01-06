@@ -26,8 +26,14 @@ type namedMetrics struct {
 }
 
 func relayMetrics(opt *options) error {
+	client, err := api.Connect()
+	if err != nil {
+		return err
+	}
 
-	status, err := serviceStatus()
+	defer client.Close()
+
+	status, err := client.GetStatus()
 	if err != nil {
 		return err
 	}
@@ -105,7 +111,7 @@ func relayMetrics(opt *options) error {
 			return nil
 		case <-ticker.C:
 			ticker.Reset(opt.interval)
-			status, err := serviceStatus()
+			status, err := client.GetStatus()
 			if err != nil {
 				return err
 			}
