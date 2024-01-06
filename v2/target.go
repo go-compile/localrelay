@@ -4,8 +4,6 @@ import (
 	"errors"
 	"net/url"
 	"strings"
-
-	"golang.org/x/net/proxy"
 )
 
 var (
@@ -62,7 +60,7 @@ func (t *TargetLink) Protocol() string {
 
 // Proxy parses the TargetLink and uses the relay to lookup proxy dialers.
 // The returned array is in the same order as written.
-func (t *TargetLink) Proxy(r *Relay) ([]proxy.Dialer, []string, error) {
+func (t *TargetLink) Proxy(r *Relay) ([]ProxyURL, []string, error) {
 	u, _ := url.Parse(string(*t))
 
 	// get ?proxy=<value> from TargetLink and split into comma seperated array
@@ -71,7 +69,7 @@ func (t *TargetLink) Proxy(r *Relay) ([]proxy.Dialer, []string, error) {
 		return nil, proxieNames, nil
 	}
 
-	proxies := make([]proxy.Dialer, len(proxieNames))
+	proxies := make([]ProxyURL, len(proxieNames))
 	for i := 0; i < len(proxies); i++ {
 		proxy, found := r.proxies[proxieNames[i]]
 		if !found {

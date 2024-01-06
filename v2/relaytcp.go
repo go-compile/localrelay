@@ -88,7 +88,7 @@ func handleConn(r *Relay, conn net.Conn, network string) {
 			r.logger.Info.Printf("DIALLING DESTINATION [%d] ADDRESS [%s] THROUGH PROXY %q\n", i+1, destination, proxyNames[pi])
 
 			// Dial destination through proxy
-			c, err := proxy.Dial(destination.Protocol(), destination.Addr())
+			c, err := proxy.Dialer().Dial(destination.Protocol(), destination.Addr())
 			if err != nil {
 				r.Metrics.dial(0, 1, start)
 

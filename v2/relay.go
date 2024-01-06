@@ -4,6 +4,7 @@ import (
 	"io"
 	"net"
 	"net/http"
+	"net/url"
 	"sync"
 	"time"
 
@@ -39,7 +40,7 @@ type Relay struct {
 
 	// ProxyEnabled is set to true when a proxy has been set for this relay
 	ProxyEnabled bool
-	proxies      map[string]proxy.Dialer
+	proxies      map[string]ProxyURL
 
 	logger *Logger
 
@@ -70,6 +71,10 @@ type PooledConn struct {
 	Conn       net.Conn
 	RemoteAddr string
 	Opened     time.Time
+}
+
+type ProxyURL struct {
+	*url.URL
 }
 
 const (
@@ -110,7 +115,7 @@ func New(name string, logger io.Writer, listener TargetLink, destination ...Targ
 		},
 
 		httpClient: http.DefaultClient,
-		proxies:    make(map[string]proxy.Dialer),
+		proxies:    make(map[string]ProxyURL),
 
 		logger: NewLogger(logger, name),
 	}
@@ -165,7 +170,7 @@ func (r *Relay) SetTLS(certificateFile, keyFile string) {
 // SetProxy sets the proxy dialer to be used
 // proxy.SOCKS5() can be used to setup a socks5 proxy
 // or a list of proxies
-func (r *Relay) SetProxy(proxies map[string]proxy.Dialer) {
+func (r *Relay) SetProxy(proxies map[string]ProxyURL) {
 	r.proxies = proxies
 	r.ProxyEnabled = true
 }
@@ -284,4 +289,27 @@ func (r *Relay) GetConns() []*PooledConn {
 	defer r.m.Unlock()
 
 	return r.connPool
+}
+
+func NewProxyURL(u *url.URL) ProxyURL {
+	return ProxyURL{u}
+}
+
+func (p *ProxyURL) Dialer() proxy.Dialer {
+	pwd, set := p.User.Password()
+	auth := &proxy.Auth{
+		User:     p.User.Username(),
+		Password: pwd,
+	}
+
+	if !set || len(auth.User) < 1 {
+		auth = nil
+	}
+
+	prox, _ := proxy.SOCKS5("tcp", p.Host, auth, nil)
+	return prox
+}
+
+func (p *ProxyURL) HttpProxyURL() {
+	http.ProxyURL(&url.URL{})
 }

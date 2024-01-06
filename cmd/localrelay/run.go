@@ -4,6 +4,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
@@ -14,7 +15,6 @@ import (
 	"github.com/kardianos/service"
 	"github.com/naoina/toml"
 	"github.com/pkg/errors"
-	"golang.org/x/net/proxy"
 )
 
 var (
@@ -141,28 +141,22 @@ func launchRelays(relays []Relay, wait bool) error {
 		relay := localrelay.New(r.Name, w, r.Listener, r.Destinations...)
 
 		// ===== set proxies
-		proxMap := make(map[string]proxy.Dialer)
+		proxMap := make(map[string]localrelay.ProxyURL)
 		for proxyName, proxyConf := range r.Proxies {
 			if strings.ToLower(proxyConf.Protocol) != "socks5" {
 				return errors.New("Socks5 is the only supported proxy type")
 			}
 
-			auth := &proxy.Auth{
-				User:     proxyConf.Username,
-				Password: proxyConf.Password,
-			}
-
-			// If auth not set make it nil
-			if proxyConf.Username == "" && proxyConf.Password == "" {
-				auth = nil
-			}
-
-			prox, err := proxy.SOCKS5("tcp", proxyConf.Address, auth, nil)
+			proxyURL, err := url.Parse(proxyConf.Protocol + "://" + proxyConf.Address)
 			if err != nil {
 				return err
 			}
 
-			proxMap[proxyName] = prox
+			if len(proxyConf.Username) > 0 || len(proxyConf.Password) > 0 {
+				proxyURL.User = url.UserPassword(proxyConf.Username, proxyConf.Password)
+			}
+
+			proxMap[proxyName] = localrelay.NewProxyURL(proxyURL)
 		}
 
 		if len(proxMap) > 0 {
