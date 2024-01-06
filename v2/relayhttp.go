@@ -29,7 +29,6 @@ func handleHTTP(w http.ResponseWriter, r *http.Request, re *Relay) {
 
 	destination := re.Destination[0]
 
-	// FIXME: force only one destination for http(s) relays
 	remoteURL := destination.Protocol() + "://" + destination.Addr() + r.URL.Path + "?" + r.URL.Query().Encode()
 
 	// BUG: sometimes requests redirect and cause a loop (Loop is auto stopped)

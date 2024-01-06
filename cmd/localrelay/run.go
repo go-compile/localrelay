@@ -166,8 +166,6 @@ func launchRelays(relays []Relay, wait bool) error {
 			relay.SetProxy(proxMap)
 		}
 
-		// TODO: setup http proxy settings
-
 		switch r.Listener.ProxyType() {
 		case localrelay.ProxyTCP, localrelay.ProxyUDP:
 			addRelay(relay)
@@ -200,30 +198,6 @@ func launchRelays(relays []Relay, wait bool) error {
 				// Set TLS certificates & make relay HTTPS
 				relay.SetTLS(r.Tls.Certificate, r.Tls.Private)
 			}
-
-			// TODO: implement proxies for HTTP(S) proxies
-
-			// If proxy enabled
-			// if r.Proxy.Host != "" && strings.ToLower(r.Proxy.Protocol) == "socks5" {
-
-			// 	userinfo := url.UserPassword(r.Proxy.Username, r.Proxy.Password)
-			// 	prox, err := url.Parse(r.Proxy.Protocol + "://" + r.Proxy.Host)
-			// 	if err != nil {
-			// 		panic(err)
-			// 	}
-
-			// 	if len(r.Proxy.Username) != 0 {
-			// 		prox.User = userinfo
-			// 	}
-
-			// 	relay.SetClient(&http.Client{
-			// 		Transport: &http.Transport{
-			// 			Proxy: http.ProxyURL(prox),
-			// 		},
-
-			// 		Timeout: time.Second * 120,
-			// 	})
-			// }
 
 			addRelay(relay)
 			wg.Add(1)
