@@ -15,12 +15,27 @@ func TestIPCPosix(t *testing.T) {
 	ipcPathPrefix = "./"
 	go func() {
 		l, err := ipc.NewListener()
-		l.Close()
+		defer l.Close()
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		ipcListener = l
+
+		err = ipc.ListenServe(l, newIPCServer())
 		if err != nil {
 			t.Fatal(err)
 		}
 	}()
+
 	time.Sleep(time.Second)
+
+	// due to the above embeded function being in a different
+	// gorutine, t.Fatal will only effect the above subroutine.
+	// Hence needing to check if ipcListener is nil.
+	if ipcListener == nil {
+		t.Fatal("ipc listener could not startup")
+	}
 
 	_, err := serviceStatus()
 	if err != nil {

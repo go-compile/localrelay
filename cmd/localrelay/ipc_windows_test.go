@@ -12,13 +12,20 @@ func TestIPCWindows(t *testing.T) {
 		// if IPC listen fails make sure your host system isn't
 		// already running localrelay. Run localrelay stop
 		l, err := ipc.NewListener()
-		l.Close()
+		defer l.Close()
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		ipcListener = l
+
+		err = ipc.ListenServe(l, newIPCServer())
 		if err != nil {
 			t.Fatal(err)
 		}
 	}()
 
-	time.Sleep(time.Millisecond * 50)
+	time.Sleep(time.Millisecond * 300)
 
 	// due to the above embeded function being in a different
 	// gorutine, t.Fatal will only effect the above subroutine.
