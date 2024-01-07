@@ -49,7 +49,8 @@ func stopRelay(relayName string) error {
 
 	defer c.Close()
 
-	if err := c.StopRelay(relayName); err == nil {
+	err = c.StopRelay(relayName)
+	if err == nil {
 		Printf("Relay %q has been stopped.\n", relayName)
 		return nil
 	}
