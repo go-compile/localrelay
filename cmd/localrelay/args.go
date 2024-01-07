@@ -122,7 +122,7 @@ func parseArgs() (*options, error) {
 			}
 
 			opt.ipcPipe = value
-		case "detach", "bg":
+		case "detach", "bg", "d":
 			opt.detach = true
 		case "store":
 			opt.store = true
@@ -139,7 +139,7 @@ func parseArgs() (*options, error) {
 
 			Printf("Timeout set to: %dms\n", dur.Milliseconds())
 			localrelay.Timeout = dur
-		case "destination", "d", "dst", "rhost":
+		case "destination", "dst", "rhost":
 			value, err := getAnswer(args, arg, &i)
 			if err != nil {
 				return nil, err
