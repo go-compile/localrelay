@@ -5,7 +5,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/go-compile/localrelay"
+	"github.com/go-compile/localrelay/v2"
 )
 
 func main() {
@@ -13,10 +13,13 @@ func main() {
 	// nextcloud is the name of the relay. Note this can be called anything
 	// 127.0.0.1:90 is the address the relay will listen on. E.g. you connect via localhost:90
 	// http://example.com is the destination address, this can be a remote server
-	r := localrelay.New("https-relay", "127.0.0.1:90", "https://example.com", os.Stdout)
+	r, err := localrelay.New("https-relay", os.Stdout, "127.0.0.1:90", "https://example.com")
+	if err != nil {
+		panic(err)
+	}
 
 	// Convert the relay from the default: TCP to a HTTP server
-	err := r.SetHTTP(http.Server{
+	err = r.SetHTTP(&http.Server{
 		// Middle ware can be set here
 		Handler: localrelay.HandleHTTP(r),
 
@@ -24,7 +27,6 @@ func main() {
 		WriteTimeout: time.Second * 15,
 		IdleTimeout:  time.Second * 30,
 	})
-
 	if err != nil {
 		panic(err)
 	}
