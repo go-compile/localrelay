@@ -27,5 +27,5 @@ func fileOwnership(stat os.FileInfo) (string, error) {
 }
 
 func runningAsRoot() bool {
-	return os.Geteuid() == 1
+	return os.Geteuid() == 0
 }
