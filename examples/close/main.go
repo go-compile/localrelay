@@ -5,12 +5,15 @@ import (
 	"os"
 	"time"
 
-	"github.com/go-compile/localrelay"
+	"github.com/go-compile/localrelay/v2"
 )
 
 func main() {
 	// Create new relay
-	r := localrelay.New("nextcloud", "127.0.0.1:90", "localhost:8080", os.Stdout)
+	r, err := localrelay.New("nextcloud", os.Stdout, "tcp://127.0.0.1:90", "tcp://localhost:8080")
+	if err != nil {
+		panic(err)
+	}
 
 	// Close relay after 15 seconds
 	go func() {
