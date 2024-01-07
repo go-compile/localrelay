@@ -13,7 +13,7 @@ func main() {
 	// nextcloud is the name of the relay. Note this can be called anything
 	// 127.0.0.1:90 is the address the relay will listen on. E.g. you connect via localhost:90
 	// http://example.com is the destination address, this can be a remote server
-	r, err := localrelay.New("https-relay", os.Stdout, "127.0.0.1:90", "https://example.com")
+	r, err := localrelay.New("https-relay", os.Stdout, "https://127.0.0.1:90", "https://example.com")
 	if err != nil {
 		panic(err)
 	}
