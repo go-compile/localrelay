@@ -31,6 +31,11 @@ func main() {
 		DisplayName: serviceName,
 		Description: serviceDescription,
 		Arguments:   []string{"start-service-daemon"},
+		Option: service.KeyValue{
+			"DelayedAutoStart":       true,
+			"OnFailure":              "restart",
+			"OnFailureDelayDuration": "5s",
+		},
 	}
 
 	prg := &daemon{}
