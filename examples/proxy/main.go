@@ -1,10 +1,10 @@
 package main
 
 import (
+	"net/url"
 	"os"
 
-	"github.com/go-compile/localrelay"
-	"golang.org/x/net/proxy"
+	"github.com/go-compile/localrelay/v2"
 )
 
 func main() {
@@ -13,7 +13,10 @@ func main() {
 	// 127.0.0.1:90 is the address the relay will listen on. E.g. you connect via localhost:90
 	// 2gzyxa5ihm7nsggfxnu52rck2vv4rvmdlkiu3zzui5du4xyclen53wid.onion:80 this can be a normal IP
 	// address or even a onion if you're using Tor
-	r := localrelay.New("onion-service", "127.0.0.1:90", "2gzyxa5ihm7nsggfxnu52rck2vv4rvmdlkiu3zzui5du4xyclen53wid.onion:80", os.Stdout)
+	r, err := localrelay.New("onion-service", os.Stdout, "tcp://127.0.0.1:90", "tcp://2gzyxa5ihm7nsggfxnu52rck2vv4rvmdlkiu3zzui5du4xyclen53wid.onion:80?proxy=tor")
+	if err != nil {
+		panic(err)
+	}
 
 	// Create a new SOCKS5 proxy
 
@@ -21,13 +24,15 @@ func main() {
 	// other than Windows. On windows it's 9150 however, if you run Tor as a
 	// service on Windows (tor.exe not the whole Tor Browser Bundle) the address
 	// will be 9050
-	prox, err := proxy.SOCKS5("tcp", "127.0.0.1:9050", nil, nil)
+	// Route traffic through Tor
+	torProxy, err := url.Parse("socks5://127.0.0.1:9050")
 	if err != nil {
 		panic(err)
 	}
 
-	// SetProxy tells the relay you want to use a proxy
-	r.SetProxy(&prox)
+	r.SetProxy(map[string]localrelay.ProxyURL{"tor": {
+		URL: torProxy,
+	}})
 
 	// Start the relay server
 	panic(r.ListenServe())
