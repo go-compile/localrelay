@@ -88,6 +88,13 @@ func main() {
 
 			return
 		case "run":
+			// detach requires admin to run
+			if opt.detach {
+				if !privCommand(true) {
+					return
+				}
+			}
+
 			if err := runRelays(opt, i, opt.commands); err != nil {
 				Println(err)
 			}

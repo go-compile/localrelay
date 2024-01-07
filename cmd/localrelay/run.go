@@ -41,7 +41,6 @@ func init() {
 }
 
 func runRelays(opt *options, i int, cmd []string) error {
-
 	home := configSystemDir()
 
 	relayPaths := make([]string, 0, len(cmd[i+1:]))
