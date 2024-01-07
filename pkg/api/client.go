@@ -121,7 +121,7 @@ func (c *Client) DropAll() error {
 }
 
 func (c *Client) StopRelay(relay string) error {
-	resp, err := c.hc.Get("http://lr/stop/relay/" + url.PathEscape(relay))
+	resp, err := c.hc.Get("http://lr/stop/" + url.PathEscape(relay))
 	if err != nil {
 		return err
 	}
