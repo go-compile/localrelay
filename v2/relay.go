@@ -5,6 +5,7 @@ import (
 	"net"
 	"net/http"
 	"net/url"
+	"os"
 	"sync"
 	"time"
 
@@ -117,6 +118,10 @@ func New(name string, logger io.Writer, listener TargetLink, destination ...Targ
 		if len(destination) > 1 {
 			return nil, ErrManyDestinations
 		}
+	}
+
+	if logger == nil {
+		logger = os.Stdout
 	}
 
 	return &Relay{
