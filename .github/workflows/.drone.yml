@@ -62,6 +62,7 @@ steps:
   - name: test
     image: golang:1.17
     commands:
+      - go get github.com/go-compile/localrelay/v2
       - go test ./...
       - go build -v ./cmd/localrelay
 
