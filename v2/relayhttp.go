@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/go-compile/localrelay/pkg/httperror"
+	"github.com/go-compile/localrelay/internal/httperror"
 )
 
 func relayHTTP(r *Relay, l net.Listener) error {
