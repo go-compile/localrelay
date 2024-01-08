@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/go-compile/localrelay/pkg/httperror"
 )
 
 func relayHTTP(r *Relay, l net.Listener) error {
@@ -35,6 +37,7 @@ func handleHTTP(w http.ResponseWriter, r *http.Request, re *Relay) {
 	req, err := http.NewRequest(r.Method, remoteURL, r.Body)
 	if err != nil {
 		re.logger.Error.Println("BUILD REQUEST ERROR: ", err)
+		serviceUnavaliable(w, r)
 		return
 	}
 
@@ -54,11 +57,15 @@ func handleHTTP(w http.ResponseWriter, r *http.Request, re *Relay) {
 	proxyStrings, proxyNames, err := destination.Proxy(re)
 	if err != nil {
 		re.logger.Error.Printf("destination proxy error: %s\n", err)
+		serviceUnavaliable(w, r)
 		return
 	}
 
 	if len(proxyNames) == 0 {
-		forwardHttp(&hclient, re, req, w, start)
+		if !forwardHttp(&hclient, re, req, w, start) {
+			serviceUnavaliable(w, r)
+		}
+
 		return
 	}
 
@@ -72,6 +79,8 @@ func handleHTTP(w http.ResponseWriter, r *http.Request, re *Relay) {
 			return
 		}
 	}
+
+	serviceUnavaliable(w, r)
 }
 
 func forwardHttp(hclient *http.Client, re *Relay, req *http.Request, w http.ResponseWriter, start time.Time) bool {
@@ -102,4 +111,9 @@ func forwardHttp(hclient *http.Client, re *Relay, req *http.Request, w http.Resp
 func cloneHttpClient(client http.Client) http.Client {
 	c := client
 	return c
+}
+
+func serviceUnavaliable(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(503)
+	w.Write(httperror.Get503())
 }
