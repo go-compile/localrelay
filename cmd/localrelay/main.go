@@ -219,6 +219,7 @@ func main() {
 
 			if err := relayStatus(); err != nil {
 				Println(err)
+				os.Exit(1)
 			}
 
 			return

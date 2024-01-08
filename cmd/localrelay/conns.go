@@ -28,12 +28,8 @@ func displayOpenConns(opt *options, onlyIPS bool) error {
 	// carriage returns
 	conns, err := activeConnections()
 	if err != nil {
-
 		Printf("Daemon:    \x1b[31m [OFFLINE] \x1b[0m\r\n")
-		Println(err)
-
-		// exit with error
-		os.Exit(1)
+		return err
 	}
 
 	filteredRelays := []string{}

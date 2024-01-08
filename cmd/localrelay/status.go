@@ -31,10 +31,7 @@ func relayStatus() error {
 	s, err := serviceStatus()
 	if err != nil {
 		Printf("Daemon:    \x1b[31m [OFFLINE] \x1b[0m\r\n")
-		Println(err)
-
-		// exit with error
-		os.Exit(1)
+		return err
 	}
 
 	Printf("\r\nDaemon:      \x1b[102m\x1b[30m [RUNNING] \x1b[0m\r\n")
