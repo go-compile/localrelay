@@ -124,7 +124,7 @@ func parseArgs() (*options, error) {
 			opt.ipcPipe = value
 		case "detach", "bg", "d":
 			opt.detach = true
-		case "store":
+		case "store", "s":
 			opt.store = true
 		case "timeout":
 			value, err := getAnswer(args, arg, &i)
