@@ -1,6 +1,0 @@
-Package: localrelay
-Version: <VERSION>
-Architecture: arm64
-Maintainer: Go Compile
-Homepage: https://github.com/go-compile/localrelay
-Description: Reverse proxy routing system allowing you to use fail overs, connect to onion hidden services.
