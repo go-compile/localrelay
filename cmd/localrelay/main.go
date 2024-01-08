@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/go-compile/localrelay/pkg/httperror"
 	"github.com/kardianos/service"
 	"github.com/pkg/errors"
 )
@@ -45,6 +46,8 @@ func main() {
 	}
 
 	daemonService = s
+
+	httperror.SetVersion(VERSION)
 
 	opt, err := parseArgs()
 	if err == nil && opt == nil {
