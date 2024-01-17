@@ -36,7 +36,7 @@ func (l *logger) Close() error {
 func newLogger(relayName string) *logger {
 	w, err := eventlog.Open("localrelayd")
 	if err != nil {
-		log.Println(err)
+		log.Fatal(err)
 	}
 
 	return &logger{

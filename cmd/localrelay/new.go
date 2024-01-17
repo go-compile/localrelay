@@ -4,6 +4,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"runtime"
 	"strings"
 
 	"github.com/chzyer/readline"
@@ -180,7 +181,31 @@ func createConfigDir() error {
 		return nil
 	}
 
-	return os.Mkdir(dir, 0644)
+	if err := os.Mkdir(dir, 0644); err != nil {
+		return err
+	}
+
+	return createLogDir()
+}
+
+func createLogDir() error {
+	if runtime.GOOS == "windows" {
+		return nil
+	}
+
+	dir := "/var/log/localrelay/"
+
+	exists, err := pathExists(dir)
+	if err != nil {
+		return err
+	}
+
+	// already exists, don't recreate it
+	if exists {
+		return nil
+	}
+
+	return os.MkdirAll(dir, 0644)
 }
 
 func pathExists(path string) (bool, error) {

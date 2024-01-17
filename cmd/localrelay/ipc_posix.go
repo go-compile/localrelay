@@ -4,7 +4,10 @@
 package main
 
 import (
+	"io"
+	"log"
 	"os"
+	"path/filepath"
 	"strconv"
 	"syscall"
 )
@@ -13,6 +16,11 @@ var (
 	// ipcPathPrefix is the dir which comes before the unix socket
 	ipcPathPrefix = "/var/run/"
 )
+
+type logger struct {
+	w         io.Writer
+	relayName string
+}
 
 func fileOwnership(stat os.FileInfo) (string, error) {
 	s := stat.Sys().(*syscall.Stat_t)
@@ -28,4 +36,24 @@ func fileOwnership(stat os.FileInfo) (string, error) {
 
 func runningAsRoot() bool {
 	return os.Geteuid() == 0
+}
+
+func (l *logger) Write(b []byte) (int, error) {
+	return l.w.Write(b)
+}
+
+func (l *logger) Close() error {
+	return l.w.Close()
+}
+
+func newLogger(relayName string) *logger {
+	f, err := os.OpenFile(filepath.Join("/var/log/localrelay/", relayName+".log"), os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return &logger{
+		w:         w,
+		relayName: relayName,
+	}
 }
