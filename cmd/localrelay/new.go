@@ -55,16 +55,10 @@ func newRelay(opt *options, i int, cmd []string) error {
 
 	listener := localrelay.TargetLink(string(opt.proxyType) + "://" + opt.host)
 
-	destination := localrelay.TargetLink(string(opt.proxyType) + "://" + opt.destination)
-	if opt.proxy.IsSet() {
-		destination += "/?proxy=proxy-a"
-	}
-
 	relay := Relay{
-		Name:         name,
-		Listener:     listener,
-		Destinations: []localrelay.TargetLink{destination},
-		Logging:      opt.logs,
+		Name:     name,
+		Listener: listener,
+		Logging:  opt.logs,
 
 		Tls: TLS{
 			Certificate: opt.certificate,
@@ -73,6 +67,17 @@ func newRelay(opt *options, i int, cmd []string) error {
 
 		Proxies:     make(map[string]Proxy),
 		AutoRestart: !opt.DisableAutoStart,
+	}
+
+	// assign the mutliple remotes
+	dsts := strings.Split(opt.destination, ",")
+	for _, dst := range dsts {
+		destination := localrelay.TargetLink(string(opt.proxyType) + "://" + dst)
+		if opt.proxy.IsSet() {
+			destination += "/?proxy=proxy-a"
+		}
+
+		relay.Destinations = append(relay.Destinations, destination)
 	}
 
 	if opt.proxy.IsSet() {
@@ -162,7 +167,6 @@ func parseBool(input string) (bool, error) {
 }
 
 func createConfigDir() error {
-
 	home := configSystemDir()
 	dir := filepath.Join(home, configDirSuffix)
 
