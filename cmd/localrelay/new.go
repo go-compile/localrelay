@@ -71,9 +71,9 @@ func newRelay(opt *options, i int, cmd []string) error {
 
 	// assign the mutliple remotes
 	dsts := strings.Split(opt.destination, ",")
-	for _, dst := range dsts {
+	for di, dst := range dsts {
 		destination := localrelay.TargetLink(string(opt.proxyType) + "://" + dst)
-		if opt.proxy.IsSet() {
+		if opt.proxy.IsSet() && !contains(opt.proxyIgnore, di+1) {
 			destination += "/?proxy=proxy-a"
 		}
 
@@ -194,4 +194,14 @@ func pathExists(path string) (bool, error) {
 
 func validateName(name string) bool {
 	return relayNameFormat.MatchString(name)
+}
+
+func contains(l []int, x int) bool {
+	for i := 0; i < len(l); i++ {
+		if l[i] == x {
+			return true
+		}
+	}
+
+	return false
 }

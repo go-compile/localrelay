@@ -268,7 +268,6 @@ func help() {
 	Printf("  %-28s %s\n", "-udp", "Set relay to UDP relay")
 	Printf("  %-28s %s\n", "-http", "Set relay to HTTP relay")
 	Printf("  %-28s %s\n", "-https", "Set relay to HTTPS relay")
-	Printf("  %-28s %s\n", "-failover", "Set relay to TCP failover relay")
 	Printf("  %-28s %s\n", "-proxy", "Set socks5 proxy via URL")
 	Printf("  %-28s %s\n", "-output, -o", "Set output file path")
 	Printf("  %-28s %s\n", "-proxy_ignore", "Destination indexes to ignore proxy settings")
