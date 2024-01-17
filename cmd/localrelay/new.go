@@ -177,12 +177,10 @@ func createConfigDir() error {
 	}
 
 	// already exists, don't recreate it
-	if exists {
-		return nil
-	}
-
-	if err := os.Mkdir(dir, 0644); err != nil {
-		return err
+	if !exists {
+		if err := os.Mkdir(dir, 0644); err != nil {
+			return err
+		}
 	}
 
 	return createLogDir()
