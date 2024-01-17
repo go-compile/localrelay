@@ -11,6 +11,8 @@ import (
 	"github.com/kardianos/service"
 )
 
+var isService = false
+
 func (p daemon) Start(s service.Service) error {
 	Println(s.String() + " started")
 	go p.run()
@@ -36,6 +38,7 @@ func (p daemon) Stop(s service.Service) error {
 }
 
 func (p daemon) run() {
+	isService = true
 	// TODO: listen to signals for reload from systemctl
 
 	if err := launchAutoStartRelays(); err != nil {

@@ -53,7 +53,7 @@ func parseArgs() (*options, error) {
 	args := os.Args[1:]
 
 	opt := &options{
-		logs:      "stdout",
+		logs:      "default",
 		interval:  time.Second,
 		proxyType: localrelay.ProxyTCP,
 	}

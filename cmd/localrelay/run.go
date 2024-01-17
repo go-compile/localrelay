@@ -119,17 +119,27 @@ func launchRelays(relays []Relay, wait bool) error {
 
 		Printf("[Info] [Relay:%d] Starting %q on %q\n", i+1, r.Name, r.Listener)
 
-		w := os.Stdout
-		if r.Logging != "stdout" {
-			Printf("[Info] [Relay:%s] Log output writing to: %q\n", r.Name, r.Logging)
+		w := io.MultiWriter(newLogger(r.Name), os.Stdout)
+		if !isService {
+			// not running as a serivce
+			w = os.Stdout
+		}
 
-			f, err := os.OpenFile(r.Logging, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
-			if err != nil {
-				return err
+		// was a custom file provided?
+		if r.Logging != "stdout" && r.Logging != "default" && r.Logging != "" {
+			if isService {
+				Printf("[Info] [Relay:%s] Custom log files are not permitted when running in daemon mode\n", r.Name)
+			} else {
+				Printf("[Info] [Relay:%s] Log output writing to: %q\n", r.Name, r.Logging)
+
+				f, err := os.OpenFile(r.Logging, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
+				if err != nil {
+					return err
+				}
+
+				addLogDescriptor(f, r.Name)
+				w = io.MultiWriter(f, os.Stdout)
 			}
-
-			addLogDescriptor(f, r.Name)
-			w = f
 		}
 
 		relay, err := localrelay.New(r.Name, w, r.Listener, r.Destinations...)

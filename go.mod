@@ -12,7 +12,7 @@ require (
 	github.com/tam7t/hpkp v0.0.0-20160821193359-2b70b4024ed5
 	github.com/valyala/fasthttp v1.51.0
 	golang.org/x/net v0.19.0
-	golang.org/x/sys v0.15.0
+	golang.org/x/sys v0.16.0
 	gopkg.in/natefinch/npipe.v2 v2.0.0-20160621034901-c1b8fa8bdcce
 )
 
