@@ -18,7 +18,7 @@ var (
 )
 
 type logger struct {
-	w         io.Writer
+	w         io.WriteCloser
 	relayName string
 }
 
@@ -53,7 +53,7 @@ func newLogger(relayName string) *logger {
 	}
 
 	return &logger{
-		w:         w,
+		w:         f,
 		relayName: relayName,
 	}
 }
