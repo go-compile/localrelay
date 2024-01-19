@@ -29,8 +29,9 @@ type options struct {
 	certificate string
 	key         string
 
-	commands []string
-	detach   bool
+	commands    []string
+	detach      bool
+	loadbalance bool
 
 	isFork           bool
 	DisableAutoStart bool
@@ -124,6 +125,8 @@ func parseArgs() (*options, error) {
 			opt.ipcPipe = value
 		case "detach", "bg", "d":
 			opt.detach = true
+		case "loadbalance", "lb":
+			opt.loadbalance = true
 		case "store", "s":
 			opt.store = true
 		case "timeout":
@@ -269,6 +272,7 @@ func help() {
 	Printf("  %-28s %s\n", "-http", "Set relay to HTTP relay")
 	Printf("  %-28s %s\n", "-https", "Set relay to HTTPS relay")
 	Printf("  %-28s %s\n", "-proxy", "Set socks5 proxy via URL")
+	Printf("  %-28s %s\n", "-loadbalance", "Enables load balancing")
 	Printf("  %-28s %s\n", "-output, -o", "Set output file path")
 	Printf("  %-28s %s\n", "-proxy_ignore", "Destination indexes to ignore proxy settings")
 	Printf("  %-28s %s\n", "-version", "View version page")

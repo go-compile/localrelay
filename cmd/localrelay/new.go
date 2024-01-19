@@ -66,6 +66,10 @@ func newRelay(opt *options, i int, cmd []string) error {
 			Private:     opt.key,
 		},
 
+		Loadbalance: Loadbalance{
+			Enabled: opt.loadbalance,
+		},
+
 		Proxies:     make(map[string]Proxy),
 		AutoRestart: !opt.DisableAutoStart,
 	}
