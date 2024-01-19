@@ -15,6 +15,8 @@ type Relay struct {
 
 	Tls     TLS
 	Proxies map[string]Proxy
+
+	Loadbalance Loadbalance
 }
 
 // TLS is used when configuring https proxies
@@ -29,6 +31,10 @@ type Proxy struct {
 	Address  string
 	Username string
 	Password string
+}
+
+type Loadbalance struct {
+	Enabled bool
 }
 
 // IsSet returns true if a proxy has been set

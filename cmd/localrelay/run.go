@@ -170,6 +170,10 @@ func launchRelays(relays []Relay, wait bool) error {
 			relay.SetProxy(proxMap)
 		}
 
+		if r.Loadbalance.Enabled {
+			relay.SetLoadbalance(true)
+		}
+
 		switch r.Listener.ProxyType() {
 		case localrelay.ProxyTCP, localrelay.ProxyUDP:
 			addRelay(relay)
