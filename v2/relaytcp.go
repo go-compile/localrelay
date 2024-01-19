@@ -2,6 +2,7 @@ package localrelay
 
 import (
 	"io"
+	"log"
 	"net"
 	"sync"
 	"time"
@@ -61,14 +62,25 @@ func handleConn(r *Relay, conn net.Conn, network string) {
 
 	start := time.Now()
 
-	for i, destination := range r.Destination {
+	destinationCandiates := make([]TargetLink, len(r.Destination))
+	copy(destinationCandiates, r.Destination)
+
+	for i := 0; len(destinationCandiates) > 0; i++ {
+		di, destination, err := nextDestination(r, destinationCandiates)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		destinationCandiates = removeTargetlink(destinationCandiates, di)
+
+		// Retreive proxy config for destination
 		proxies, proxyNames, err := destination.Proxy(r)
 		if err != nil {
 			r.logger.Error.Printf("A PROXY FOR DESTINATION %q WAS REFERENCED BUT NOT DEFINED\n", destination)
 			return
 		}
 
-		// if no proxy is set
+		// if no proxy is set direct dial
 		if proxies == nil {
 			r.logger.Info.Printf("DAILING REMOTE [%s]\n", destination)
 
@@ -110,6 +122,56 @@ func handleConn(r *Relay, conn net.Conn, network string) {
 			return
 		}
 	}
+
+	// for i, destination := range r.Destination {
+	// 	proxies, proxyNames, err := destination.Proxy(r)
+	// 	if err != nil {
+	// 		r.logger.Error.Printf("A PROXY FOR DESTINATION %q WAS REFERENCED BUT NOT DEFINED\n", destination)
+	// 		return
+	// 	}
+
+	// 	// if no proxy is set
+	// 	if proxies == nil {
+	// 		r.logger.Info.Printf("DAILING REMOTE [%s]\n", destination)
+
+	// 		if err := dial(r, conn, destination.Addr(), i+1, destination.Protocol(), start); err != nil {
+	// 			r.logger.Info.Printf("FAILED DAILING REMOTE [%s]\n", destination)
+	// 			// errored dialing, continue to try next destination
+	// 			continue
+	// 		}
+
+	// 		r.logger.Info.Printf("CONNECTION CLOSED %q ON %q\n", conn.RemoteAddr(), conn.LocalAddr())
+	// 		// close connection
+	// 		return
+	// 	}
+
+	// 	// proxies are set for this destination
+	// 	for pi, proxy := range proxies {
+	// 		r.logger.Info.Printf("DIALLING DESTINATION [%d] ADDRESS [%s] THROUGH PROXY %q\n", i+1, destination, proxyNames[pi])
+
+	// 		// Dial destination through proxy
+	// 		c, err := proxy.Dialer().Dial(destination.Protocol(), destination.Addr())
+	// 		if err != nil {
+	// 			r.Metrics.dial(0, 1, start)
+
+	// 			r.logger.Error.Printf("FAILED TO DIAL DESTINATION ADDR: %s\n", err)
+	// 			// try next proxy
+	// 			continue
+	// 		}
+
+	// 		// TODO: test validate
+	// 		r.setConnRemote(c, c.RemoteAddr())
+
+	// 		r.Metrics.dial(1, 0, start)
+
+	// 		r.logger.Info.Printf("CONNECTED TO %s\n", destination)
+	// 		streamConns(conn, c, r.Metrics)
+
+	// 		r.logger.Info.Printf("CONNECTION CLOSED %q ON %q\n", conn.RemoteAddr(), conn.LocalAddr())
+	// 		// close connection
+	// 		return
+	// 	}
+	// }
 
 	r.logger.Info.Printf("UNABLE TO MAKE A CONNECTION FROM %q TO %q\n", conn.RemoteAddr(), conn.LocalAddr())
 }
@@ -249,4 +311,8 @@ func copierOut(client net.Conn, dst net.Conn, buffer int, m *Metrics) error {
 			return errors.WithStack(err)
 		}
 	}
+}
+
+func removeTargetlink(slice []TargetLink, s int) []TargetLink {
+	return append(slice[:s], slice[s+1:]...)
 }

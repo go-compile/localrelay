@@ -60,11 +60,18 @@ type Relay struct {
 	certificateFile string
 	keyFile         string
 
+	loadbalance Loadbalance
+
 	running bool
 	m       sync.Mutex
 
 	// connPool contains a list of ACTIVE connections
 	connPool []*PooledConn
+}
+
+type Loadbalance struct {
+	Enabled   bool
+	Algorithm string
 }
 
 // PooledConn allows meta data to be attached to a connection
@@ -193,6 +200,10 @@ func (r *Relay) SetTLS(certificateFile, keyFile string) {
 func (r *Relay) SetProxy(proxies map[string]ProxyURL) {
 	r.proxies = proxies
 	r.ProxyEnabled = true
+}
+
+func (r *Relay) SetLoadbalance(enabled bool) {
+	r.loadbalance.Enabled = true
 }
 
 // Close will close the relay's listener
