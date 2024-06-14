@@ -4,8 +4,8 @@ type: docker
 name: go-1-18
 
 steps:
-  - name: test
-    image: golang:1.18
+  - name: test-go1.22
+    image: golang:1.22
     commands:
       - go test ./...
       - go build -v ./cmd/localrelay
