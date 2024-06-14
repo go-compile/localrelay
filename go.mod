@@ -4,7 +4,7 @@ go 1.21
 
 require (
 	github.com/chzyer/readline v1.5.1
-	github.com/containerd/console v1.0.4
+	github.com/containerd/console v1.0.3
 	github.com/fasthttp/router v1.5.1
 	github.com/go-compile/localrelay/v2 v2.0.0-20240119152158-a43947254ed3
 	github.com/kardianos/service v1.2.2
