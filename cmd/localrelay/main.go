@@ -33,7 +33,7 @@ func main() {
 		Description: serviceDescription,
 		Arguments:   []string{"start-service-daemon"},
 		Option: service.KeyValue{
-			"DelayedAutoStart":       true,
+			"DelayedAutoStart":       false,
 			"OnFailure":              "restart",
 			"OnFailureDelayDuration": "5s",
 		},
