@@ -24,3 +24,8 @@ func Connect() (*http.Client, net.Conn, error) {
 
 	return httpClient, conn, nil
 }
+
+// SetPathPrefix will determin where the IPC listener binds and connects
+func SetPathPrefix(prefix string) {
+	ipcPathPrefix = prefix
+}
