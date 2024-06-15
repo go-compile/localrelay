@@ -8,7 +8,7 @@ import (
 	"net/http"
 )
 
-const (
+var (
 	// ipcPathPrefix is the dir which comes before the unix socket
 	ipcPathPrefix = "/var/run/"
 )

@@ -11,8 +11,6 @@ import (
 )
 
 func TestIPCPosix(t *testing.T) {
-
-	ipcPathPrefix = "./"
 	go func() {
 		l, err := ipc.NewListener()
 		if err != nil {
