@@ -15,10 +15,11 @@ func TestIPCPosix(t *testing.T) {
 	ipcPathPrefix = "./"
 	go func() {
 		l, err := ipc.NewListener()
-		defer l.Close()
 		if err != nil {
 			t.Fatal(err)
 		}
+
+		defer l.Close()
 
 		ipcListener = l
 

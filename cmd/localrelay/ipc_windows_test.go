@@ -12,10 +12,11 @@ func TestIPCWindows(t *testing.T) {
 		// if IPC listen fails make sure your host system isn't
 		// already running localrelay. Run localrelay stop
 		l, err := ipc.NewListener()
-		defer l.Close()
 		if err != nil {
 			t.Fatal(err)
 		}
+
+		defer l.Close()
 
 		ipcListener = l
 
