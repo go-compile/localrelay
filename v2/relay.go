@@ -67,6 +67,9 @@ type Relay struct {
 
 	// connPool contains a list of ACTIVE connections
 	connPool []*PooledConn
+
+	// Tags are used to propogate relay properties to the API client/CLI
+	Targs map[string]struct{}
 }
 
 type Loadbalance struct {
@@ -120,6 +123,11 @@ func New(name string, logger io.Writer, listener TargetLink, destination ...Targ
 		return nil, ErrNoDestination
 	}
 
+	tags := make(map[string]struct{})
+	if len(destination) > 1 {
+		tags["failover"] = struct{}{}
+	}
+
 	// if a http(s) proxy enforce one destination only policy
 	if t := destination[0].ProxyType(); t == ProxyHTTP || t == ProxyHTTPS {
 		if len(destination) > 1 {
@@ -145,6 +153,7 @@ func New(name string, logger io.Writer, listener TargetLink, destination ...Targ
 		proxies:    make(map[string]ProxyURL),
 
 		logger: NewLogger(logger, name),
+		Targs:  tags,
 	}, nil
 }
 
@@ -204,6 +213,27 @@ func (r *Relay) SetProxy(proxies map[string]ProxyURL) {
 
 func (r *Relay) SetLoadbalance(enabled bool) {
 	r.loadbalance.Enabled = true
+
+	if enabled {
+		r.Targs["load-balancer"] = struct{}{}
+		delete(r.Targs, "failover")
+	} else {
+		delete(r.Targs, "load-balancer")
+
+		if len(r.Destination) < 2 {
+			delete(r.Targs, "failover")
+		}
+	}
+}
+
+// Loadbalancer returns true if the relay is a load balancer
+func (r *Relay) Loadbalancer() bool {
+	return r.loadbalance.Enabled || hasTag(r.Targs, "load-balancer")
+}
+
+// Failover returns true if the relay offers failover but is not a load balancer
+func (r *Relay) Failover() bool {
+	return hasTag(r.Targs, "failover")
 }
 
 // Close will close the relay's listener
@@ -343,4 +373,9 @@ func (p *ProxyURL) Dialer() proxy.Dialer {
 
 func (p *ProxyURL) HttpProxyURL() {
 	http.ProxyURL(&url.URL{})
+}
+
+func hasTag(tags map[string]struct{}, tag string) bool {
+	_, ok := tags[tag]
+	return ok
 }

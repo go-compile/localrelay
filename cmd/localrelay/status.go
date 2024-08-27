@@ -80,6 +80,14 @@ func relayStatus() error {
 			badges += "\x1b[92m [PROXY] \x1b[0m"
 		}
 
+		if s.Relays[i].Loadbalancer() {
+			badges += "\x1b[93m [LOAD BALANCER] \x1b[0m"
+		}
+
+		if s.Relays[i].Failover() {
+			badges += "\x1b[93m [FAILOVER] \x1b[0m"
+		}
+
 		Printf("  \x1b[90m%.2d\x1b[0m: %s %s\r\n      %s -> %s\r\n", i+1, s.Relays[i].Name, badges, s.Relays[i].Listener, fmtDestination(s.Relays[i].Destination, 6))
 	}
 
