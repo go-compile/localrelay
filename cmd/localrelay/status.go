@@ -80,7 +80,7 @@ func relayStatus() error {
 			badges += "\x1b[92m [PROXY] \x1b[0m"
 		}
 
-		Printf("  \x1b[90m%.2d\x1b[0m: %s %s\r\n      %s -> %s\r\n", i+1, s.Relays[i].Name, badges, s.Relays[i].Listener, s.Relays[i].Destination)
+		Printf("  \x1b[90m%.2d\x1b[0m: %s %s\r\n      %s -> %s\r\n", i+1, s.Relays[i].Name, badges, s.Relays[i].Listener, fmtDestination(s.Relays[i].Destination, 6))
 	}
 
 	return nil
@@ -117,4 +117,25 @@ func formatDuration(d time.Duration) string {
 	}
 
 	return strconv.FormatFloat(d.Hours()/24, 'f', 2, 64) + " days"
+}
+
+func fmtDestination(targets []localrelay.TargetLink, limit int) string {
+	if len(targets) > limit {
+		return "[" + joinTargets(targets[:limit], "\x1b[90m,\x1b[0m ") + " \x1b[90m... n=" + strconv.Itoa(len(targets)) + "\x1b[0m]"
+	}
+
+	return "[" + joinTargets(targets, " ") + "]"
+}
+
+func joinTargets(targets []localrelay.TargetLink, sep string) (str string) {
+	for i := 0; i < len(targets); i++ {
+		if len(str) == 0 {
+			str += targets[i].Print()
+			continue
+		}
+
+		str += sep + targets[i].Print()
+	}
+
+	return str
 }
