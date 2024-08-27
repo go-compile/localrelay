@@ -24,8 +24,7 @@ func dial(r *Relay, conn net.Conn, remoteAddress string, i int, network string, 
 		return ErrFailConnect
 	}
 
-	// TODO: validate setConnRemote( is used correctly
-	r.setConnRemote(c, c.RemoteAddr())
+	r.setConnRemote(conn, c.RemoteAddr())
 
 	r.Metrics.dial(1, 0, start)
 

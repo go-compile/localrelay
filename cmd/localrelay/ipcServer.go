@@ -182,7 +182,6 @@ func ipcRouteConns(ctx *fasthttp.RequestCtx) {
 	relays := runningRelaysCopy()
 	for _, r := range relays {
 		for _, conn := range r.GetConns() {
-
 			relayConns = append(relayConns, api.Connection{
 				LocalAddr:  conn.Conn.LocalAddr().String(),
 				RemoteAddr: conn.Conn.RemoteAddr().String(),

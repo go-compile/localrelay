@@ -109,8 +109,7 @@ func handleConn(r *Relay, conn net.Conn, network string) {
 				continue
 			}
 
-			// TODO: test validate
-			r.setConnRemote(c, c.RemoteAddr())
+			r.setConnRemote(conn, c.RemoteAddr())
 
 			r.Metrics.dial(1, 0, start)
 

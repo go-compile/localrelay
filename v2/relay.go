@@ -313,7 +313,7 @@ func (r *Relay) storeConn(conn net.Conn) {
 	r.m.Lock()
 	defer r.m.Unlock()
 
-	r.connPool = append(r.connPool, &PooledConn{conn, "", time.Now()})
+	r.connPool = append(r.connPool, &PooledConn{conn, "\x1b[92mdialing\x1b[0m", time.Now()})
 }
 
 // popConn removes the provided connection from the conn pool
