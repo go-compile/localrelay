@@ -31,7 +31,7 @@ func dial(r *Relay, conn net.Conn, remoteAddress string, i int, network string, 
 	r.logger.Info.Printf("CONNECTED TO %s\n", remoteAddress)
 	err = streamConns(conn, c, r.Metrics)
 	if err != nil {
-		r.logger.Error.Printf("STREAM ERROR %q for %q\n", conn.RemoteAddr())
+		r.logger.Error.Printf("STREAM ERROR %q for %q\n", err, conn.RemoteAddr())
 	}
 
 	r.logger.Info.Printf("CONNECTION CLOSED %q ON %q\n", conn.RemoteAddr(), conn.LocalAddr())

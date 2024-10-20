@@ -116,7 +116,7 @@ func handleConn(r *Relay, conn net.Conn, network string) {
 			r.logger.Info.Printf("CONNECTED TO %s\n", destination)
 			err = streamConns(conn, c, r.Metrics)
 			if err != nil {
-				r.logger.Error.Printf("STREAM ERROR %q for %q\n", conn.RemoteAddr())
+				r.logger.Error.Printf("STREAM ERROR %q for %q\n", err, conn.RemoteAddr())
 			}
 
 			r.logger.Info.Printf("CONNECTION CLOSED %q ON %q\n", conn.RemoteAddr(), conn.LocalAddr())
