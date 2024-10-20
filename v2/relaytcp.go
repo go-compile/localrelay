@@ -73,7 +73,7 @@ func handleConn(r *Relay, conn net.Conn, network string) {
 
 		destinationCandiates = removeTargetlink(destinationCandiates, di)
 
-		// Retreive proxy config for destination
+		// Retrieve proxy config for destination
 		proxies, proxyNames, err := destination.Proxy(r)
 		if err != nil {
 			r.logger.Error.Printf("A PROXY FOR DESTINATION %q WAS REFERENCED BUT NOT DEFINED\n", destination)
@@ -82,10 +82,10 @@ func handleConn(r *Relay, conn net.Conn, network string) {
 
 		// if no proxy is set direct dial
 		if proxies == nil {
-			r.logger.Info.Printf("DAILING REMOTE [%s]\n", destination)
+			r.logger.Info.Printf("DIALING REMOTE [%s]\n", destination)
 
-			if err := dial(r, conn, destination.Addr(), i+1, destination.Protocol(), start); err != nil {
-				r.logger.Info.Printf("FAILED DAILING REMOTE [%s]\n", destination)
+			if err := dial(r, conn, destination.Addr(), i, destination.Protocol(), start); err != nil {
+				r.logger.Info.Printf("FAILED DIALING REMOTE [%s]\n", destination)
 				// errored dialing, continue to try next destination
 				continue
 			}
@@ -114,7 +114,10 @@ func handleConn(r *Relay, conn net.Conn, network string) {
 			r.Metrics.dial(1, 0, start)
 
 			r.logger.Info.Printf("CONNECTED TO %s\n", destination)
-			streamConns(conn, c, r.Metrics)
+			err = streamConns(conn, c, r.Metrics)
+			if err != nil {
+				r.logger.Error.Printf("STREAM ERROR %q for %q\n", conn.RemoteAddr())
+			}
 
 			r.logger.Info.Printf("CONNECTION CLOSED %q ON %q\n", conn.RemoteAddr(), conn.LocalAddr())
 			// close connection
@@ -189,6 +192,8 @@ func streamConns(client net.Conn, remote net.Conn, m *Metrics) error {
 	wg.Add(1)
 	err := copierOut(client, remote, 128, m)
 	wg.Done()
+
+	wg.Wait()
 
 	// if error is reporting that the conn is closed ignore both
 	if errors.Is(copyInErr, io.EOF) || errors.Is(err, io.EOF) || errors.Is(copyInErr, net.ErrClosed) {

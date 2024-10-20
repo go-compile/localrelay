@@ -1,4 +1,5 @@
-VERSION=$(shell git describe --tags --abbrev=0)
+# VERSION=$(shell git describe --tags --abbrev=0)
+VERSION=v2.0.0-rc3
 COMMIT=$(shell git rev-parse --short HEAD)
 BRANCH=$(shell git rev-parse --abbrev-ref HEAD)
 
@@ -18,6 +19,13 @@ publish:
 
 install:
 	cd ./cmd/localrelay/ && go install -v -ldflags="-s -w -X main.VERSION=${VERSION} -X main.BRANCH=${BRANCH} -X main.COMMIT=${COMMIT}"
+
+dev-install:
+	cd ./cmd/localrelay/ && go build -v -ldflags="-s -w -X main.VERSION=${VERSION} -X main.BRANCH=${BRANCH} -X main.COMMIT=${COMMIT}"
+	sudo chown root:root ./cmd/localrelay/localrelay
+	sudo chmod 755 ./cmd/localrelay/localrelay
+	sudo mv ./cmd/localrelay/localrelay /usr/bin/
+	sudo localrelay restart
 
 install-deps:
 	# Install developer dependencies
