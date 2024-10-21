@@ -1,4 +1,4 @@
-# LocalRelay
+# Localrelay
 
 [![GitHub release](https://img.shields.io/github/release/go-compile/localrelay.svg)](https://github.com/go-compile/localrelay/releases)
 [![Go Report Card](https://goreportcard.com/badge/go-compile/localrelay)](https://goreportcard.com/report/go-compile/localrelay)
@@ -7,7 +7,9 @@
 [![Docker Version](https://img.shields.io/docker/v/gocompile/localrelay?label=docker%20version&sort=semver)](https://hub.docker.com/r/gocompile/localrelay/)
 ![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/go-compile/localrelay/.github/workflows/go.yml)
 
-A cross platform CLI & lib which acts as a reverse proxy allowing the destination address to be customised and allows the use of a SOCKS5 proxy. Supporting both raw TCP connections and HTTP/HTTPS connections with options such as; IP locking, Certificate pinning. This app allows you to host services e.g. Nextcloud on Tor and access it on your mobile or laptop anywhere.
+<img align="right" width="100" height="100" src="./icon.png">
+
+Localrelay is a cross platform (Windows, Linux, Mac, Android, and more) reverse proxy which allows the destination address to be customised and can even use a SOCKS5 proxy. Supporting both raw TCP connections and HTTP/HTTPS connections. **Localrelay allows you to host services e.g. Nextcloud on Tor and access it on your mobile or laptop anywhere without needing to open your firewall**.
 
 <div align=center>
 
@@ -17,9 +19,33 @@ A cross platform CLI & lib which acts as a reverse proxy allowing the destinatio
 
 </div>
 
-## Use Cases
 
-If you self host a service for example; [Bitwarden](https://github.com/dani-garcia/vaultwarden), [Nextcloud](https://github.com/nextcloud), [Syncthing](https://github.com/syncthing/syncthing), [Grafana](https://github.com/grafana/grafana), [Gitea](https://github.com/go-gitea/gitea)... You may not want to expose your public IP address to the internet. Especially considering some self-hosted platforms such as [Plex](https://www.plex.tv/) has been exploited with code execution [vulnerabilities](https://www.cvedetails.com/vulnerability-list.php?vendor_id=14994). You may consider to protect it behind Tor (however this isn't full proof).
+
+## Common Localrelay Use Cases
+
+1. **YOUR HOME LAB AWAY FROM HOME**<br/>
+Localrelay is commonly used with failover proxies to allow for custom routing rules based on network connectivity. Connect directly to your home lab via the IP when on your home network, and when away, connect via a hop server or proxy!
+
+> When **home connect directly to the IP**, when away from home **connect with Tor**! Or when away connect via a hop server, or several.
+
+2. **FORCE APPLICATIONS TO USE TOR**<br/>
+Another use of Localrelay is force an application which doesn't allow for proxies to use one. For example, you can force Bitwarden to connect over Tor, or force Nextcloud to do the same.
+
+> Protect your IP and force applications to use SOCKS5 proxies even when they don't natively support it, all possible with Localrelay.
+
+3. **FAILOVER ROUTING**<br/>
+Prevent service downtime by setting up failover relays for TCP, UDP, HTTP or HTTPS destinations. Localrelay will automatically pick the next available destination and route your traffic over it.
+
+> Stop downtime, setup failover routing to ensure you always have a route to your destination. You can even setup proxy failover, if one SOCKS proxy fails, use another automatically! All can be configured exactly how you wish with a simple config file.
+
+4. **LOADBALANCING WITH FAILOVER**<br/>
+Distribute your load evenly, or bias using weights, with Localrelay load balancer.
+
+> Load balance your server connections for HTTP(s), TCP, or UDP. Or setup your browser to load balance between SOCKS5 proxies, giving you a new IP address per website you visit! 
+
+---
+
+If you self host a service for example; [Bitwarden](https://github.com/dani-garcia/vaultwarden), [Nextcloud](https://github.com/nextcloud), [Syncthing](https://github.com/syncthing/syncthing), [Grafana](https://github.com/grafana/grafana), [Gitea](https://github.com/go-gitea/gitea)... You may not want to expose your public IP address to the internet, you may prefer to protect it behind Tor.
 
 Access your local or remote services securely over [Tor](https://www.torproject.org/) without needing to port forward.
 
@@ -27,48 +53,43 @@ Many apps such as Nextcloud, Termis and Bitwarden do not allow you to specify a 
 
 When at **home connect locally**, when away **connect over Tor**. Securely connect remotely over Tor without port forwarding AND when at home connect directly with high speeds.
 
-## This Repository
+### Features
+- Proxy TCP, UDP, HTTP, and HTTPS connections
+- Use SOCKS5 proxies for all remote hosts, some or none, completely customisable!
+- Load balance.
+- Failover.
+- Failover with SOCKS5 proxies.
+- Run relays in the background and start at boot.
+- View active connections, source, destination, relay and active duration.
+- View each relay's bandwidth live (auto updating stats page).
+- Drop connections via the CLI.
+- Drop all connections from a specified IP.
+- Stop, start, restart relays ran by the service.
+- CLI to create relay configs.
+- Built in HTTP API over a unix socket.
+- View all connected IP addresses.
 
-This repository contains the library written in Go, for it's cross platform capabilities, and contains the CLI application which can be ran on all major operating systems including [Android via Termux](https://termux.com/).
+### Manage the Localrelay Service
 
-For examples of API usage visit [examples/](https://github.com/go-compile/localrelay/tree/master/examples).
+You can optionally install Localrelay as a service/daemon on Windows, Mac, Linux, and Unix other like systems to **run your relays in the background** and start at boot. 
 
-## Library Features
 
-Min Go version: `v1.17`
-- Create relays with custom remote address
-- Proxy remote address through SOCKS5 proxy
-- Close relay concurrently
-- Verbose logging with custom output (io.Writer)
-- Multiple failover proxies for TCP relay
-- Failovers for TCP relays
-- Select which remote will connect via a proxy
-- HTTP relay
-  - Http to https
-  - Header modification
-  - Useragent spoofing
-  - Accept language spoofing
-  - Proxy using socks5
-- Metrics
-  - Upload/Download
-  - Total connections
-  - Active connections
-  - Dialler: successes/failures
-  - Concurrent safe
-  - Dialler 10 point average response time
-    - When using Tor this is the circuit build time
+| Reverse Proxy Screenshots |
+|:--:|
+| ![Localrelay CLI status command](./.github/images/localrelay_status2-fs8.png) |
+| ![Localrelay CLI monitor proxies](./.github/images/localrelay_monitor-fs8.png) |
+| ![Localrelay CLI view connected IP addresses to relays](./.github/images/localrelay_conns_ips-fs8.png) |
+| ![Relay spoofing useragent & using Tor](./examples/http-privacy/access-tor.png)|
 
-## Privacy Proxies
+### Install & Build
 
-Proxy your services whilst stripping personal information such as User-Agent, accept language or even cookies. Route the traffic through Tor to access the service anywhere in the word even behind a firewall.
+To install Localrelay you can either build from source, or use one of the installers.
 
-<div align="center">
-
-![Relay spoofing useragent & using Tor](/examples/http-privacy/access-tor.png)
-
-![Relay spoofing useragent & accept language](/examples/http-privacy/ifconfig.me.png)
-
-</div>
+- [Install Localrelay for Windows](https://github.com/go-compile/localrelay/wiki/Install)
+- [Install Localrelay for Ubuntu and Debian](https://github.com/go-compile/localrelay/wiki/Install)
+- [Install Localrelay for Android](https://github.com/go-compile/localrelay/wiki/Install)
+- [Install Localrelay Universal Linux](https://github.com/go-compile/localrelay/wiki/Install)
+- [Install Localrelay for Mac](https://github.com/go-compile/localrelay/wiki/Install)
 
 ## CLI Usage
 
@@ -121,22 +142,6 @@ localrelay new onion -host 127.0.0.1:8080 -destination 2gzyxa5ihm7nsggfxnu52rck2
 # Create a failover TCP relay with one remote accessed via Tor
 localrelay new onion -host 127.0.0.1:8080 -destination 192.168.1.240:80,2gzyxa5ihm7nsggfxnu52rck2vv4rvmdlkiu3zzui5du4xyclen53wid.onion:80 -failover -ignore_proxy=0 -proxy socks5://127.0.0.1:9050
 ```
-
-<div align="center">
-
-> localrelay status
-
-![Localrelay status](.github/images/service.status.png)
-
-</div>
-
-<div align="center">
-
-> localrelay monitor
-
-![Localrelay status](.github/images/monitor.png)
-
-</div>
 
 <div align="center">
 <br>
